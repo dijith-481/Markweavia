@@ -9,6 +9,12 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@codemirror/lang-markdown": "^6.3.2",
+    "@codemirror/language-data": "^6.5.1",
+    "@codemirror/state": "^6.5.2",
+    "@codemirror/theme-one-dark": "^6.1.2",
+    "@codemirror/view": "^6.36.8",
+    "@uiw/react-codemirror": "^4.23.12",
     "next": "15.3.2",
     "postcss": "^8.5.3",
     "react": "^19.0.0",

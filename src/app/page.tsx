@@ -2,10 +2,25 @@
 "use client"; // This is a client component
 
 import React, { useState, useEffect, useCallback, useRef } from "react";
-import ReactMarkdown from "react-markdown";
+
+import ReactMarkdown, { Components } from "react-markdown";
 import remarkGfm from "remark-gfm";
 import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
-import { materialDark } from "react-syntax-highlighter/dist/esm/styles/prism"; // Choose a theme
+import { materialDark as prismMaterialDark } from "react-syntax-highlighter/dist/esm/styles/prism";
+import CodeMirror from "@uiw/react-codemirror";
+import { markdown as markdownLang } from "@codemirror/lang-markdown";
+import { languages } from "@codemirror/language-data";
+import { CSSProperties } from "react";
+import { oneDark } from "@codemirror/theme-one-dark"; // CodeMirror theme
+import { EditorView } from "@codemirror/view";
+
+interface CodeComponentProps {
+  node?: any;
+  inline?: boolean;
+  className?: string;
+  children?: React.ReactNode;
+  [key: string]: any;
+}
 
 // Helper function for word count
 const countWords = (text: string): number => {
@@ -15,6 +30,8 @@ const countWords = (text: string): number => {
   return text.trim().split(/\s+/).length;
 };
 
+const LOCAL_STORAGE_KEY = "markdown-editor-content";
+
 export default function HomePage() {
   const [markdownText, setMarkdownText] = useState<string>("");
   const [wordCount, setWordCount] = useState<number>(0);
@@ -23,14 +40,19 @@ export default function HomePage() {
     useState<boolean>(false);
   const saveAsDropdownRef = useRef<HTMLDivElement>(null); // For click outside
 
-  const initialMarkdown = `# Welcome to Markdown Editor!
+  useEffect(() => {
+    const savedContent = localStorage.getItem(LOCAL_STORAGE_KEY);
+    const initialContent = `# Welcome to Markdown Editor!
 
 Type your Markdown here. Changes will appear in the preview pane.
 
-## Features (Phase 1)
+## Features
 - Live Preview
 - Word Count
 - Code Syntax Highlighting
+- Download as .md (Ctrl+S or via Save As menu)
+- Line Numbers in Editor
+- Auto-saving to Local Storage
 
 \`\`\`javascript
 function greet(name) {
@@ -38,32 +60,38 @@ function greet(name) {
 }
 greet('World');
 \`\`\`
-
-> This is a blockquote.
-
-- Item 1
-- Item 2
-  - Sub-item
 `;
+    if (savedContent) {
+      setMarkdownText(savedContent);
+    } else {
+      setMarkdownText(initialContent);
+    }
+  }, []); // Empty dependency array means this runs once on mount
+  // END: CHANGED_CODE_BLOCK - Load content from localStorage
 
-  // Load initial content or saved content (for future use)
+  // START: CHANGED_CODE_BLOCK - Auto-save content to localStorage
   useEffect(() => {
-    // For now, just set initial markdown.
-    // Later, we can load from localStorage here.
-    setMarkdownText(initialMarkdown);
-  }, [initialMarkdown]); // Dependency array ensures this runs once on mount
+    // Debounce saving to avoid excessive localStorage writes
+    const handler = setTimeout(() => {
+      if (markdownText !== undefined) {
+        // Ensure markdownText is not initial undefined
+        localStorage.setItem(LOCAL_STORAGE_KEY, markdownText);
+      }
+    }, 500); // Save 500ms after the last change
+
+    return () => {
+      clearTimeout(handler);
+    };
+  }, [markdownText]);
 
   // Update word count whenever markdownText changes
   useEffect(() => {
     setWordCount(countWords(markdownText));
   }, [markdownText]);
 
-  const handleMarkdownChange = useCallback(
-    (event: React.ChangeEvent<HTMLTextAreaElement>) => {
-      setMarkdownText(event.target.value);
-    },
-    [],
-  );
+  const handleMarkdownChange = useCallback((value: string) => {
+    setMarkdownText(value);
+  }, []);
   const handleDownloadMd = useCallback(() => {
     if (!markdownText.trim()) {
       alert("Nothing to download!");
@@ -138,6 +166,60 @@ greet('World');
     };
   }, [isSaveAsDropdownOpen]);
 
+  const editorExtensions = [
+    markdownLang({ codeLanguages: languages }),
+    oneDark, // Theme
+    EditorView.lineWrapping, // Enable line wrapping
+    EditorView.theme({
+      // Custom styling for CodeMirror
+      "&": {
+        fontSize: "14px", // Match previous textarea font size
+        backgroundColor: "#2d3748", // Tailwind gray-700
+        color: "#e2e8f0", // Tailwind gray-100 (adjust as needed)
+        height: "100%", // Make editor fill its container
+      },
+      ".cm-content": {
+        fontFamily: "monospace",
+        caretColor: "#fff",
+      },
+      ".cm-gutters": {
+        backgroundColor: "#1a202c", // Tailwind gray-900 (or a slightly darker gray)
+        color: "#a0aec0", // Tailwind gray-500
+        borderRight: "1px solid #4a5568", // Tailwind gray-600
+      },
+      ".cm-activeLineGutter": {
+        backgroundColor: "#2c5282", // A highlight color (e.g., blue-700)
+      },
+      ".cm-lineNumbers .cm-gutterElement": {
+        padding: "0 8px 0 8px", // Adjust gutter padding
+      },
+      ".cm-focused": {
+        outline: "none !important", // Remove CM default outline
+      },
+      // You might need more specific styling here to match Nord theme if oneDark isn't close enough
+    }),
+  ];
+  const markdownComponents: Components = {
+    code(props: CodeComponentProps) {
+      const { node, inline, className, children, ...rest } = props;
+      const match = /language-(\w+)/.exec(className || "");
+      return !inline && match ? (
+        <SyntaxHighlighter
+          style={prismMaterialDark as { [key: string]: CSSProperties }} // Explicit cast for the style prop
+          language={match[1]}
+          PreTag="div"
+          {...props} // Spread remaining props
+        >
+          {String(children).replace(/\n$/, "")}
+        </SyntaxHighlighter>
+      ) : (
+        <code className={className} {...props}>
+          {children}
+        </code>
+      );
+    },
+  };
+
   return (
     <div className="flex flex-col h-screen bg-gray-800 text-white">
       {/* Header Area - Placeholder for future buttons */}
@@ -205,16 +287,29 @@ greet('World');
 
       <main className="flex flex-1 overflow-hidden">
         {/* Editor Pane */}
-        <div className="w-1/2 p-4 flex flex-col border-r border-gray-700">
-          <textarea
-            value={markdownText}
-            onChange={handleMarkdownChange}
-            placeholder="Type your Markdown here..."
-            className="flex-1 w-full p-3 bg-gray-700 text-gray-100 rounded-md resize-none focus:outline-none focus:ring-2 focus:ring-blue-500 font-mono text-sm leading-relaxed"
-            spellCheck="false"
-          />
+        <div className="w-1/2 flex flex-col border-r border-gray-700 overflow-hidden">
+          {/* The p-4 was moved to CodeMirror container below for better height management */}
+          <div className="flex-1 w-full overflow-auto p-0">
+            {" "}
+            {/* Added p-0 and overflow-auto to parent */}
+            <CodeMirror
+              value={markdownText}
+              height="100%" // Crucial for CodeMirror to fill parent
+              extensions={editorExtensions}
+              onChange={handleMarkdownChange}
+              theme={oneDark} // Apply the theme explicitly if not done in extensions
+              basicSetup={{
+                lineNumbers: true,
+                foldGutter: true,
+                autocompletion: true,
+                highlightActiveLine: true,
+                highlightActiveLineGutter: true,
+                // You can customize more basicSetup options here
+              }}
+              className="h-full text-sm" // Ensure h-full and potentially font-size
+            />
+          </div>
         </div>
-
         {/* Preview Pane */}
         <div className="w-1/2 p-4 overflow-y-auto">
           <div className="prose prose-invert max-w-none prose-sm sm:prose-base lg:prose-lg xl:prose-xl 2xl:prose-2xl">
@@ -224,28 +319,12 @@ greet('World');
             */}
             <ReactMarkdown
               remarkPlugins={[remarkGfm]}
-              components={{
-                code({ node, inline, className, children, ...props }) {
-                  const match = /language-(\w+)/.exec(className || "");
-                  return !inline && match ? (
-                    <SyntaxHighlighter
-                      style={materialDark} // Choose your style
-                      language={match[1]}
-                      PreTag="div"
-                      {...props}
-                    >
-                      {String(children).replace(/\n$/, "")}
-                    </SyntaxHighlighter>
-                  ) : (
-                    <code className={className} {...props}>
-                      {children}
-                    </code>
-                  );
-                },
-              }}
+              // START: CHANGED_CODE_BLOCK - Use typed components
+              components={markdownComponents}
+              // END: CHANGED_CODE_BLOCK - Use typed components
             >
               {markdownText}
-            </ReactMarkdown>
+            </ReactMarkdown>{" "}
           </div>
         </div>
       </main>
