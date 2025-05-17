@@ -1,102 +1,124 @@
-import Image from "next/image";
+// src/app/page.tsx
+"use client"; // This is a client component
 
-export default function Home() {
+import React, { useState, useEffect, useCallback } from "react";
+import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
+import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
+import { materialDark } from "react-syntax-highlighter/dist/esm/styles/prism"; // Choose a theme
+
+// Helper function for word count
+const countWords = (text: string): number => {
+  if (!text.trim()) {
+    return 0;
+  }
+  return text.trim().split(/\s+/).length;
+};
+
+export default function HomePage() {
+  const [markdownText, setMarkdownText] = useState<string>("");
+  const [wordCount, setWordCount] = useState<number>(0);
+
+  const initialMarkdown = `# Welcome to Markdown Editor!
+
+Type your Markdown here. Changes will appear in the preview pane.
+
+## Features (Phase 1)
+- Live Preview
+- Word Count
+- Code Syntax Highlighting
+
+\`\`\`javascript
+function greet(name) {
+  console.log(\`Hello, \${name}!\`);
+}
+greet('World');
+\`\`\`
+
+> This is a blockquote.
+
+- Item 1
+- Item 2
+  - Sub-item
+`;
+
+  // Load initial content or saved content (for future use)
+  useEffect(() => {
+    // For now, just set initial markdown.
+    // Later, we can load from localStorage here.
+    setMarkdownText(initialMarkdown);
+  }, [initialMarkdown]); // Dependency array ensures this runs once on mount
+
+  // Update word count whenever markdownText changes
+  useEffect(() => {
+    setWordCount(countWords(markdownText));
+  }, [markdownText]);
+
+  const handleMarkdownChange = useCallback(
+    (event: React.ChangeEvent<HTMLTextAreaElement>) => {
+      setMarkdownText(event.target.value);
+    },
+    [],
+  );
+
   return (
-    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-      <main className="flex flex-col gap-[32px] row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="list-inside list-decimal text-sm/6 text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
-          <li className="mb-2 tracking-[-.01em]">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-[family-name:var(--font-geist-mono)] font-semibold">
-              src/app/page.tsx
-            </code>
-            .
-          </li>
-          <li className="tracking-[-.01em]">
-            Save and see your changes instantly.
-          </li>
-        </ol>
+    <div className="flex flex-col h-screen bg-gray-800 text-white">
+      {/* Header Area - Placeholder for future buttons */}
+      <header className="p-4 bg-gray-900 shadow-md flex justify-between items-center">
+        <h1 className="text-xl font-semibold">Markdown Editor</h1>
+        {/* Future: Save As, Theme Toggle buttons here */}
+      </header>
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:w-auto"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 w-full sm:w-auto md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
+      <main className="flex flex-1 overflow-hidden">
+        {/* Editor Pane */}
+        <div className="w-1/2 p-4 flex flex-col border-r border-gray-700">
+          <textarea
+            value={markdownText}
+            onChange={handleMarkdownChange}
+            placeholder="Type your Markdown here..."
+            className="flex-1 w-full p-3 bg-gray-700 text-gray-100 rounded-md resize-none focus:outline-none focus:ring-2 focus:ring-blue-500 font-mono text-sm leading-relaxed"
+            spellCheck="false"
+          />
+        </div>
+
+        {/* Preview Pane */}
+        <div className="w-1/2 p-4 overflow-y-auto">
+          <div className="prose prose-invert max-w-none prose-sm sm:prose-base lg:prose-lg xl:prose-xl 2xl:prose-2xl">
+            {/* 
+              `prose-invert` for dark mode with Tailwind Typography
+              Adjust `max-w-none` and prose sizes as needed
+            */}
+            <ReactMarkdown
+              remarkPlugins={[remarkGfm]}
+              components={{
+                code({ node, inline, className, children, ...props }) {
+                  const match = /language-(\w+)/.exec(className || "");
+                  return !inline && match ? (
+                    <SyntaxHighlighter
+                      style={materialDark} // Choose your style
+                      language={match[1]}
+                      PreTag="div"
+                      {...props}
+                    >
+                      {String(children).replace(/\n$/, "")}
+                    </SyntaxHighlighter>
+                  ) : (
+                    <code className={className} {...props}>
+                      {children}
+                    </code>
+                  );
+                },
+              }}
+            >
+              {markdownText}
+            </ReactMarkdown>
+          </div>
         </div>
       </main>
-      <footer className="row-start-3 flex gap-[24px] flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
+
+      {/* Footer Area - Word Count */}
+      <footer className="p-2 bg-gray-900 text-right text-sm pr-6">
+        Word Count: {wordCount}
       </footer>
     </div>
   );
