@@ -14,14 +14,19 @@
     "@codemirror/state": "^6.5.2",
     "@codemirror/theme-one-dark": "^6.1.2",
     "@codemirror/view": "^6.36.8",
+    "@replit/codemirror-vim": "^6.3.0",
     "@uiw/react-codemirror": "^4.23.12",
+    "html2canvas": "^1.4.1",
+    "jspdf": "^3.0.1",
     "next": "15.3.2",
     "postcss": "^8.5.3",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "react-markdown": "^10.1.0",
     "react-syntax-highlighter": "^15.6.1",
-    "remark-gfm": "^4.0.1"
+    "rehype-stringify": "^10.0.1",
+    "remark-gfm": "^4.0.1",
+    "remark-sectionize": "^2.1.0"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",

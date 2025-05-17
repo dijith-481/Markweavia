@@ -1,4 +1,3 @@
-// src/app/page.tsx
 "use client"; // This is a client component
 
 import React, { useState, useEffect, useCallback, useRef } from "react";
@@ -13,6 +12,11 @@ import { languages } from "@codemirror/language-data";
 import { CSSProperties } from "react";
 import { oneDark } from "@codemirror/theme-one-dark"; // CodeMirror theme
 import { EditorView } from "@codemirror/view";
+import {
+  exportToPdf,
+  exportToSlides,
+  slideTemplates,
+} from "./utils/export-utils";
 
 interface CodeComponentProps {
   node?: any;
@@ -38,7 +42,11 @@ export default function HomePage() {
 
   const [isSaveAsDropdownOpen, setIsSaveAsDropdownOpen] =
     useState<boolean>(false);
-  const saveAsDropdownRef = useRef<HTMLDivElement>(null); // For click outside
+  const [isTemplateDropdownOpen, setIsTemplateDropdownOpen] =
+    useState<boolean>(false);
+  const saveAsDropdownRef = useRef<HTMLDivElement>(null);
+  const templateDropdownRef = useRef<HTMLDivElement>(null);
+  const previewRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const savedContent = localStorage.getItem(LOCAL_STORAGE_KEY);
@@ -66,25 +74,20 @@ greet('World');
     } else {
       setMarkdownText(initialContent);
     }
-  }, []); // Empty dependency array means this runs once on mount
-  // END: CHANGED_CODE_BLOCK - Load content from localStorage
+  }, []);
 
-  // START: CHANGED_CODE_BLOCK - Auto-save content to localStorage
   useEffect(() => {
-    // Debounce saving to avoid excessive localStorage writes
     const handler = setTimeout(() => {
       if (markdownText !== undefined) {
-        // Ensure markdownText is not initial undefined
         localStorage.setItem(LOCAL_STORAGE_KEY, markdownText);
       }
-    }, 500); // Save 500ms after the last change
+    }, 500);
 
     return () => {
       clearTimeout(handler);
     };
   }, [markdownText]);
 
-  // Update word count whenever markdownText changes
   useEffect(() => {
     setWordCount(countWords(markdownText));
   }, [markdownText]);
@@ -92,6 +95,7 @@ greet('World');
   const handleMarkdownChange = useCallback((value: string) => {
     setMarkdownText(value);
   }, []);
+
   const handleDownloadMd = useCallback(() => {
     if (!markdownText.trim()) {
       alert("Nothing to download!");
@@ -111,39 +115,62 @@ greet('World');
     setIsSaveAsDropdownOpen(false);
   }, [markdownText]);
 
-  const handleSaveAsPdf = () => {
-    alert("Save as PDF coming soon!");
+  const handleSaveAsPdf = async () => {
+    const success = await exportToPdf(markdownText, previewRef);
+    if (!success) {
+      alert("Failed to generate PDF. Please try again.");
+    }
     setIsSaveAsDropdownOpen(false);
   };
 
-  const handleSaveAsSlides = () => {
-    alert("Save as Slides (ODP?) coming soon!");
+  const handleSaveAsSlides = async () => {
+    const success = await exportToSlides(markdownText);
+    if (!success) {
+      alert("Failed to generate slides. Please try again.");
+    }
     setIsSaveAsDropdownOpen(false);
+  };
+
+  const loadTemplate = (templateKey: keyof typeof slideTemplates) => {
+    if (
+      markdownText.trim() &&
+      !confirm("This will replace your current content. Continue?")
+    ) {
+      return;
+    }
+    setMarkdownText(slideTemplates[templateKey]);
+    setIsTemplateDropdownOpen(false);
   };
 
   const toggleSaveAsDropdown = () => {
     setIsSaveAsDropdownOpen((prev) => !prev);
+    setIsTemplateDropdownOpen(false); // Close template dropdown if open
+  };
+
+  const toggleTemplateDropdown = () => {
+    setIsTemplateDropdownOpen((prev) => !prev);
+    setIsSaveAsDropdownOpen(false); // Close save as dropdown if open
   };
 
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
       if ((event.ctrlKey || event.metaKey) && event.key === "s") {
-        event.preventDefault(); // Prevent browser's default save dialog
+        event.preventDefault();
         handleDownloadMd();
       }
 
-      if (event.key === "Escape" && isSaveAsDropdownOpen) {
-        setIsSaveAsDropdownOpen(false);
+      if (event.key === "Escape") {
+        if (isSaveAsDropdownOpen) setIsSaveAsDropdownOpen(false);
+        if (isTemplateDropdownOpen) setIsTemplateDropdownOpen(false);
       }
     };
 
     window.addEventListener("keydown", handleKeyDown);
 
-    // Cleanup function to remove the event listener when the component unmounts
     return () => {
       window.removeEventListener("keydown", handleKeyDown);
     };
-  }, [handleDownloadMd, isSaveAsDropdownOpen]); // Add handleDownloadMd to dependency array
+  }, [handleDownloadMd, isSaveAsDropdownOpen, isTemplateDropdownOpen]);
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -153,9 +180,16 @@ greet('World');
       ) {
         setIsSaveAsDropdownOpen(false);
       }
+
+      if (
+        templateDropdownRef.current &&
+        !templateDropdownRef.current.contains(event.target as Node)
+      ) {
+        setIsTemplateDropdownOpen(false);
+      }
     };
 
-    if (isSaveAsDropdownOpen) {
+    if (isSaveAsDropdownOpen || isTemplateDropdownOpen) {
       document.addEventListener("mousedown", handleClickOutside);
     } else {
       document.removeEventListener("mousedown", handleClickOutside);
@@ -164,69 +198,181 @@ greet('World');
     return () => {
       document.removeEventListener("mousedown", handleClickOutside);
     };
-  }, [isSaveAsDropdownOpen]);
+  }, [isSaveAsDropdownOpen, isTemplateDropdownOpen]);
 
   const editorExtensions = [
     markdownLang({ codeLanguages: languages }),
-    oneDark, // Theme
-    EditorView.lineWrapping, // Enable line wrapping
+    oneDark,
+    EditorView.lineWrapping,
     EditorView.theme({
-      // Custom styling for CodeMirror
       "&": {
-        fontSize: "14px", // Match previous textarea font size
-        backgroundColor: "#2d3748", // Tailwind gray-700
-        color: "#e2e8f0", // Tailwind gray-100 (adjust as needed)
-        height: "100%", // Make editor fill its container
+        fontSize: "14px",
+        backgroundColor: "#2d3748",
+        color: "#e2e8f0",
+        height: "100%",
       },
       ".cm-content": {
         fontFamily: "monospace",
         caretColor: "#fff",
       },
       ".cm-gutters": {
-        backgroundColor: "#1a202c", // Tailwind gray-900 (or a slightly darker gray)
-        color: "#a0aec0", // Tailwind gray-500
-        borderRight: "1px solid #4a5568", // Tailwind gray-600
+        backgroundColor: "#1a202c",
+        color: "#a0aec0",
+        borderRight: "1px solid #4a5568",
       },
       ".cm-activeLineGutter": {
-        backgroundColor: "#2c5282", // A highlight color (e.g., blue-700)
+        backgroundColor: "#2c5282",
       },
       ".cm-lineNumbers .cm-gutterElement": {
-        padding: "0 8px 0 8px", // Adjust gutter padding
+        padding: "0 8px 0 8px",
       },
       ".cm-focused": {
-        outline: "none !important", // Remove CM default outline
+        outline: "none !important",
       },
-      // You might need more specific styling here to match Nord theme if oneDark isn't close enough
     }),
   ];
+
+  // Enhanced markdown components with Tailwind v4 styling
   const markdownComponents: Components = {
     code(props: CodeComponentProps) {
       const { node, inline, className, children, ...rest } = props;
       const match = /language-(\w+)/.exec(className || "");
       return !inline && match ? (
         <SyntaxHighlighter
-          style={prismMaterialDark as { [key: string]: CSSProperties }} // Explicit cast for the style prop
+          style={prismMaterialDark as Record<string, CSSProperties>}
           language={match[1]}
           PreTag="div"
-          {...props} // Spread remaining props
+          customStyle={{ borderRadius: "0.375rem", margin: "1rem 0" }}
+          {...rest}
         >
           {String(children).replace(/\n$/, "")}
         </SyntaxHighlighter>
       ) : (
-        <code className={className} {...props}>
+        <code
+          className={`bg-gray-700 px-1 rounded ${className || ""}`}
+          {...rest}
+        >
           {children}
         </code>
       );
     },
+    h1: ({ node, ...props }) => (
+      <h1
+        className="text-3xl font-bold mt-6 mb-4 pb-2 border-b border-gray-600"
+        {...props}
+      />
+    ),
+    h2: ({ node, ...props }) => (
+      <h2
+        className="text-2xl font-semibold mt-5 mb-3 pb-1 border-b border-gray-700"
+        {...props}
+      />
+    ),
+    h3: ({ node, ...props }) => (
+      <h3 className="text-xl font-medium mt-4 mb-2" {...props} />
+    ),
+    h4: ({ node, ...props }) => (
+      <h4 className="text-lg font-medium mt-3 mb-1" {...props} />
+    ),
+    p: ({ node, ...props }) => <p className="my-3 leading-7" {...props} />,
+    ul: ({ node, ...props }) => (
+      <ul className="list-disc pl-5 my-4 space-y-1" {...props} />
+    ),
+    ol: ({ node, ...props }) => (
+      <ol className="list-decimal pl-5 my-4 space-y-1" {...props} />
+    ),
+    li: ({ node, ...props }) => <li className="ml-1" {...props} />,
+    blockquote: ({ node, ...props }) => (
+      <blockquote
+        className="border-l-4 border-gray-500 pl-4 py-1 my-4 italic bg-gray-800 rounded-r"
+        {...props}
+      />
+    ),
+    a: ({ node, ...props }) => (
+      <a
+        className="text-blue-400 hover:text-blue-300 underline decoration-1 underline-offset-2"
+        {...props}
+      />
+    ),
+    table: ({ node, ...props }) => (
+      <div className="overflow-x-auto my-4">
+        <table
+          className="w-full border-collapse border border-gray-700"
+          {...props}
+        />
+      </div>
+    ),
+    thead: ({ node, ...props }) => <thead className="bg-gray-800" {...props} />,
+    tbody: ({ node, ...props }) => <tbody {...props} />,
+    tr: ({ node, ...props }) => (
+      <tr className="border-b border-gray-700 even:bg-gray-800/30" {...props} />
+    ),
+    th: ({ node, ...props }) => (
+      <th className="px-4 py-2 text-left font-medium" {...props} />
+    ),
+    td: ({ node, ...props }) => <td className="px-4 py-2" {...props} />,
+    img: ({ node, ...props }) => (
+      <img
+        className="max-w-full h-auto rounded my-4"
+        {...props}
+        alt={props.alt || "Image"}
+      />
+    ),
+    hr: ({ node, ...props }) => (
+      <hr className="my-8 border-t border-gray-700" {...props} />
+    ),
+    strong: ({ node, ...props }) => (
+      <strong className="font-semibold" {...props} />
+    ),
+    em: ({ node, ...props }) => <em className="italic" {...props} />,
   };
 
   return (
     <div className="flex flex-col h-screen bg-gray-800 text-white">
-      {/* Header Area - Placeholder for future buttons */}
       <header className="p-4 bg-gray-900 shadow-md flex justify-between items-center">
         <h1 className="text-xl font-semibold">Markdown Editor</h1>
-        {/* Future: Save As, Theme Toggle buttons here */}
-        <div className="flex items-center space-x-2">
+        <div className="flex items-center space-x-3">
+          {/* Template dropdown */}
+          <div className="relative" ref={templateDropdownRef}>
+            <button
+              onClick={toggleTemplateDropdown}
+              className="px-3 py-1.5 bg-purple-600 hover:bg-purple-700 text-white text-sm rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-opacity-50 flex items-center"
+              title="Load slide template"
+              aria-haspopup="true"
+              aria-expanded={isTemplateDropdownOpen}
+            >
+              Templates
+              <span
+                className={`ml-1 transform transition-transform duration-200 ${isTemplateDropdownOpen ? "rotate-180" : "rotate-0"}`}
+              >
+                ▼
+              </span>
+            </button>
+            {isTemplateDropdownOpen && (
+              <div className="absolute left-0 mt-2 w-48 bg-gray-700 rounded-md shadow-lg py-1 z-50 ring-1 ring-black ring-opacity-5">
+                <button
+                  onClick={() => loadTemplate("basic")}
+                  className="block w-full text-left px-4 py-2 text-sm text-gray-100 hover:bg-gray-600 hover:text-white"
+                >
+                  Basic Slides
+                </button>
+                <button
+                  onClick={() => loadTemplate("professional")}
+                  className="block w-full text-left px-4 py-2 text-sm text-gray-100 hover:bg-gray-600 hover:text-white"
+                >
+                  Professional Slides
+                </button>
+                <button
+                  onClick={() => loadTemplate("academic")}
+                  className="block w-full text-left px-4 py-2 text-sm text-gray-100 hover:bg-gray-600 hover:text-white"
+                >
+                  Academic Slides
+                </button>
+              </div>
+            )}
+          </div>
+
+          {/* Save As dropdown */}
           <div className="relative" ref={saveAsDropdownRef}>
             <button
               onClick={toggleSaveAsDropdown}
@@ -235,7 +381,7 @@ greet('World');
               aria-haspopup="true"
               aria-expanded={isSaveAsDropdownOpen}
             >
-              Save as{" "}
+              Save as
               <span
                 className={`ml-1 transform transition-transform duration-200 ${isSaveAsDropdownOpen ? "rotate-180" : "rotate-0"}`}
               >
@@ -262,74 +408,51 @@ greet('World');
                   onClick={handleSaveAsSlides}
                   className="block w-full text-left px-4 py-2 text-sm text-gray-100 hover:bg-gray-600 hover:text-white"
                 >
-                  Slides (.odp?)
+                  Slides (.html)
                 </button>
               </div>
             )}
           </div>
-          {/* "Save As" Dropdown - Basic Structure */}
-
-          {/* <button */}
-          {/*   onClick={handleDownloadMd} */}
-          {/*   className="px-3 py-1.5 bg-green-600 hover:bg-green-700 text-white text-sm rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-opacity-50" */}
-          {/*   title="Download as Markdown file (.md)" */}
-          {/* > */}
-          {/*   Download .md */}
-          {/* </button> */}
-
-          {/* Placeholder for future Light/Dark Toggle */}
-          <div
-            className="w-8 h-8 bg-gray-700 rounded-full cursor-pointer"
-            title="Theme toggle (coming soon)"
-          ></div>
         </div>
       </header>
 
       <main className="flex flex-1 overflow-hidden">
-        {/* Editor Pane */}
         <div className="w-1/2 flex flex-col border-r border-gray-700 overflow-hidden">
-          {/* The p-4 was moved to CodeMirror container below for better height management */}
           <div className="flex-1 w-full overflow-auto p-0">
-            {" "}
-            {/* Added p-0 and overflow-auto to parent */}
             <CodeMirror
               value={markdownText}
-              height="100%" // Crucial for CodeMirror to fill parent
+              height="100%"
               extensions={editorExtensions}
               onChange={handleMarkdownChange}
-              theme={oneDark} // Apply the theme explicitly if not done in extensions
+              theme={oneDark}
               basicSetup={{
                 lineNumbers: true,
                 foldGutter: true,
                 autocompletion: true,
                 highlightActiveLine: true,
                 highlightActiveLineGutter: true,
-                // You can customize more basicSetup options here
               }}
-              className="h-full text-sm" // Ensure h-full and potentially font-size
+              className="h-full text-sm"
             />
           </div>
         </div>
-        {/* Preview Pane */}
-        <div className="w-1/2 p-4 overflow-y-auto">
-          <div className="prose prose-invert max-w-none prose-sm sm:prose-base lg:prose-lg xl:prose-xl 2xl:prose-2xl">
-            {/* 
-              `prose-invert` for dark mode with Tailwind Typography
-              Adjust `max-w-none` and prose sizes as needed
-            */}
+        <div className="w-1/2 p-4 overflow-y-auto bg-gray-900">
+          <div
+            ref={previewRef}
+            className="prose prose-invert prose-sm sm:prose-base max-w-3xl mx-auto"
+          >
             <ReactMarkdown
               remarkPlugins={[remarkGfm]}
-              // START: CHANGED_CODE_BLOCK - Use typed components
               components={markdownComponents}
-              // END: CHANGED_CODE_BLOCK - Use typed components
             >
               {markdownText}
-            </ReactMarkdown>{" "}
+            </ReactMarkdown>
           </div>
         </div>
       </main>
 
-      {/* Footer Area - Word Count */}
+      {/* No need for custom global styles when using Tailwind's prose classes */}
+
       <footer className="p-2 bg-gray-900 text-right text-sm pr-6">
         Word Count: {wordCount}
       </footer>
