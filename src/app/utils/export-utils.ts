@@ -1,7 +1,6 @@
 import { jsPDF } from "jspdf";
 import html2canvas from "html2canvas";
 import remarkParse from "remark-parse";
-import remarkSlide from "remark-sectionize";
 import { unified } from "unified";
 import remarkRehype from "remark-rehype";
 import rehypeStringify from "rehype-stringify";
@@ -16,57 +15,125 @@ export const exportToPdf = async (
   markdownContent: string,
   previewRef: React.RefObject<HTMLDivElement | null>,
 ) => {
-  try {
-    if (!previewRef.current) {
-      throw new Error("Preview area not available");
-    }
+  if (!previewRef.current) {
+    console.error("Preview area not available for PDF export.");
+    alert("Preview area not available for PDF export.");
+    return false;
+  }
 
-    // Use html2canvas to capture the rendered markdown
-    const canvas = await html2canvas(previewRef.current, {
-      scale: 2, // Higher scale for better quality
+  // const originalStyles = {
+  //   className: previewRef.current.className,
+  //   // You might need to save and restore inline styles if any are critical
+  //   scrollPosition: previewRef.current.scrollTop, // if you want to restore scroll
+  // };
+
+  // Get the actual element to apply styles to
+  const elementToCapture = previewRef.current;
+
+  try {
+    elementToCapture.classList.add("pdf-render-mode");
+
+    const canvas = await html2canvas(elementToCapture, {
+      scale: 2,
       useCORS: true,
       logging: false,
+      windowWidth: elementToCapture.scrollWidth,
+      windowHeight: elementToCapture.scrollHeight,
     });
-
-    // Create PDF with appropriate dimensions
+    elementToCapture.classList.remove("pdf-render-mode");
     const pdf = new jsPDF({
       orientation: "portrait",
-      unit: "mm",
+      unit: "pt",
       format: "a4",
     });
 
-    // Calculate dimensions
-    const imgData = canvas.toDataURL("image/png");
     const pdfWidth = pdf.internal.pageSize.getWidth();
     const pdfHeight = pdf.internal.pageSize.getHeight();
-    const aspectRatio = canvas.height / canvas.width;
+    const canvasWidthInPoints = canvas.width / 2; // Adjust for scale
+    const canvasHeightInPoints = canvas.height / 2; // Adjust for scale
+
+    const aspectRatio = canvasHeightInPoints / canvasWidthInPoints;
+
     const imgWidth = pdfWidth;
-    const imgHeight = pdfWidth * aspectRatio;
-
-    // Add image to PDF
-    let heightLeft = imgHeight;
+    const imgHeight = imgWidth * aspectRatio;
     let position = 0;
-    pdf.addImage(imgData, "PNG", 0, position, imgWidth, imgHeight);
-    heightLeft -= pdfHeight;
 
-    // Add new pages if content overflows
-    while (heightLeft > 0) {
-      position = heightLeft - imgHeight;
-      pdf.addPage();
-      pdf.addImage(imgData, "PNG", 0, position, imgWidth, imgHeight);
-      heightLeft -= pdfHeight;
+    // If the content is shorter than one page, don't stretch it
+    if (imgHeight < pdfHeight) {
+      pdf.addImage(
+        canvas.toDataURL("image/png"),
+        "PNG",
+        0,
+        0,
+        imgWidth,
+        imgHeight,
+      );
+    } else {
+      // Paginate
+      let heightLeft = canvasHeightInPoints; // Use the scaled-down height for pagination logic
+      const pageCanvas = document.createElement("canvas");
+      const pageCtx = pageCanvas.getContext("2d");
+
+      // A4 page dimensions in pixels at 96 DPI (approx) = 595pt x 842pt
+      // We need to scale the canvas section to fit the PDF page width
+      const contentScaleToFitPdfWidth = pdfWidth / canvasWidthInPoints;
+
+      pageCanvas.width = canvas.width; // Use original canvas width for slicing
+      // Calculate slice height based on how much of original canvas fits one PDF page
+      pageCanvas.height = Math.floor(
+        (pdfHeight / contentScaleToFitPdfWidth) * 2,
+      ); // *2 because canvas is scaled up
+
+      while (heightLeft > 0.1) {
+        // Using 0.1 to handle floating point inaccuracies
+        const sliceY = canvas.height / 2 - heightLeft; // Y position on the original scaled canvas
+
+        // Clear and draw the slice onto the temporary pageCanvas
+        pageCtx!.clearRect(0, 0, pageCanvas.width, pageCanvas.height);
+        pageCtx!.drawImage(
+          canvas, // source canvas
+          0, // sx
+          sliceY * 2, // sy (use original canvas coordinates, so *2 for scale)
+          canvas.width, // sWidth
+          Math.min(pageCanvas.height, heightLeft * 2), // sHeight (don't exceed remaining or page height)
+          0, // dx
+          0, // dy
+          pageCanvas.width, // dWidth
+          Math.min(pageCanvas.height, heightLeft * 2), // dHeight
+        );
+
+        const pageImgData = pageCanvas.toDataURL("image/png");
+        if (position > 0) {
+          // position is used to track if it's not the first page
+          pdf.addPage();
+        }
+        pdf.addImage(
+          pageImgData,
+          "PNG",
+          0,
+          0,
+          pdfWidth,
+          pdfHeight *
+            (Math.min(pageCanvas.height, heightLeft * 2) / pageCanvas.height),
+        );
+
+        heightLeft -= pageCanvas.height / 2; // Decrement by the CSS pixel equivalent of the slice
+        position += pdfHeight; // Not strictly needed for addImage(0,0) but good for logic
+      }
     }
 
-    // Save the PDF
     pdf.save("markdown-document.pdf");
     return true;
   } catch (error) {
     console.error("Error generating PDF:", error);
+    // Ensure styles are restored even if an error occurs
+    elementToCapture.classList.remove("pdf-render-mode");
+    // previewRef.current.className = originalStyles.className;
+    alert("Failed to generate PDF. Check console for details.");
     return false;
   }
 };
 
-// Convert Markdown to slide HTML format
 export const convertToSlides = async (markdownContent: string) => {
   try {
     // Split content by horizontal rules or h1/h2 headings

@@ -1,22 +1,22 @@
 "use client"; // This is a client component
 
 import React, { useState, useEffect, useCallback, useRef } from "react";
-
 import ReactMarkdown, { Components } from "react-markdown";
 import remarkGfm from "remark-gfm";
 import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
-import { materialDark as prismMaterialDark } from "react-syntax-highlighter/dist/esm/styles/prism";
+import { nord as prismnord } from "react-syntax-highlighter/dist/esm/styles/prism";
 import CodeMirror from "@uiw/react-codemirror";
 import { markdown as markdownLang } from "@codemirror/lang-markdown";
 import { languages } from "@codemirror/language-data";
 import { CSSProperties } from "react";
-import { oneDark } from "@codemirror/theme-one-dark"; // CodeMirror theme
+import { nord } from "@uiw/codemirror-theme-nord";
 import { EditorView } from "@codemirror/view";
 import {
   exportToPdf,
   exportToSlides,
   slideTemplates,
 } from "./utils/export-utils";
+import { vim } from "@replit/codemirror-vim";
 
 interface CodeComponentProps {
   node?: any;
@@ -26,19 +26,38 @@ interface CodeComponentProps {
   [key: string]: any;
 }
 
-// Helper function for word count
 const countWords = (text: string): number => {
   if (!text.trim()) {
     return 0;
   }
   return text.trim().split(/\s+/).length;
 };
+const countletters = (text: string): number => {
+  if (!text.trim()) {
+    return 0;
+  }
+  return text.trim().length;
+};
 
 const LOCAL_STORAGE_KEY = "markdown-editor-content";
 
 export default function HomePage() {
+  const codeMirrorRef = useRef(null);
   const [markdownText, setMarkdownText] = useState<string>("");
-  const [wordCount, setWordCount] = useState<number>(0);
+  const [showWordCount, setShowWordCount] = useState(true);
+  const [count, setCount] = useState<number>(0);
+  const toggleCount = () => {
+    console.log("toggleCount");
+    setShowWordCount(!showWordCount);
+    if (showWordCount) {
+      setCount(countWords(markdownText));
+    } else {
+      setCount(countletters(markdownText));
+    }
+
+    console.log(showWordCount);
+    console.log(count);
+  };
 
   const [isSaveAsDropdownOpen, setIsSaveAsDropdownOpen] =
     useState<boolean>(false);
@@ -89,7 +108,11 @@ greet('World');
   }, [markdownText]);
 
   useEffect(() => {
-    setWordCount(countWords(markdownText));
+    if (showWordCount) {
+      setCount(countWords(markdownText));
+    } else {
+      setCount(countletters(markdownText));
+    }
   }, [markdownText]);
 
   const handleMarkdownChange = useCallback((value: string) => {
@@ -142,14 +165,20 @@ greet('World');
     setIsTemplateDropdownOpen(false);
   };
 
-  const toggleSaveAsDropdown = () => {
-    setIsSaveAsDropdownOpen((prev) => !prev);
+  const showSaveAsDropdown = () => {
+    setIsSaveAsDropdownOpen(() => true);
     setIsTemplateDropdownOpen(false); // Close template dropdown if open
   };
 
-  const toggleTemplateDropdown = () => {
-    setIsTemplateDropdownOpen((prev) => !prev);
+  const showTemplateDropdown = () => {
+    setIsTemplateDropdownOpen(() => true);
     setIsSaveAsDropdownOpen(false); // Close save as dropdown if open
+  };
+
+  const focusCodeMirror = () => {
+    if ((codeMirrorRef as any).current && (codeMirrorRef.current as any).view) {
+      (codeMirrorRef.current as any).view.focus();
+    }
   };
 
   useEffect(() => {
@@ -162,6 +191,10 @@ greet('World');
       if (event.key === "Escape") {
         if (isSaveAsDropdownOpen) setIsSaveAsDropdownOpen(false);
         if (isTemplateDropdownOpen) setIsTemplateDropdownOpen(false);
+      }
+      if (event.key === "i") {
+        event.preventDefault();
+        focusCodeMirror();
       }
     };
 
@@ -201,55 +234,32 @@ greet('World');
   }, [isSaveAsDropdownOpen, isTemplateDropdownOpen]);
 
   const editorExtensions = [
+    vim(),
     markdownLang({ codeLanguages: languages }),
-    oneDark,
+    nord,
     EditorView.lineWrapping,
-    EditorView.theme({
-      "&": {
-        fontSize: "14px",
-        backgroundColor: "#2d3748",
-        color: "#e2e8f0",
-        height: "100%",
-      },
-      ".cm-content": {
-        fontFamily: "monospace",
-        caretColor: "#fff",
-      },
-      ".cm-gutters": {
-        backgroundColor: "#1a202c",
-        color: "#a0aec0",
-        borderRight: "1px solid #4a5568",
-      },
-      ".cm-activeLineGutter": {
-        backgroundColor: "#2c5282",
-      },
-      ".cm-lineNumbers .cm-gutterElement": {
-        padding: "0 8px 0 8px",
-      },
-      ".cm-focused": {
-        outline: "none !important",
-      },
-    }),
   ];
 
-  // Enhanced markdown components with Tailwind v4 styling
   const markdownComponents: Components = {
     code(props: CodeComponentProps) {
       const { node, inline, className, children, ...rest } = props;
       const match = /language-(\w+)/.exec(className || "");
       return !inline && match ? (
-        <SyntaxHighlighter
-          style={prismMaterialDark as Record<string, CSSProperties>}
-          language={match[1]}
-          PreTag="div"
-          customStyle={{ borderRadius: "0.375rem", margin: "1rem 0" }}
-          {...rest}
-        >
-          {String(children).replace(/\n$/, "")}
-        </SyntaxHighlighter>
+        <div className="bg-nord0 p-4 rounded-md">
+          <div>{match[1].toUpperCase()}</div>
+          <SyntaxHighlighter
+            style={prismnord as Record<string, CSSProperties>}
+            language={match[1]}
+            PreTag="div"
+            customStyle={{}}
+            {...rest}
+          >
+            {String(children).replace(/\n$/, "")}
+          </SyntaxHighlighter>
+        </div>
       ) : (
         <code
-          className={`bg-gray-700 px-1 rounded ${className || ""}`}
+          className={`bg-nordic text-nord14  italic px-1 rounded-md ${className || ""}`}
           {...rest}
         >
           {children}
@@ -257,14 +267,11 @@ greet('World');
       );
     },
     h1: ({ node, ...props }) => (
-      <h1
-        className="text-3xl font-bold mt-6 mb-4 pb-2 border-b border-gray-600"
-        {...props}
-      />
+      <h1 className="text-3xl font-bold mt-6 mb-4 pb-2 border-b " {...props} />
     ),
     h2: ({ node, ...props }) => (
       <h2
-        className="text-2xl font-semibold mt-5 mb-3 pb-1 border-b border-gray-700"
+        className="text-2xl font-semibold mt-5 mb-3 pb-1 border-b border-nord1"
         {...props}
       />
     ),
@@ -284,7 +291,7 @@ greet('World');
     li: ({ node, ...props }) => <li className="ml-1" {...props} />,
     blockquote: ({ node, ...props }) => (
       <blockquote
-        className="border-l-4 border-gray-500 pl-4 py-1 my-4 italic bg-gray-800 rounded-r"
+        className="border-l-4 border-nord3 pl-4 py-1 my-4 italic bg-nord3 rounded-r"
         {...props}
       />
     ),
@@ -295,17 +302,17 @@ greet('World');
       />
     ),
     table: ({ node, ...props }) => (
-      <div className="overflow-x-auto my-4">
-        <table
-          className="w-full border-collapse border border-gray-700"
-          {...props}
-        />
+      <div className="overflow-x-auto my-4 rounded-md">
+        <table className="w-full border-collapse  border-nord1" {...props} />
       </div>
     ),
-    thead: ({ node, ...props }) => <thead className="bg-gray-800" {...props} />,
+    thead: ({ node, ...props }) => <thead className="bg-nord9" {...props} />,
     tbody: ({ node, ...props }) => <tbody {...props} />,
     tr: ({ node, ...props }) => (
-      <tr className="border-b border-gray-700 even:bg-gray-800/30" {...props} />
+      <tr
+        className="border-b border-nord0 even:bg-nord3/30 bg-nord0/30"
+        {...props}
+      />
     ),
     th: ({ node, ...props }) => (
       <th className="px-4 py-2 text-left font-medium" {...props} />
@@ -319,7 +326,7 @@ greet('World');
       />
     ),
     hr: ({ node, ...props }) => (
-      <hr className="my-8 border-t border-gray-700" {...props} />
+      <hr className="my-8 border-t border-nord3" {...props} />
     ),
     strong: ({ node, ...props }) => (
       <strong className="font-semibold" {...props} />
@@ -328,18 +335,14 @@ greet('World');
   };
 
   return (
-    <div className="flex flex-col h-screen bg-gray-800 text-white">
-      <header className="p-4 bg-gray-900 shadow-md flex justify-between items-center">
-        <h1 className="text-xl font-semibold">Markdown Editor</h1>
+    <div className="flex flex-col h-screen bg-nordic text-nord4 ">
+      <header className="p-4 bg-nordic shadow-md flex justify-between items-center text-nord9">
+        <h1 className="text-xl font-bold">Markdown Editor</h1>
         <div className="flex items-center space-x-3">
-          {/* Template dropdown */}
           <div className="relative" ref={templateDropdownRef}>
             <button
-              onClick={toggleTemplateDropdown}
-              className="px-3 py-1.5 bg-purple-600 hover:bg-purple-700 text-white text-sm rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-opacity-50 flex items-center"
-              title="Load slide template"
-              aria-haspopup="true"
-              aria-expanded={isTemplateDropdownOpen}
+              onMouseEnter={showTemplateDropdown}
+              className="px-3 py-1.5 bg-nord10 hover: text-nordic text-sm rounded-md focus:outline-none    flex items-center"
             >
               Templates
               <span
@@ -349,37 +352,32 @@ greet('World');
               </span>
             </button>
             {isTemplateDropdownOpen && (
-              <div className="absolute left-0 mt-2 w-48 bg-gray-700 rounded-md shadow-lg py-1 z-50 ring-1 ring-black ring-opacity-5">
+              <div className="absolute left-0 mt-2 overflow-hidden w-48 bg-nord0 rounded-md   z-50 ">
                 <button
+                  className=" w-full text-left px-4 py-2 text-sm hover:bg-nord9 hover:text-nord0"
                   onClick={() => loadTemplate("basic")}
-                  className="block w-full text-left px-4 py-2 text-sm text-gray-100 hover:bg-gray-600 hover:text-white"
                 >
                   Basic Slides
                 </button>
                 <button
                   onClick={() => loadTemplate("professional")}
-                  className="block w-full text-left px-4 py-2 text-sm text-gray-100 hover:bg-gray-600 hover:text-white"
+                  className=" w-full text-left px-4 py-2 text-sm hover:bg-nord9 hover:text-nord0"
                 >
                   Professional Slides
                 </button>
                 <button
                   onClick={() => loadTemplate("academic")}
-                  className="block w-full text-left px-4 py-2 text-sm text-gray-100 hover:bg-gray-600 hover:text-white"
+                  className=" w-full text-left px-4 py-2 text-sm hover:bg-nord9 hover:text-nord0"
                 >
                   Academic Slides
                 </button>
               </div>
             )}
           </div>
-
-          {/* Save As dropdown */}
           <div className="relative" ref={saveAsDropdownRef}>
             <button
-              onClick={toggleSaveAsDropdown}
-              className="px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white text-sm rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 flex items-center"
-              title="Save options"
-              aria-haspopup="true"
-              aria-expanded={isSaveAsDropdownOpen}
+              onMouseEnter={showSaveAsDropdown}
+              className="px-3 py-1.5 bg-nord14 text-nord0   text-sm rounded-md focus:outline-none    flex items-center"
             >
               Save as
               <span
@@ -389,24 +387,23 @@ greet('World');
               </span>
             </button>
             {isSaveAsDropdownOpen && (
-              <div className="absolute right-0 mt-2 w-48 bg-gray-700 rounded-md shadow-lg py-1 z-50 ring-1 ring-black ring-opacity-5">
+              <div className="absolute right-0 mt-2 overflow-hidden w-48 bg-nord0 rounded-md   z-50 ">
                 <button
                   onClick={handleDownloadMd}
-                  className="block w-full text-left px-4 py-2 text-sm text-gray-100 hover:bg-gray-600 hover:text-white"
+                  className=" w-full text-left px-4 py-2 text-sm hover:bg-nord14 hover:text-nord0"
                   title="Save as Markdown file (.md) - Or use Ctrl+S"
                 >
                   Markdown (.md)
-                  <span className="block text-xs text-gray-400">Ctrl+S</span>
                 </button>
                 <button
                   onClick={handleSaveAsPdf}
-                  className="block w-full text-left px-4 py-2 text-sm text-gray-100 hover:bg-gray-600 hover:text-white"
+                  className=" w-full text-left px-4 py-2 text-sm hover:bg-nord14 hover:text-nord0"
                 >
                   PDF (.pdf)
                 </button>
                 <button
                   onClick={handleSaveAsSlides}
-                  className="block w-full text-left px-4 py-2 text-sm text-gray-100 hover:bg-gray-600 hover:text-white"
+                  className=" w-full text-left px-4 py-2 text-sm hover:bg-nord14 hover:text-nord0"
                 >
                   Slides (.html)
                 </button>
@@ -416,15 +413,15 @@ greet('World');
         </div>
       </header>
 
-      <main className="flex flex-1 overflow-hidden">
-        <div className="w-1/2 flex flex-col border-r border-gray-700 overflow-hidden">
-          <div className="flex-1 w-full overflow-auto p-0">
+      <main className="flex flex-1   flex-wrap gap-4 justify-evenly h-full">
+        <div className="relative md:w-[47vw]  w-full  h-[85vh] rounded-md  overflow-y-auto   flex flex-col  border-r border-gray-700 overflow-hidden">
+          <div className="flex-1 w-full md:overflow-y-auto ">
             <CodeMirror
               value={markdownText}
               height="100%"
               extensions={editorExtensions}
               onChange={handleMarkdownChange}
-              theme={oneDark}
+              theme={nord}
               basicSetup={{
                 lineNumbers: true,
                 foldGutter: true,
@@ -433,10 +430,12 @@ greet('World');
                 highlightActiveLineGutter: true,
               }}
               className="h-full text-sm"
+              ref={codeMirrorRef}
             />
           </div>
         </div>
-        <div className="w-1/2 p-4 overflow-y-auto bg-gray-900">
+
+        <div className="relative md:w-1/2 p-8  w-full  h-[85vh] rounded-md overflow-scroll  bg-nordic flex flex-col   ">
           <div
             ref={previewRef}
             className="prose prose-invert prose-sm sm:prose-base max-w-3xl mx-auto"
@@ -450,11 +449,13 @@ greet('World');
           </div>
         </div>
       </main>
-
-      {/* No need for custom global styles when using Tailwind's prose classes */}
-
-      <footer className="p-2 bg-gray-900 text-right text-sm pr-6">
-        Word Count: {wordCount}
+      <footer className="p-2  text-right h-full text-sm pr-6">
+        <button
+          onClick={toggleCount}
+          className="ml-2 text-nord9 rounded-sm px-2 hover:bg-nord9 hover:text-nord0"
+        >
+          {showWordCount ? "Word" : "Letter"} Count: {count}{" "}
+        </button>
       </footer>
     </div>
   );
