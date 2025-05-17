@@ -28,14 +28,63 @@ export const baseFontSizesConfig: Record<
     idealUnit?: string;
   }
 > = {
-  "--slide-font-size": { min: 16, idealVmin: 2.2, max: 28 },
-  "--slide-h1-size": { min: 32, idealVmin: 5.0, max: 60 },
-  "--slide-h2-size": { min: 28, idealVmin: 4.0, max: 50 },
-  "--slide-h3-size": { min: 24, idealVmin: 3.5, max: 44 },
+  "--slide-font-size": { min: 0, idealVmin: 4.0, max: 160 },
+  "--slide-h1-size": { min: 0, idealVmin: 12.0, max: 160 },
+  "--slide-h2-size": { min: 0, idealVmin: 8.0, max: 150 },
+  "--slide-h3-size": { min: 0, idealVmin: 6.0, max: 144 },
+  // "--slide-font-size": { min: 16, idealVmin: 2.2, max: 28 },
+  // "--slide-h1-size": { min: 32, idealVmin: 5.0, max: 60 },
+  // "--slide-h2-size": { min: 28, idealVmin: 4.0, max: 50 },
+  // "--slide-h3-size": { min: 24, idealVmin: 3.5, max: 44 },
 };
 
 export const LOCAL_STORAGE_FONT_MULTIPLIER_KEY =
   "markdown-editor-font-multiplier";
+
+export const GOOGLE_FONTS_LIST: Array<{
+  name: string;
+  query: string;
+  family: string;
+}> = [
+  {
+    name: "System Default",
+    query: "",
+    family:
+      "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol'",
+  },
+  {
+    name: "Roboto",
+    query: "Roboto:wght@400;700;900",
+    family: "'Roboto', sans-serif",
+  },
+  {
+    name: "Open Sans",
+    query: "Open+Sans:wght@400;700",
+    family: "'Open Sans', sans-serif",
+  },
+  {
+    name: "Lato",
+    query: "Lato:wght@400;700;900",
+    family: "'Lato', sans-serif",
+  },
+  {
+    name: "Montserrat",
+    query: "Montserrat:wght@400;700",
+    family: "'Montserrat', sans-serif",
+  },
+  {
+    name: "Source Code Pro",
+    query: "Source+Code+Pro:wght@400;700",
+    family: "'Source Code Pro', monospace",
+  },
+  {
+    name: "Inter",
+    query: "Inter:wght@400;700;900",
+    family: "'Inter', sans-serif",
+  },
+];
+export const LOCAL_STORAGE_FONT_FAMILY_KEY = "markdown-editor-font-family";
+
 // Helper to convert hex to RGB string
 const hexToRgbString = (hex: string): string => {
   const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
@@ -91,12 +140,12 @@ export const themes: Record<string, Record<string, string>> = {
     "--nord5": "#434C5E",
     "--nord6": "#2E3440", // Dark text
     "--nord7": "#8FBCBB",
-    "--nord8": "#88C0D0",
+    "--nord8": "#81A1C1",
     "--nord9": "#81A1C1",
     "--nord10": "#5E81AC", // Accents
     "--nord11": "#BF616A",
     "--nord12": "#D08770",
-    "--nord13": "#9d744c",
+    "--nord13": "#81a1c1",
     /* Darker yellow for light bg */ "--nord14": "#A3BE8C",
     "--nord15": "#B48EAD",
     "--nord0-rgb": hexToRgbString("#ECEFF4"),
@@ -112,7 +161,7 @@ export const themes: Record<string, Record<string, string>> = {
     "--nord10-rgb": hexToRgbString("#5E81AC"),
     "--nord11-rgb": hexToRgbString("#BF616A"),
     "--nord12-rgb": hexToRgbString("#D08770"),
-    "--nord13-rgb": hexToRgbString("#9d744c"),
+    "--nord13-rgb": hexToRgbString("#81a1c1"),
     "--nord14-rgb": hexToRgbString("#A3BE8C"),
     "--nord15-rgb": hexToRgbString("#B48EAD"),
     "--preview-bg": "#F9FAFB", // Example: A very light gray for light theme preview
@@ -121,4 +170,26 @@ export const themes: Record<string, Record<string, string>> = {
   },
 };
 export const LOCAL_STORAGE_THEME_KEY = "markdown-editor-theme";
-// --- End Theme Definitions ---
+export const LOCAL_STORAGE_PAGE_NUMBERS_KEY = "markdown-editor-page-numbers";
+export const LOCAL_STORAGE_PAGE_NUMBER_FIRST_PAGE_KEY =
+  "markdown-editor-page-number-first-page";
+export const LOCAL_STORAGE_HEADER_FOOTERS_KEY =
+  "markdown-editor-header-footers";
+
+export const headerFooterPositions = [
+  { value: "top-left", label: "Top Left" },
+  { value: "top-center", label: "Top Center" },
+  { value: "top-right", label: "Top Right" },
+  { value: "bottom-left", label: "Bottom Left" },
+  { value: "bottom-center", label: "Bottom Center" },
+  { value: "bottom-right", label: "Bottom Right" },
+] as const; // Use "as const" for stricter typing of values
+
+export type HeaderFooterPosition =
+  (typeof headerFooterPositions)[number]["value"];
+
+export interface HeaderFooterItem {
+  id: string;
+  text: string;
+  position: HeaderFooterPosition;
+}

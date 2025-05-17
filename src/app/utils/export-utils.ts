@@ -1,256 +1,12 @@
-import { jsPDF } from "jspdf";
-import html2canvas from "html2canvas";
-import remarkParse from "remark-parse";
-import { unified } from "unified";
-import remarkRehype from "remark-rehype";
-import rehypeStringify from "rehype-stringify";
-
-/**
- * Export Utilities for Markdown Editor
- * Handles exporting to PDF and slide formats
- */
-
-// Convert Markdown content to PDF
-export const exportToPdf = async (
-  markdownContent: string,
-  previewRef: React.RefObject<HTMLDivElement | null>,
-) => {
-  if (!previewRef.current) {
-    console.error("Preview area not available for PDF export.");
-    alert("Preview area not available for PDF export.");
-    return false;
-  }
-
-  // const originalStyles = {
-  //   className: previewRef.current.className,
-  //   // You might need to save and restore inline styles if any are critical
-  //   scrollPosition: previewRef.current.scrollTop, // if you want to restore scroll
-  // };
-
-  // Get the actual element to apply styles to
-  const elementToCapture = previewRef.current;
-
-  try {
-    elementToCapture.classList.add("pdf-render-mode");
-
-    const canvas = await html2canvas(elementToCapture, {
-      scale: 2,
-      useCORS: true,
-      logging: false,
-      windowWidth: elementToCapture.scrollWidth,
-      windowHeight: elementToCapture.scrollHeight,
-    });
-    elementToCapture.classList.remove("pdf-render-mode");
-    const pdf = new jsPDF({
-      orientation: "portrait",
-      unit: "pt",
-      format: "a4",
-    });
-
-    const pdfWidth = pdf.internal.pageSize.getWidth();
-    const pdfHeight = pdf.internal.pageSize.getHeight();
-    const canvasWidthInPoints = canvas.width / 2; // Adjust for scale
-    const canvasHeightInPoints = canvas.height / 2; // Adjust for scale
-
-    const aspectRatio = canvasHeightInPoints / canvasWidthInPoints;
-
-    const imgWidth = pdfWidth;
-    const imgHeight = imgWidth * aspectRatio;
-    let position = 0;
-
-    // If the content is shorter than one page, don't stretch it
-    if (imgHeight < pdfHeight) {
-      pdf.addImage(
-        canvas.toDataURL("image/png"),
-        "PNG",
-        0,
-        0,
-        imgWidth,
-        imgHeight,
-      );
-    } else {
-      // Paginate
-      let heightLeft = canvasHeightInPoints; // Use the scaled-down height for pagination logic
-      const pageCanvas = document.createElement("canvas");
-      const pageCtx = pageCanvas.getContext("2d");
-
-      // A4 page dimensions in pixels at 96 DPI (approx) = 595pt x 842pt
-      // We need to scale the canvas section to fit the PDF page width
-      const contentScaleToFitPdfWidth = pdfWidth / canvasWidthInPoints;
-
-      pageCanvas.width = canvas.width; // Use original canvas width for slicing
-      // Calculate slice height based on how much of original canvas fits one PDF page
-      pageCanvas.height = Math.floor(
-        (pdfHeight / contentScaleToFitPdfWidth) * 2,
-      ); // *2 because canvas is scaled up
-
-      while (heightLeft > 0.1) {
-        // Using 0.1 to handle floating point inaccuracies
-        const sliceY = canvas.height / 2 - heightLeft; // Y position on the original scaled canvas
-
-        // Clear and draw the slice onto the temporary pageCanvas
-        pageCtx!.clearRect(0, 0, pageCanvas.width, pageCanvas.height);
-        pageCtx!.drawImage(
-          canvas, // source canvas
-          0, // sx
-          sliceY * 2, // sy (use original canvas coordinates, so *2 for scale)
-          canvas.width, // sWidth
-          Math.min(pageCanvas.height, heightLeft * 2), // sHeight (don't exceed remaining or page height)
-          0, // dx
-          0, // dy
-          pageCanvas.width, // dWidth
-          Math.min(pageCanvas.height, heightLeft * 2), // dHeight
-        );
-
-        const pageImgData = pageCanvas.toDataURL("image/png");
-        if (position > 0) {
-          // position is used to track if it's not the first page
-          pdf.addPage();
-        }
-        pdf.addImage(
-          pageImgData,
-          "PNG",
-          0,
-          0,
-          pdfWidth,
-          pdfHeight *
-            (Math.min(pageCanvas.height, heightLeft * 2) / pageCanvas.height),
-        );
-
-        heightLeft -= pageCanvas.height / 2; // Decrement by the CSS pixel equivalent of the slice
-        position += pdfHeight; // Not strictly needed for addImage(0,0) but good for logic
-      }
-    }
-
-    pdf.save("markdown-document.pdf");
-    return true;
-  } catch (error) {
-    console.error("Error generating PDF:", error);
-    // Ensure styles are restored even if an error occurs
-    elementToCapture.classList.remove("pdf-render-mode");
-    // previewRef.current.className = originalStyles.className;
-    alert("Failed to generate PDF. Check console for details.");
-    return false;
-  }
-};
-
-export const convertToSlides = async (markdownContent: string) => {
-  try {
-    // Split content by horizontal rules or h1/h2 headings
-    const slideDelimiter = /^---$|^#{1,2}\s/m;
-    const slides = markdownContent
-      .split(slideDelimiter)
-      .filter((slide) => slide.trim().length > 0)
-      .map((slide) => slide.trim());
-
-    // Process each slide to HTML
-    const slideProcessor = unified()
-      .use(remarkParse)
-      .use(remarkRehype)
-      .use(rehypeStringify);
-
-    // Process each slide to HTML
-    const slidesHtml = await Promise.all(
-      slides.map(async (slide) => {
-        const result = await slideProcessor.process(`# ${slide}`);
-        return result.toString();
-      }),
-    );
-
-    return slidesHtml;
-  } catch (error) {
-    console.error("Error converting to slides:", error);
-    return [];
-  }
-};
-
-// Export to OpenDocument Presentation format (simplified - creates HTML slides)
-export const exportToSlides = async (markdownContent: string) => {
-  try {
-    const slidesHtml = await convertToSlides(markdownContent);
-
-    // Create a simple HTML presentation
-    const presentationHtml = `
-      <!DOCTYPE html>
-      <html lang="en">
-      <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Markdown Presentation</title>
-        <style>
-          body { margin: 0; font-family: sans-serif; }
-          .slides { width: 100vw; height: 100vh; overflow: hidden; }
-          .slide {
-            width: 100%; height: 100%; display: none;
-            padding: 2em; box-sizing: border-box;
-            background: #191d24;
-          }
-          .slide.active { display: block; }
-          .slide h1 { font-size: 4.5em; margin-bottom: 1.0em; }
-          .slide ul, .slide ol { font-size: 1.5em; }
-          .slide p { font-size: 2.0em; }
-          .slide pre { background: #2e3440; padding: 1em; border-radius: 5px; }
-          .controls {
-            position: fixed; bottom: 20px; right: 20px;
-            display: flex; gap: 10px;
-          }
-          .controls button {
-            background: #333; color: white; border: none;
-            padding: 10px 15px; border-radius: 5px; cursor: pointer;
-          }
-        </style>
-      </head>
-      <body>
-        <div class="slides">
-          ${slidesHtml.map((slide, i) => `<div class="slide ${i === 0 ? "active" : ""}" id="slide-${i}">${slide}</div>`).join("")}
-        </div>
-        <div class="controls">
-          <button id="prev">Previous</button>
-          <span id="slide-counter">1/${slidesHtml.length}</span>
-          <button id="next">Next</button>
-        </div>
-        <script>
-          let currentSlide = 0;
-          const slides = document.querySelectorAll('.slide');
-          const counter = document.getElementById('slide-counter');
-          
-          function showSlide(n) {
-            slides[currentSlide].classList.remove('active');
-            currentSlide = (n + slides.length) % slides.length;
-            slides[currentSlide].classList.add('active');
-            counter.textContent = \`\${currentSlide + 1}/\${slides.length}\`;
-          }
-          
-          document.getElementById('next').addEventListener('click', () => showSlide(currentSlide + 1));
-          document.getElementById('prev').addEventListener('click', () => showSlide(currentSlide - 1));
-          
-          document.addEventListener('keydown', (e) => {
-            if (e.key === 'ArrowRight') showSlide(currentSlide + 1);
-            if (e.key === 'ArrowLeft') showSlide(currentSlide - 1);
-          });
-        </script>
-      </body>
-      </html>
-    `;
-
-    // Create a blob and trigger download
-    const blob = new Blob([presentationHtml], { type: "text/html" });
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement("a");
-    link.href = url;
-    link.download = "presentation.html";
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-    URL.revokeObjectURL(url);
-    return true;
-  } catch (error) {
-    console.error("Error exporting to slides:", error);
-    return false;
-  }
-};
-
+import { marked } from "marked";
 // Slide templates - predefined markdown content for different slide layouts
+import { HeaderFooterItem } from "./theme";
+
+export interface SlideLayoutOptions {
+  showPageNumbers: boolean;
+  pageNumberOnFirstPage: boolean;
+  headerFooters: HeaderFooterItem[];
+}
 export const slideTemplates = {
   basic: `# My Presentation
 ## Slide 1
@@ -332,11 +88,6 @@ Figure 1: Relationship between variables X and Y
 `,
 };
 
-//TODO
-
-import { marked } from "marked";
-
-// Helper function to split markdown into slide content
 function splitMarkdownIntoSlides(markdown: string): string[] {
   const lines = markdown.split("\n");
   const slides: string[] = [];
@@ -385,6 +136,7 @@ function splitMarkdownIntoSlides(markdown: string): string[] {
 export async function exportToCustomSlidesHtml(
   fullMarkdown: string,
   themeVariables: Record<string, string>,
+  layoutOptions?: SlideLayoutOptions,
 ): Promise<string> {
   marked.setOptions({
     gfm: true,
@@ -396,16 +148,47 @@ export async function exportToCustomSlidesHtml(
   let slidesHtmlContent = "";
 
   if (slideMarkdownArray.length > 0) {
-    for (const slideMd of slideMarkdownArray) {
+    for (let i = 0; i < slideMarkdownArray.length; i++) {
+      const slideMd = slideMarkdownArray[i];
       const slideContentHtml = await marked.parse(slideMd.trim());
-      slidesHtmlContent += `<div class="slide"><div class="slide-content-wrapper">${slideContentHtml}</div></div>\n`;
+      const slideIdAttribute = i === 0 ? ' id="first-slide"' : ""; // Add id only for the first slide
+      let layoutAdditions = "";
+      if (layoutOptions) {
+        // Page Numbers
+        if (
+          layoutOptions.showPageNumbers &&
+          (i > 0 || layoutOptions.pageNumberOnFirstPage)
+        ) {
+          // Default page number to bottom-right if not specified further
+          layoutAdditions += `<div class="slide-page-number pos-bottom-right">${i + 1}  </div>`;
+          layoutOptions.headerFooters.forEach((item) => {
+            layoutAdditions += `<div class="slide-header-footer-item pos-${item.position}">${item.text}</div>`;
+          });
+        }
+        // Headers/Footers
+      }
+
+      slidesHtmlContent += `<div class="slide" data-slide-index="${i}"${slideIdAttribute}><div class="slide-content-wrapper">${slideContentHtml}</div>${layoutAdditions}</div>\n`;
+      console.log(layoutAdditions, slidesHtmlContent);
     }
   } else {
+    let fallbackLayoutAdditions = "";
+    if (layoutOptions) {
+      if (
+        layoutOptions.showPageNumbers &&
+        layoutOptions.pageNumberOnFirstPage
+      ) {
+        fallbackLayoutAdditions += `<div class="slide-page-number pos-bottom-right">1 / 1</div>`;
+      }
+      layoutOptions.headerFooters.forEach((item) => {
+        fallbackLayoutAdditions += `<div class="slide-header-footer-item pos-${item.position}">${item.text}</div>`;
+      });
+    }
     if (fullMarkdown.trim().length > 0) {
       const fallbackHtml = await marked.parse(fullMarkdown.trim());
-      slidesHtmlContent = `<div class="slide active"><div class="slide-content-wrapper">${fallbackHtml}</div></div>\n`;
+      slidesHtmlContent = `<div class="slide active" data-slide-index="0" id="first-slide"><div class="slide-content-wrapper">${fallbackHtml}</div>${fallbackLayoutAdditions}</div>\n`;
     } else {
-      slidesHtmlContent = `<div class="slide active"><div class="slide-content-wrapper"><p style="text-align:center; font-size: 2vmin;">Empty content.</p></div></div>\n`;
+      slidesHtmlContent = `<div class="slide active" data-slide-index="0" id="first-slide"><div class="slide-content-wrapper"><p style="text-align:center; font-size: 2vmin;">Empty content.</p></div>${fallbackLayoutAdditions}</div>\n`;
     }
   }
 
@@ -414,6 +197,25 @@ export async function exportToCustomSlidesHtml(
     cssVariablesString += `  ${key}: ${value};\n`;
   }
   cssVariablesString += "}\n";
+
+  const layoutCss = `
+.slide { position: relative; /* Ensure this is set for absolute positioning of children */ }
+.slide-header-footer-item, .slide-page-number {
+  position: absolute;
+  font-size: calc(var(--slide-font-size) * 0.65); /* e.g., 65% of base slide font */
+  color: var(--nord4); /* Or a specific variable for this */
+  padding: 3vmin 3.5vmin;
+  z-index: 10; /* Make sure they are above content, but below main nav if any */
+  pointer-events: none; /* So they don't interfere with selecting text on the slide */
+  white-space: nowrap;
+}
+.pos-top-left    { top: 0; left: 0; text-align: left; }
+.pos-top-center  { top: 0; left: 50%; transform: translateX(-50%); text-align: center; }
+.pos-top-right   { top: 0; right: 0; text-align: right; }
+.pos-bottom-left { bottom: 0; left: 0; text-align: left; }
+.pos-bottom-center { bottom: 0; left: 50%; transform: translateX(-50%); text-align: center; }
+.pos-bottom-right { bottom: 0; right: 0; text-align: right; }
+`;
 
   const prismNordThemeCss = `
 code[class*=language-],pre[class*=language-]{color:#f8f8f2;background:0 0;font-family:Consolas,Monaco,'Andale Mono','Ubuntu Mono',monospace;font-size:1em;text-align:left;white-space:pre;word-spacing:normal;word-break:normal;word-wrap:normal;line-height:1.5;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-hyphens:none;-moz-hyphens:none;-ms-hyphens:none;hyphens:none}
@@ -457,6 +259,7 @@ pre[class*="language-"].line-numbers>code{position:relative;white-space:inherit}
 
  ${cssVariablesString} /* Use the dynamically generated CSS variables */
       ${prismNordThemeCss}
+ ${layoutCss} 
       html, body {
         height: 100%; margin: 0; padding: 0; overflow: hidden; /* Fullscreen */
         font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol';
@@ -487,11 +290,14 @@ pre[class*="language-"].line-numbers>code{position:relative;white-space:inherit}
         font-size: var(--slide-font-size);
       }
 
-      .slide h1 { font-size: var(--slide-h1-size); font-weight: bold; margin:0.4em 0; padding-bottom: 0.2em; border-bottom: 1px solid var(--nord3); color: var(--nord8); }
+      .slide h1 { font-size: var(--slide-h1-size); font-weight: bold; margin:0.4em 0; padding-bottom: 0.2em; border-bottom: 1px solid var(--nord3); color: var(--nord8); text-align:center; }
       .slide h2 { font-size: var(--slide-h2-size); font-weight: bold; margin:0.4em 0; padding-bottom: 0.15em; border-bottom: 1px solid var(--nord3); color: var(--nord9); }
       .slide h3 { font-size: var(--slide-h3-size); font-weight: bold; margin:0.4em 0; color: var(--nord7); }
       .slide h4, .slide h5, .slide h6 { font-size: calc(var(--slide-font-size) * 1.1); font-weight: bold; margin:0.4em 0; }
       .slide p { margin: 0.7em 0; line-height: 1.6; }
+
+    #first-slide pre { background-color: transparent !important; shadow: none !important; box-shadow: none !important; font-style: italic; }
+      #first-slide p  { text-align:center;}
       .slide ul, .slide ol { margin: 0.7em 0; padding-left: 2.5em; }
       .slide li { margin-bottom: 0.3em; }
       .slide blockquote {
@@ -542,7 +348,7 @@ pre[class*="language-"].line-numbers>code{position:relative;white-space:inherit}
         opacity: 0;
         transition: opacity 0.3s ease-in-out, visibility 0.3s ease-in-out;
       }
-      .slide-navigation button, .slide-navigation span {
+    .slide-navigation button  {
         background-color: rgba(var(--nord10-rgb, 94, 129, 172), 0.85); /* nord10 with alpha */
         color: var(--nord6); border: none;
         padding: 6px 10px; /* Smaller buttons */
@@ -563,13 +369,6 @@ pre[class*="language-"].line-numbers>code{position:relative;white-space:inherit}
       }
       #prism-custom-paths { display: none; }
     </style>
-    <script>
-      // Add RGB versions of Nord colors for RGBA usage
-      // document.documentElement.style.setProperty('--nord10-rgb', '94, 129, 172');
-      // document.documentElement.style.setProperty('--nord9-rgb', '129, 161, 193');
-      // document.documentElement.style.setProperty('--nord3-rgb', '76, 86, 106');
-      // document.documentElement.style.setProperty('--nord2-rgb', '67, 76, 94');
-    </script>
 </head>
 <body>
     <div class="slides-container">
@@ -723,17 +522,43 @@ pre[class*="language-"].line-numbers>code{position:relative;white-space:inherit}
 export async function exportSingleSlideToHtml(
   slideMarkdown: string,
   themeVariables: Record<string, string>,
+  currentSlideIndex: number,
+  layoutOptions?: SlideLayoutOptions,
 ): Promise<string> {
   marked.setOptions({
     gfm: true,
     pedantic: false,
     breaks: false,
   });
+  let layoutAdditions = "";
+  if (layoutOptions) {
+    if (currentSlideIndex > 0 || layoutOptions.pageNumberOnFirstPage) {
+      if (layoutOptions.showPageNumbers) {
+        layoutAdditions += `<div class="slide-page-number pos-bottom-right">page No</div>`;
+      }
+      // Headers/Footers
+      layoutOptions.headerFooters.forEach((item) => {
+        layoutAdditions += `<div class="slide-header-footer-item pos-${item.position}">${item.text}</div>`;
+      });
+    }
+  }
 
-  // marked.parse() is async in v4+
-  const slideContentHtml = slideMarkdown.trim()
-    ? await marked.parse(slideMarkdown.trim())
-    : '<p style="text-align:center; font-size: 2vmin;"><em>Empty slide or no content at cursor.</em></p>'; // Fallback for empty slide
+  const layoutCss = `/* ... same layoutCss as in exportToCustomSlidesHtml ... */
+.slide { position: relative; }
+.slide-header-footer-item, .slide-page-number {
+  position: absolute; font-size: calc(var(--slide-font-size) * 0.65); color: var(--nord4); padding: 3vmin 3.5vmin; z-index: 10; pointer-events: none; white-space: nowrap;
+}
+.pos-top-left { top: 0; left: 0; text-align: left; } .pos-top-center { top: 0; left: 50%; transform: translateX(-50%); text-align: center; } .pos-top-right { top: 0; right: 0; text-align: right; } .pos-bottom-left { bottom: 0; left: 0; text-align: left; } .pos-bottom-center { bottom: 0; left: 50%; transform: translateX(-50%); text-align: center; } .pos-bottom-right { bottom: 0; right: 0; text-align: right; }
+`;
+
+  const slideIdAttribute = currentSlideIndex === 0 ? ' id="first-slide"' : ""; // Add id only for the first slide
+
+  const slideWrapperContent = `
+        <div ${slideIdAttribute} class="slide-content-wrapper">
+        ${slideMarkdown.trim() ? await marked.parse(slideMarkdown.trim()) : '<p style="text-align:center; font-size: 2vmin;"><em>Empty slide.</em></p>'}
+    </div>
+    ${layoutAdditions}
+  `;
 
   const prismNordThemeCss = `
 code[class*=language-],pre[class*=language-]{color:#f8f8f2;background:0 0;font-family:Consolas,Monaco,'Andale Mono','Ubuntu Mono',monospace;font-size:1em;text-align:left;white-space:pre;word-spacing:normal;word-break:normal;word-wrap:normal;line-height:1.5;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-hyphens:none;-moz-hyphens:none;-ms-hyphens:none;hyphens:none}
@@ -781,16 +606,18 @@ pre[class*="language-"].line-numbers>code{position:relative;white-space:inherit}
     <style>
       ${cssVariablesString}
       ${prismNordThemeCss}
+      ${layoutCss}
       html, body {
         height: 100%; width: 100%; margin: 0; padding: 0; overflow: hidden;
         font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol';
         background-color: var(--nord0); color: var(--nord4);
         display: flex; align-items: center; justify-content: center; /* Center the single slide */
       }
+
       /* Styles from exportToCustomSlidesHtml for .slide, .slide-content-wrapper, h1-h6, p, ul, ol, etc. */
       /* We are creating a single "slide" environment */
       .slide { /* This will be the main container for the content */
-        width: 100%; height: 100%; padding: 5vmin 8vmin;
+        width: 100vw; height: 100vh; padding: 5vmin 8vmin;
         box-sizing: border-box;
         overflow-y: auto; display: flex; flex-direction: column;
         align-items: center; justify-content: center; 
@@ -800,7 +627,8 @@ pre[class*="language-"].line-numbers>code{position:relative;white-space:inherit}
         text-align: left; 
         font-size: var(--slide-font-size);
       }
-      .slide h1 { font-size: var(--slide-h1-size); font-weight: bold; margin:0.4em 0; padding-bottom: 0.2em; border-bottom: 1px solid var(--nord3); color: var(--nord8); }
+
+      .slide h1 { font-size: var(--slide-h1-size); font-weight: bold; margin:0.4em 0; padding-bottom: 0.2em; border-bottom: 1px solid var(--nord3); color: var(--nord8); text-align:center;}
       .slide h2 { font-size: var(--slide-h2-size); font-weight: bold; margin:0.4em 0; padding-bottom: 0.15em; border-bottom: 1px solid var(--nord3); color: var(--nord9); }
       .slide h3 { font-size: var(--slide-h3-size); font-weight: bold; margin:0.4em 0; color: var(--nord7); }
       .slide h4, .slide h5, .slide h6 { font-size: calc(var(--slide-font-size) * 1.1); font-weight: bold; margin:0.4em 0; }
@@ -816,13 +644,17 @@ pre[class*="language-"].line-numbers>code{position:relative;white-space:inherit}
       .slide a:hover { color: var(--nord7); text-decoration: underline; }
       .slide pre {
         margin: 1em 0; border-radius: 6px; overflow-x: auto;
-        background-color: var(--nord1) !important; 
+        background-color: var(--nord1) ; 
         padding: 1em;
         font-size: calc(var(--slide-font-size) * 0.85); 
         box-shadow: 0 2px 8px rgba(0,0,0,0.3);
       }
+      
+
+      #first-slide pre  { background-color: transparent !important;font-style:italic; shadow: none !important; box-shadow: none !important; }
+      #first-slide p  { text-align:center;}
       .slide pre code {
-        background-color: transparent !important; 
+        background-color: transparent ; 
         color: var(--nord6) !important; 
       }
       .slide code:not(pre code) {
@@ -852,11 +684,7 @@ pre[class*="language-"].line-numbers>code{position:relative;white-space:inherit}
     </style>
 </head>
 <body>
-    <div class="slide"> <!-- Wrap content in a .slide div to apply styles -->
-        <div class="slide-content-wrapper">
-            ${slideContentHtml}
-        </div>
-    </div>
+  <div class="slide"> ${slideWrapperContent} </div>
     <script src="${prismJsUrl}" data-manual></script>
     <script src="${prismAutoloaderUrl}"></script>
     <script src="${prismLineNumbersUrl}"></script>
