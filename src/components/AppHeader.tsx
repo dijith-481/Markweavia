@@ -1,4 +1,6 @@
 import React from "react";
+import Image from "next/image";
+import Link from "next/link";
 
 interface AppHeaderProps {
   onUploadClick: () => void;
@@ -16,8 +18,18 @@ export default function AppHeader({
   fileInputRef,
 }: AppHeaderProps) {
   return (
-    <header className="p-4   flex justify-between items-center text-nord9">
-      <h1 className="text-2xl font-bold pl-4">Markweavia</h1>
+    <header className="p-4   flex justify-between items-center text-nord9 px-8">
+      <Link href="/" className="flex  flex-row space-x-3 justify-center items-baseline ">
+        <Image
+          src="logo.svg"
+          alt="Markweavia Logo"
+          className="m-0"
+          width={46}
+          height={46}
+          priority
+        />
+        <Image src="arkweavia.svg" alt="arkweavia Logo" width={128} height={128} priority />
+      </Link>{" "}
       <div className="flex items-center space-x-3 ">
         <input
           type="file"
