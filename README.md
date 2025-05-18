@@ -126,13 +126,9 @@ This design ensures that presentations are easy to navigate both with a mouse an
 
 ## Future Plans
 
-We're excited about enhancing Markweavia further! Here are some features on our roadmap:
-
 *   **Image Pasting & Handling:** Directly paste images into the Markdown editor and have them appropriately embedded in slides.
 *   **More Themes:** Continuously expand the selection of built-in themes.
 *   **User-Loadable Custom Themes:** Allow users to define and load their own CSS theme variables or full theme files.
-*   **Advanced Export Options:** (e.g., PDF export, speaker notes)
-*   **Collaboration Features:** (Potential long-term goal)
 
 ## Contributing
 
