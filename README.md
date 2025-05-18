@@ -148,7 +148,7 @@ Please ensure your code adheres to the existing style and that any new features 
 
 ## License
 
-This project is licensed under the **GNU General Public License v2.0**.
+This project is licensed under the **GNU General Public License v3.0**.
 See the [LICENSE](LICENSE) file for details.
 
 <div align="center">
