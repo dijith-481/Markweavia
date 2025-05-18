@@ -84,7 +84,6 @@ This research investigates the causal relationship between independent variable 
 ## Results: Quantitative Findings
 *   Descriptive Statistics (Means, SDs)
 *   Inferential Statistics (e.g., t-test: t(df) = x.xx, p = .yyy; ANOVA: F(df1, df2) = x.xx, p = .yyy)
-*   [Optional: Include a simple chart or graph description if data were available]
     *   "Figure 1 shows a positive correlation between X and Y (r = .zz, p < .01)."
 ---
 ## Results: Qualitative Themes

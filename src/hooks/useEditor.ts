@@ -12,23 +12,12 @@ Type your Markdown here. Changes will appear in the preview pane.
 ## Features
 - Live Preview
 - Word Count
-- Code Syntax Highlighting
-- Download as .md (Ctrl+S or via Save As menu)
-- Download as slides 
-- Line Numbers in Editor
 - Font Scaling
 - Page Numbers
 - Header/Footers
 - Customizable Themes
 - vim keybindings
 - Auto-saving to Local Storage
-
-\`\`\`javascript
-function greet(name) {
-  console.log(\`Hello, \${name}!\`);
-}
-greet('World');
-\`\`\`
 `;
 
 export function useEditor(
