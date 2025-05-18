@@ -9,6 +9,7 @@ const initialMarkdownContent = `# Welcome to Markweavia!
 *Markdown, beautifully woven.*
 
 Type your Markdown here. Your content will instantly appear as a slide preview on the right.
+> type \`\`\`ggdG\`\`\` to delete all content.
 
 ## Core Features
 - **Effortless Slide Creation:** Write content in Markdown; see it as a slide.

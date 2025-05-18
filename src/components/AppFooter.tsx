@@ -22,6 +22,15 @@ const cyclingTips = [
     ),
   },
   {
+    key: "dd",
+    content: (
+      <>
+        Vim: <kbd className="kbd-style-footer">dd</kbd>
+        to delete your regrets one at a time &lt;3
+      </>
+    ),
+  },
+  {
     key: "vimSaveMd",
     content: (
       <>
@@ -30,6 +39,15 @@ const cyclingTips = [
       </>
     ),
   },
+  {
+    key: "replace",
+    content: (
+      <>
+        Wanna <kbd className="kbd-style-footer">:%s/alone/together/g</kbd>
+      </>
+    ),
+  },
+
   {
     key: "vimSaveSlides",
     content: (
@@ -101,6 +119,15 @@ const cyclingTips = [
     ),
   },
   {
+    key: "ggVg",
+    content: (
+      <>
+        Vim:<kbd className="kbd-style-footer">ggVG</kbd>
+        to select all your deepest desires at once
+      </>
+    ),
+  },
+  {
     key: "tagline",
     content: <>Markweavia: Markdown, beautifully woven.</>,
   },
@@ -110,6 +137,15 @@ const cyclingTips = [
       <>
         Every <kbd className="kbd-style-footer">:w</kbd> in Vim is like a little pat on your
         document's head.
+      </>
+    ),
+  },
+  {
+    key: "deleteAllContent",
+    content: (
+      <>
+        Vim: <kbd className="kbd-style-footer">ggdG</kbd>
+        to delete all content
       </>
     ),
   },

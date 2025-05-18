@@ -21,6 +21,12 @@ export default function InfoPopup({ show, onClose, popupRef }: InfoPopupProps) {
         quickly focus the Markdown editor.
       </p>
       <p className="mb-1">
+        <strong className="text-nord7">Delete All Content:</strong> Press{" "}
+        <kbd className="px-1 py-0.5 text-xs font-semibold text-nord0 bg-nord9 rounded-sm">ggdG</kbd>{" "}
+        to quickly delete all content
+      </p>
+
+      <p className="mb-1">
         <strong className="text-nord7">Vim Mode:</strong> Basic Vim keybindings are enabled. (e.g.,{" "}
         <kbd>Esc</kbd>, <kbd>i</kbd>, <kbd>:w</kbd> to save .md, <kbd>:ws</kbd> to save slides,{" "}
         <kbd>:u</kbd> to upload).
