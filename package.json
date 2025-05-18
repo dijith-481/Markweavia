@@ -29,7 +29,9 @@
     "react-syntax-highlighter": "^15.6.1",
     "rehype-stringify": "^10.0.1",
     "remark-gfm": "^4.0.1",
-    "remark-sectionize": "^2.1.0"
+    "remark-sectionize": "^2.1.0",
+    "uuid": "^11.1.0",
+    "uuid4": "^2.0.3"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",

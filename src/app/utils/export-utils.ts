@@ -1,10 +1,10 @@
 import { marked } from "marked";
 // Slide templates - predefined markdown content for different slide layouts
-import { HeaderFooterItem } from "./theme";
+import { HeaderFooterItem } from "./local-storage";
 
 export interface SlideLayoutOptions {
   showPageNumbers: boolean;
-  pageNumberOnFirstPage: boolean;
+  layoutOnFirstPage: boolean;
   headerFooters: HeaderFooterItem[];
 }
 export const slideTemplates = {
@@ -98,8 +98,7 @@ function splitMarkdownIntoSlides(markdown: string): string[] {
     const trimmedLine = line.trim();
     const isHeading = trimmedLine.startsWith("#");
     // Ensure separator is on its own line, possibly with whitespace
-    const isSeparator =
-      trimmedLine === "---" || trimmedLine === "***" || trimmedLine === "___";
+    const isSeparator = trimmedLine === "---" || trimmedLine === "***" || trimmedLine === "___";
 
     if (isHeading) {
       // If there's existing content for a slide, save it
@@ -137,6 +136,7 @@ export async function exportToCustomSlidesHtml(
   fullMarkdown: string,
   themeVariables: Record<string, string>,
   layoutOptions?: SlideLayoutOptions,
+  documentTitle?: string,
 ): Promise<string> {
   marked.setOptions({
     gfm: true,
@@ -146,6 +146,7 @@ export async function exportToCustomSlidesHtml(
 
   const slideMarkdownArray = splitMarkdownIntoSlides(fullMarkdown);
   let slidesHtmlContent = "";
+  const titleForHtml = documentTitle || "Markdown Slides";
 
   if (slideMarkdownArray.length > 0) {
     for (let i = 0; i < slideMarkdownArray.length; i++) {
@@ -154,18 +155,15 @@ export async function exportToCustomSlidesHtml(
       const slideIdAttribute = i === 0 ? ' id="first-slide"' : ""; // Add id only for the first slide
       let layoutAdditions = "";
       if (layoutOptions) {
-        // Page Numbers
-        if (
-          layoutOptions.showPageNumbers &&
-          (i > 0 || layoutOptions.pageNumberOnFirstPage)
-        ) {
-          // Default page number to bottom-right if not specified further
-          layoutAdditions += `<div class="slide-page-number pos-bottom-right">${i + 1}  </div>`;
+        if (i > 0 || layoutOptions.layoutOnFirstPage) {
           layoutOptions.headerFooters.forEach((item) => {
-            layoutAdditions += `<div class="slide-header-footer-item pos-${item.position}">${item.text}</div>`;
+            if (item.id === "8781pg-numslide") {
+              layoutAdditions += `<div class="slide-page-number pos-${item.position}">${i + 1}</div>`;
+            } else {
+              layoutAdditions += `<div class="slide-header-footer-item pos-${item.position}">${item.text}</div>`;
+            }
           });
         }
-        // Headers/Footers
       }
 
       slidesHtmlContent += `<div class="slide" data-slide-index="${i}"${slideIdAttribute}><div class="slide-content-wrapper">${slideContentHtml}</div>${layoutAdditions}</div>\n`;
@@ -174,10 +172,7 @@ export async function exportToCustomSlidesHtml(
   } else {
     let fallbackLayoutAdditions = "";
     if (layoutOptions) {
-      if (
-        layoutOptions.showPageNumbers &&
-        layoutOptions.pageNumberOnFirstPage
-      ) {
+      if (layoutOptions.showPageNumbers && layoutOptions.layoutOnFirstPage) {
         fallbackLayoutAdditions += `<div class="slide-page-number pos-bottom-right">1 / 1</div>`;
       }
       layoutOptions.headerFooters.forEach((item) => {
@@ -241,8 +236,7 @@ pre[class*="language-"].line-numbers>code{position:relative;white-space:inherit}
 .line-numbers-rows>span{display:block;counter-increment:linenumber}
 .line-numbers-rows>span:before{content:counter(linenumber);color:#999;display:block;padding-right:.8em;text-align:right}`;
 
-  const prismJsUrl =
-    "https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js";
+  const prismJsUrl = "https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js";
   const prismAutoloaderUrl =
     "https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/plugins/autoloader/prism-autoloader.min.js";
   const prismLineNumbersUrl =
@@ -254,7 +248,7 @@ pre[class*="language-"].line-numbers>code{position:relative;white-space:inherit}
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Markdown Slides</title>
+    <title>${titleForHtml}</title> 
     <style>
 
  ${cssVariablesString} /* Use the dynamically generated CSS variables */
@@ -296,7 +290,7 @@ pre[class*="language-"].line-numbers>code{position:relative;white-space:inherit}
       .slide h4, .slide h5, .slide h6 { font-size: calc(var(--slide-font-size) * 1.1); font-weight: bold; margin:0.4em 0; }
       .slide p { margin: 0.7em 0; line-height: 1.6; }
 
-    #first-slide pre { background-color: transparent !important; shadow: none !important; box-shadow: none !important; font-style: italic; }
+    #first-slide pre { background-color: transparent !important; shadow: none !important; box-shadow: none !important; font-style: italic;text-align:center; }
       #first-slide p  { text-align:center;}
       .slide ul, .slide ol { margin: 0.7em 0; padding-left: 2.5em; }
       .slide li { margin-bottom: 0.3em; }
@@ -522,7 +516,7 @@ pre[class*="language-"].line-numbers>code{position:relative;white-space:inherit}
 export async function exportSingleSlideToHtml(
   slideMarkdown: string,
   themeVariables: Record<string, string>,
-  currentSlideIndex: number,
+  currentPageNo: number,
   layoutOptions?: SlideLayoutOptions,
 ): Promise<string> {
   marked.setOptions({
@@ -532,13 +526,13 @@ export async function exportSingleSlideToHtml(
   });
   let layoutAdditions = "";
   if (layoutOptions) {
-    if (currentSlideIndex > 0 || layoutOptions.pageNumberOnFirstPage) {
-      if (layoutOptions.showPageNumbers) {
-        layoutAdditions += `<div class="slide-page-number pos-bottom-right">page No</div>`;
-      }
-      // Headers/Footers
+    if (currentPageNo > 1 || layoutOptions.layoutOnFirstPage) {
       layoutOptions.headerFooters.forEach((item) => {
-        layoutAdditions += `<div class="slide-header-footer-item pos-${item.position}">${item.text}</div>`;
+        if (item.id === "8781pg-numslide") {
+          layoutAdditions += `<div class="slide-page-number pos-${item.position}">${currentPageNo}</div>`;
+        } else {
+          layoutAdditions += `<div class="slide-header-footer-item pos-${item.position}">${item.text}</div>`;
+        }
       });
     }
   }
@@ -551,7 +545,7 @@ export async function exportSingleSlideToHtml(
 .pos-top-left { top: 0; left: 0; text-align: left; } .pos-top-center { top: 0; left: 50%; transform: translateX(-50%); text-align: center; } .pos-top-right { top: 0; right: 0; text-align: right; } .pos-bottom-left { bottom: 0; left: 0; text-align: left; } .pos-bottom-center { bottom: 0; left: 50%; transform: translateX(-50%); text-align: center; } .pos-bottom-right { bottom: 0; right: 0; text-align: right; }
 `;
 
-  const slideIdAttribute = currentSlideIndex === 0 ? ' id="first-slide"' : ""; // Add id only for the first slide
+  const slideIdAttribute = currentPageNo === 1 ? ' id="first-slide"' : ""; // Add id only for the first slide
 
   const slideWrapperContent = `
         <div ${slideIdAttribute} class="slide-content-wrapper">
@@ -584,8 +578,7 @@ pre[class*="language-"].line-numbers>code{position:relative;white-space:inherit}
 .line-numbers-rows>span{display:block;counter-increment:linenumber}
 .line-numbers-rows>span:before{content:counter(linenumber);color:#999;display:block;padding-right:.8em;text-align:right}`;
 
-  const prismJsUrl =
-    "https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js";
+  const prismJsUrl = "https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js";
   const prismAutoloaderUrl =
     "https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/plugins/autoloader/prism-autoloader.min.js";
   const prismLineNumbersUrl =
@@ -651,7 +644,7 @@ pre[class*="language-"].line-numbers>code{position:relative;white-space:inherit}
       }
       
 
-      #first-slide pre  { background-color: transparent !important;font-style:italic; shadow: none !important; box-shadow: none !important; }
+      #first-slide pre  { background-color: transparent !important;font-style:italic; shadow: none !important; box-shadow: none !important;text-align:center; }
       #first-slide p  { text-align:center;}
       .slide pre code {
         background-color: transparent ; 
@@ -702,4 +695,28 @@ pre[class*="language-"].line-numbers>code{position:relative;white-space:inherit}
 </body>
 </html>`;
   return htmlOutput;
+}
+
+export function getFilenameFromFirstH1(
+  markdownText: string,
+  defaultName: string = "document",
+): string {
+  if (!markdownText || typeof markdownText !== "string") {
+    return defaultName;
+  }
+
+  const lines = markdownText.split("\n");
+  for (const line of lines) {
+    const trimmedLine = line.trim();
+    if (trimmedLine.startsWith("# ")) {
+      let headingText = trimmedLine.substring(2).trim();
+      headingText = headingText
+        .replace(/[^\w\s-]/g, "")
+        .replace(/\s+/g, "_")
+        .substring(0, 50);
+
+      return headingText || defaultName;
+    }
+  }
+  return defaultName;
 }
