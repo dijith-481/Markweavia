@@ -1,4 +1,3 @@
-// --- Theme Definitions ---
 const nordColors = {
   nord0: "#2E3440",
   nord1: "#3B4252",
@@ -32,60 +31,10 @@ export const baseFontSizesConfig: Record<
   "--slide-h1-size": { min: 0, idealVmin: 12.0, max: 160 },
   "--slide-h2-size": { min: 0, idealVmin: 8.0, max: 150 },
   "--slide-h3-size": { min: 0, idealVmin: 6.0, max: 144 },
-  // "--slide-font-size": { min: 16, idealVmin: 2.2, max: 28 },
-  // "--slide-h1-size": { min: 32, idealVmin: 5.0, max: 60 },
-  // "--slide-h2-size": { min: 28, idealVmin: 4.0, max: 50 },
-  // "--slide-h3-size": { min: 24, idealVmin: 3.5, max: 44 },
 };
 
-export const LOCAL_STORAGE_FONT_MULTIPLIER_KEY =
-  "markdown-editor-font-multiplier";
+export const LOCAL_STORAGE_FONT_MULTIPLIER_KEY = "markdown-editor-font-multiplier";
 
-export const GOOGLE_FONTS_LIST: Array<{
-  name: string;
-  query: string;
-  family: string;
-}> = [
-  {
-    name: "System Default",
-    query: "",
-    family:
-      "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol'",
-  },
-  {
-    name: "Roboto",
-    query: "Roboto:wght@400;700;900",
-    family: "'Roboto', sans-serif",
-  },
-  {
-    name: "Open Sans",
-    query: "Open+Sans:wght@400;700",
-    family: "'Open Sans', sans-serif",
-  },
-  {
-    name: "Lato",
-    query: "Lato:wght@400;700;900",
-    family: "'Lato', sans-serif",
-  },
-  {
-    name: "Montserrat",
-    query: "Montserrat:wght@400;700",
-    family: "'Montserrat', sans-serif",
-  },
-  {
-    name: "Source Code Pro",
-    query: "Source+Code+Pro:wght@400;700",
-    family: "'Source Code Pro', monospace",
-  },
-  {
-    name: "Inter",
-    query: "Inter:wght@400;700;900",
-    family: "'Inter', sans-serif",
-  },
-];
-export const LOCAL_STORAGE_FONT_FAMILY_KEY = "markdown-editor-font-family";
-
-// Helper to convert hex to RGB string
 const hexToRgbString = (hex: string): string => {
   const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
   return result
@@ -171,10 +120,8 @@ export const themes: Record<string, Record<string, string>> = {
 };
 export const LOCAL_STORAGE_THEME_KEY = "markdown-editor-theme";
 export const LOCAL_STORAGE_PAGE_NUMBERS_KEY = "markdown-editor-page-numbers";
-export const LOCAL_STORAGE_PAGE_NUMBER_FIRST_PAGE_KEY =
-  "markdown-editor-page-number-first-page";
-export const LOCAL_STORAGE_HEADER_FOOTERS_KEY =
-  "markdown-editor-header-footers";
+export const LOCAL_STORAGE_PAGE_NUMBER_FIRST_PAGE_KEY = "markdown-editor-page-number-first-page";
+export const LOCAL_STORAGE_HEADER_FOOTERS_KEY = "markdown-editor-header-footers";
 
 export const headerFooterPositions = [
   { value: "top-left", label: "Top Left" },
@@ -185,8 +132,7 @@ export const headerFooterPositions = [
   { value: "bottom-right", label: "Bottom Right" },
 ] as const; // Use "as const" for stricter typing of values
 
-export type HeaderFooterPosition =
-  (typeof headerFooterPositions)[number]["value"];
+export type HeaderFooterPosition = (typeof headerFooterPositions)[number]["value"];
 
 export interface HeaderFooterItem {
   id: string;
