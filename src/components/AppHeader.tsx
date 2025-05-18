@@ -17,7 +17,7 @@ export default function AppHeader({
 }: AppHeaderProps) {
   return (
     <header className="p-4   flex justify-between items-center text-nord9">
-      <h1 className="text-xl font-bold">Markdown Editor</h1>
+      <h1 className="text-2xl font-bold pl-4">Markweavia</h1>
       <div className="flex items-center space-x-3 ">
         <input
           type="file"

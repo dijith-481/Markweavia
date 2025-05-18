@@ -40,6 +40,14 @@ const cyclingTips = [
     ),
   },
   {
+    key: "hjklGoBrrr",
+    content: (
+      <>
+        Not making slides? Then <code className="code-style-footer">hjkl</code> go hlkj;hkl;!
+      </>
+    ),
+  },
+  {
     key: "vimUpload",
     content: (
       <>
@@ -49,19 +57,66 @@ const cyclingTips = [
     ),
   },
   {
-    key: "slides",
+    key: "slidesSyntax",
     content: (
       <>
         Slides: Use <code className="code-style-footer"># Title</code> /{" "}
-        <code className="code-style-footer">## Subtitle</code>. Separate with{" "}
+        <code className="code-style-footer">## Heading</code>. Separate with{" "}
         <code className="code-style-footer">---</code>
+      </>
+    ),
+  },
+
+  {
+    key: "madeWithLove",
+    content: (
+      <>
+        Made with <span style={{ color: "#bf616a" }}>❤</span> & Vim by{" "}
+        <a
+          href="https://dijith.vercel.app"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="link-style-footer"
+        >
+          Dijith
+        </a>
+      </>
+    ),
+  },
+  {
+    key: "githubStar",
+    content: (
+      <>
+        Enjoying Markweavia? Give it a <span style={{ color: "#5e81ac" }}>★</span> on{" "}
+        <a
+          href="https://github.com/dijit-481/markweavia"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="link-style-footer"
+        >
+          GitHub
+        </a>
+        !
+      </>
+    ),
+  },
+  {
+    key: "tagline",
+    content: <>Markweavia: Markdown, beautifully woven.</>,
+  },
+  {
+    key: "vimquote",
+    content: (
+      <>
+        Every <kbd className="kbd-style-footer">:w</kbd> in Vim is like a little pat on your
+        document's head.
       </>
     ),
   },
 ];
 
-const TIP_VISIBLE_DURATION = 4500; // ms
-const TIP_FADE_DURATION = 500; // ms
+const TIP_VISIBLE_DURATION = 4500;
+const TIP_FADE_DURATION = 500;
 
 export default function AppFooter({
   showInfoPopup,

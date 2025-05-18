@@ -187,7 +187,7 @@ pre[class*="language-"].line-numbers>code{position:relative;white-space:inherit}
       .slide th:first-child, .slide td:first-child { border-left: none; }
       .slide img { max-width: 70vw; max-height: 60vh; height: auto; border-radius: 4px; margin: 1em auto; display: block; box-shadow: 0 2px 8px rgba(0,0,0,0.2); }
       .slide hr { margin: 1.5em 0; border: 0; border-top: 1px solid var(--nord3); }
-      .slide strong { font-weight: bold; color: var(--nord13); } 
+        .slide strong { font-weight: 900; color: var(--nord13); } 
       .slide em { font-style: italic; color: var(--nord12); }
       .slide-navigation { position: fixed; bottom: 20px; right: 20px; display: flex; flex-direction: column; gap: 8px; z-index: 1000; opacity: 0; transition: opacity 0.3s ease-in-out, visibility 0.3s ease-in-out; }
       .slide-navigation button  { background-color: rgba(var(--nord10-rgb, 94, 129, 172), 0.85); color: var(--nord6); border: none; padding: 6px 10px; border-radius: 5px; cursor: pointer; font-size: 12px; font-weight: 500; transition: background-color 0.2s ease, transform 0.1s ease; min-width: 60px; text-align: center; box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
@@ -382,7 +382,7 @@ pre[class*="language-"].line-numbers>code{position:relative;white-space:inherit}
       .slide th:first-child, .slide td:first-child { border-left: none; }
       .slide img { max-width: 70vw; max-height: 60vh; height: auto; border-radius: 4px; margin: 1em auto; display: block; box-shadow: 0 2px 8px rgba(0,0,0,0.2); }
       .slide hr { margin: 1.5em 0; border: 0; border-top: 1px solid var(--nord3); }
-      .slide strong { font-weight: bold; color: var(--nord13); } 
+      .slide strong { font-weight: 900; color: var(--nord13); } 
       .slide em { font-style: italic; color: var(--nord12); }
       #prism-custom-paths { display: none; }
     </style>

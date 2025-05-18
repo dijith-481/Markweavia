@@ -50,8 +50,8 @@ export const themes: Record<string, Record<string, string>> = {
     "--nord9": nordColors.nord9,
     "--nord10": nordColors.nord10,
     "--nord11": nordColors.nord11,
-    "--nord12": nordColors.nord12,
-    "--nord13": nordColors.nord13,
+    "--nord12": nordColors.nord8,
+    "--nord13": nordColors.nord10,
     "--nord14": nordColors.nord14,
     "--nord15": nordColors.nord15,
     "--nord0-rgb": hexToRgbString(nordColors.nord0),
@@ -85,9 +85,9 @@ export const themes: Record<string, Record<string, string>> = {
     "--nord7": "#8FBCBB",
     "--nord8": "#81A1C1",
     "--nord9": "#81A1C1",
-    "--nord10": "#5E81AC",
+    "--nord10": "#4b5f82",
     "--nord11": "#BF616A",
-    "--nord12": "#D08770",
+    "--nord12": "#5E81AC",
     "--nord13": "#81a1c1",
     "--nord14": "#A3BE8C",
     "--nord15": "#B48EAD",
@@ -126,7 +126,7 @@ export const themes: Record<string, Record<string, string>> = {
     "--nord10": "#555555", // Button background (text on it should be light, e.g., --nord0)
     "--nord11": "#616161", // "Danger" or alternate, mapped to a mid-dark gray
     "--nord12": "#616161", // "Warning" or alternate
-    "--nord13": "#424242", // "Highlight" (e.g. strong text, inline code text)
+    "--nord13": "#121212", // "Highlight" (e.g. strong text, inline code text)
     "--nord14": "#424242", // "Success" or alternate
     "--nord15": "#424242", // "Special" or alternate
     "--nord0-rgb": hexToRgbString("#FFFFFF"),
@@ -164,7 +164,7 @@ export const themes: Record<string, Record<string, string>> = {
     "--nord10": "#4A4A4A", // Button background (text on it should be light, e.g., --nord4)
     "--nord11": "#9E9E9E", // "Danger" or alternate
     "--nord12": "#9E9E9E", // "Warning" or alternate
-    "--nord13": "#BDBDBD", // "Highlight" (e.g. strong text, inline code text)
+    "--nord13": "#fDfDfD", // "Highlight" (e.g. strong text, inline code text)
     "--nord14": "#BDBDBD", // "Success" or alternate
     "--nord15": "#BDBDBD", // "Special" or alternate
     "--nord0-rgb": hexToRgbString("#121212"),

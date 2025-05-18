@@ -6,8 +6,8 @@ import "./globals.css";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "Markdown Editor Pro",
-  description: "Edit and preview Markdown with advanced features.",
+  title: "Markweavia",
+  description: "Markdown, beautifully woven.",
 };
 
 export default function RootLayout({

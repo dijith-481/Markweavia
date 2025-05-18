@@ -1,6 +1,4 @@
-/* src/app/globals.css */
 @import "tailwindcss";
-
 @theme {
   --color-nordic: #191d24;
   --color-nord0: #2e3440;
@@ -22,12 +20,9 @@
 }
 body {
   margin: 0;
-  font-family:
-    -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen", "Ubuntu", "Cantarell",
-    "Fira Sans", "Droid Sans", "Helvetica Neue", sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  overscroll-behavior: none; /* Prevents pull-to-refresh on mobile if app is full screen */
+  overscroll-behavior: none;
 }
 * {
   scrollbar-width: none;
@@ -37,171 +32,11 @@ body {
   display: none;
 }
 
-/* Optional: Improve preview scrollbar for dark themes if needed */
-.overflow-y-auto::-webkit-scrollbar {
-  width: 8px;
-}
-.overflow-y-auto::-webkit-scrollbar-track {
-  background: #2d3748; /* gray-700 */
-}
-.overflow-y-auto::-webkit-scrollbar-thumb {
-  background: #4a5568; /* gray-600 */
-  border-radius: 4px;
-}
-.overflow-y-auto::-webkit-scrollbar-thumb:hover {
-  background: #718096; /* gray-500 */
-}
-
-.pdf-render-mode {
-  background-color: white !important;
-  color: #202020 !important; /* Dark gray, almost black */
-  font-family: "Times New Roman", Times, serif !important; /* A common serif font for documents */
-  font-size: 12pt !important; /* Standard document font size */
-  line-height: 1.5 !important;
-  padding: 20mm !important; /* A4 page margins */
-  width: 210mm !important; /* A4 width, adjust if needed */
-  box-sizing: border-box !important;
-}
-.pdf-render-mode h1,
-.pdf-render-mode h2,
-.pdf-render-mode h3,
-.pdf-render-mode h4,
-.pdf-render-mode h5,
-.pdf-render-mode h6 {
-  color: #000000 !important;
-  font-family: Arial, Helvetica, sans-serif !important; /* Sans-serif for headings */
-  margin-top: 1.2em !important;
-  margin-bottom: 0.6em !important;
-  page-break-after: avoid !important; /* Try to prevent page breaks right after headings */
-}
-
-.pdf-render-mode h1 {
-  font-size: 24pt !important;
-}
-.pdf-render-mode h2 {
-  font-size: 18pt !important;
-}
-.pdf-render-mode h3 {
-  font-size: 14pt !important;
-}
-
-.pdf-render-mode p {
-  color: #202020 !important;
-  margin-bottom: 0.8em !important;
-  text-align: justify !important; /* Justify text for a document look */
-}
-
-.pdf-render-mode ul,
-.pdf-render-mode ol {
-  color: #202020 !important;
-  margin-left: 10mm !important;
-  margin-bottom: 0.8em !important;
-}
-
-.pdf-render-mode li {
-  margin-bottom: 0.3em !important;
-}
-
-.pdf-render-mode a {
-  color: #0000ee !important; /* Standard blue link color */
-  text-decoration: underline !important;
-}
-.pdf-render-mode a:visited {
-  color: #551a8b !important; /* Standard purple visited link color */
-}
-
-.pdf-render-mode code {
-  font-family: "Courier New", Courier, monospace !important;
-  background-color: #f0f0f0 !important; /* Light gray background for inline code */
-  color: #333333 !important;
-  padding: 0.1em 0.3em !important;
-  border-radius: 3px !important;
-  font-size: 0.95em !important;
-}
-
-.pdf-render-mode pre {
-  font-family: "Courier New", Courier, monospace !important;
-  background-color: #f4f4f4 !important; /* Very light gray for code blocks */
-  color: #111111 !important;
-  padding: 1em !important;
-  border: 1px solid #dddddd !important;
-  border-radius: 4px !important;
-  overflow-x: auto !important;
-  white-space: pre-wrap !important; /* Allow wrapping for long lines in PDF */
-  word-wrap: break-word !important;
-  font-size: 10pt !important;
-  page-break-inside: avoid !important; /* Try to keep code blocks on one page */
-}
-
-/* Remove syntax highlighting colors from react-syntax-highlighter for PDF */
-.pdf-render-mode pre > code span {
-  color: inherit !important;
-  background-color: transparent !important;
-}
-
-.pdf-render-mode blockquote {
-  border-left: 3px solid #cccccc !important;
-  padding-left: 1em !important;
-  margin-left: 0 !important;
-  margin-right: 0 !important;
-  font-style: italic !important;
-  color: #555555 !important;
-  background-color: transparent !important;
-}
-
-.pdf-render-mode table {
-  border-collapse: collapse !important;
-  width: 100% !important;
-  margin-bottom: 1em !important;
-  page-break-inside: avoid !important;
-}
-
-.pdf-render-mode th,
-.pdf-render-mode td {
-  border: 1px solid #cccccc !important;
-  padding: 0.5em !important;
-  color: #202020 !important;
-  text-align: left !important;
-}
-
-.pdf-render-mode th {
-  background-color: #e9e9e9 !important;
-  font-weight: bold !important;
-}
-
-.pdf-render-mode img {
-  max-width: 100% !important; /* Ensure images fit */
-  height: auto !important;
-  display: block !important; /* Helps with margins */
-  margin: 1em auto !important; /* Center images */
-  page-break-inside: avoid !important;
-}
-
-.pdf-render-mode hr {
-  border: none !important;
-  border-top: 1px solid #cccccc !important;
-  margin: 2em 0 !important;
-}
-
-.pdf-render-mode .prose {
-  all: unset; /* Reset prose styles aggressively */
-  /* Reapply very basic structure if needed, but let .pdf-render-mode tags take over */
-}
-/* Further specific overrides for prose children if unset is too aggressive */
-.pdf-render-mode .prose h1, .pdf-render-mode .prose h2 /* etc. */ {
-  /* Styles here will be overridden by .pdf-render-mode h1 anyway due to specificity or !important */
-}
-
-/* Hide elements not for print */
-.pdf-render-mode .no-print {
-  display: none !important;
-}
-
 @layer components {
   .kbd-style-footer {
     @apply px-1 py-0.5 text-xs font-semibold inline-block  text-nord0 bg-nord9 rounded-sm not-italic;
   }
   .code-style-footer {
-    @apply text-nord0 px-1 py-0.5 text-xs font-semibold inline-block  bg-nord7 rounded-sm;
+    @apply text-nord0 px-1 py-0.5 text-xs font-semibold inline-block  bg-nord9 rounded-sm;
   }
 }
