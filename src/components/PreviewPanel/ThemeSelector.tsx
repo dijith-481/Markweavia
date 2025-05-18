@@ -9,17 +9,15 @@ interface ThemeSelectorProps {
   dropdownRef: React.RefObject<HTMLDivElement>;
 }
 
-// Helper function to format theme names for display
 const formatThemeNameForDisplay = (themeKey: string): string => {
   if (themeKey === "nordDark") return "Nord Dark (Default)";
   if (themeKey === "nordLight") return "Nord Light";
   if (themeKey === "proWhiteMonochrome") return "True White";
   if (themeKey === "proBlackMonochrome") return "True Black";
 
-  // Fallback for any other themes: convert camelCase or PascalCase to Title Case
   return themeKey
-    .replace(/([A-Z])/g, " $1") // Add space before uppercase letters
-    .replace(/^./, (str) => str.toUpperCase()) // Capitalize first letter
+    .replace(/([A-Z])/g, " $1")
+    .replace(/^./, (str) => str.toUpperCase())
     .trim();
 };
 
@@ -34,7 +32,7 @@ export default function ThemeSelector({
     <div className="relative" ref={dropdownRef}>
       <button
         onClick={onToggleDropdown}
-        className="px-3 py-1.5 bg-nord8 hover:bg-nord7 text-nord0 text-sm w-30 rounded-md focus:outline-none flex items-center" // w-30 might need adjustment if theme names are long
+        className="px-3 py-1.5 bg-nord8 hover:bg-nord7 text-nord0 text-sm w-30 rounded-md focus:outline-none flex items-center"
       >
         Themes
         <span

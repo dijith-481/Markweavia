@@ -3,8 +3,8 @@ import InfoPopup from "./UI/InfoPopup";
 
 interface AppFooterProps {
   showInfoPopup: boolean;
-  onToggleInfoPopup: () => void; // For the main InfoPopup modal
-  infoPopupRef: React.RefObject<HTMLDivElement>; // For the main InfoPopup modal
+  onToggleInfoPopup: () => void;
+  infoPopupRef: React.RefObject<HTMLDivElement>;
   showWordCount: boolean;
   count: number;
   onToggleCountType: () => void;
@@ -51,8 +51,8 @@ const cyclingTips = [
     key: "vimUpload",
     content: (
       <>
-        Vim: <kbd className="kbd-style-footer">:u</kbd> or{" "}
-        <kbd className="kbd-style-footer">Ctrl+O</kbd> to upload file
+        Vim: <kbd className="kbd-style-footer">:u</kbd>
+        to upload file
       </>
     ),
   },

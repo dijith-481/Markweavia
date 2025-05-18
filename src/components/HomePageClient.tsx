@@ -19,7 +19,7 @@ import { useFileHandling } from "../hooks/useFileHandling";
 import { useKeyboardAndFocus } from "../hooks/useKeyboardAndFocus";
 
 export default function HomePageClient() {
-  const codeMirrorRef = useRef<any>(null); // Adjust type if specific CodeMirror wrapper type available
+  const codeMirrorRef = useRef<any>(null);
 
   const {
     activeTheme,

@@ -1,13 +1,13 @@
 import React from "react";
 import CodeMirror from "@uiw/react-codemirror";
-import { Extension } from "@codemirror/state"; // For extensions type
+import { Extension } from "@codemirror/state";
 
 interface EditorPanelProps {
   markdownText: string;
   onMarkdownChange: (value: string) => void;
   extensions: Extension[];
-  codeMirrorRef: React.RefObject<any>; // Adjust type if you have a specific CodeMirror wrapper type
-  theme: Extension; // Assuming nord theme is an Extension
+  codeMirrorRef: React.RefObject<any>;
+  theme: Extension;
 }
 
 export default function EditorPanel({
@@ -25,7 +25,7 @@ export default function EditorPanel({
           height="100%"
           extensions={extensions}
           onChange={onMarkdownChange}
-          theme={theme} // Pass the theme prop here
+          theme={theme}
           basicSetup={{
             lineNumbers: true,
             foldGutter: false,
@@ -35,7 +35,7 @@ export default function EditorPanel({
           }}
           className="h-full text-sm"
           ref={codeMirrorRef}
-          id="codeMirrorRef" // Added for potential direct DOM targeting
+          id="codeMirrorRef"
         />
       </div>
     </div>

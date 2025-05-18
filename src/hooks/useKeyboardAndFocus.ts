@@ -1,7 +1,7 @@
 import { useEffect, useCallback } from "react";
 
 export function useKeyboardAndFocus(
-  codeMirrorRef: React.RefObject<any>, // Adjust if you have a specific CodeMirror wrapper type
+  codeMirrorRef: React.RefObject<any>,
   onDownloadMd: () => void,
   onSaveAsSlides: () => void,
   onTriggerUpload: () => void,
@@ -19,9 +19,8 @@ export function useKeyboardAndFocus(
       if (event.key === "Escape") {
         if (isAnyPopupOpen) {
           closeAllPopups();
-          event.preventDefault(); // Prevent CM Vim from handling Esc if a popup was open
+          event.preventDefault();
         }
-        // Allow Esc to be handled by Vim if no popups are open
       }
 
       if ((event.ctrlKey || event.metaKey) && event.key === "s" && !event.shiftKey) {

@@ -18,7 +18,7 @@ export default function SlidePreviewFrame({ previewHtml, onMouseEnter }: SlidePr
             width: "100%",
             border: "none",
           }}
-          sandbox="allow-scripts" // Keep sandbox for security if HTML is generated
+          sandbox="allow-scripts"
         />
       </div>
     </div>

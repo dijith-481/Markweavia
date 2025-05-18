@@ -99,7 +99,6 @@ export function usePersistentSettings() {
       if (newState) {
         setHeaderFooters((hf) => {
           if (!hf.find((item) => item.id === PAGE_NUMBER_SLIDE_ID)) {
-            // Find an available position for page numbers
             const usedPositions = new Set(hf.map((item) => item.position));
             const availablePos = headerFooterPositions.find((p) => !usedPositions.has(p.value));
             return [
@@ -133,7 +132,7 @@ export function usePersistentSettings() {
 
   const removeHeaderFooterItem = (id: string) => {
     if (id === PAGE_NUMBER_SLIDE_ID) {
-      setShowPageNumbers(false); // This will trigger the effect to remove it from headerFooters
+      setShowPageNumbers(false);
     } else {
       setHeaderFooters((prev) => prev.filter((item) => item.id !== id));
     }

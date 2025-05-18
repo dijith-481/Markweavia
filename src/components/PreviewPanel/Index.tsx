@@ -18,31 +18,26 @@ interface PreviewPanelProps {
   previewHtml: string;
   onHidePopups: () => void;
 
-  // Theme
   activeTheme: string;
   onLoadTheme: (themeName: keyof typeof themeOptions) => void;
   isThemeDropdownOpen: boolean;
   onToggleThemeDropdown: () => void;
   themeDropdownRef: React.RefObject<HTMLDivElement>;
 
-  // Template
   onLoadTemplate: (templateKey: keyof typeof slideTemplates) => void;
   isTemplateDropdownOpen: boolean;
   onToggleTemplateDropdown: () => void;
   templateDropdownRef: React.RefObject<HTMLDivElement>;
 
-  // Font
   fontSizeMultiplier: number;
   onIncreaseFontSize: () => void;
   onDecreaseFontSize: () => void;
 
-  // Layout Settings
   showPageNumbers: boolean;
   onToggleShowPageNumbers: () => void;
   headerfooterOnFirstPage: boolean;
   onToggleHeaderFooterOnFirstPage: () => void;
 
-  // Header/Footer Manager
   headerFooters: HeaderFooterItem[];
   availableHeaderFooterPositions: { value: HeaderFooterPosition; label: string }[];
   onAddHeaderFooterItem: (text: string, position: HeaderFooterPosition) => boolean;
@@ -54,7 +49,6 @@ interface PreviewPanelProps {
   editingItemId: string | null;
   onSetEditingItemId: (id: string | null) => void;
 
-  // Full Preview
   onPreviewFullSlides: () => void;
 }
 

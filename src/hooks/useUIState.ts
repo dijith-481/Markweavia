@@ -15,11 +15,11 @@ export function useUIState() {
 
   const toggleTemplateDropdown = () => {
     setIsTemplateDropdownOpen((prev) => !prev);
-    setIsThemeDropdownOpen(false); // Close other dropdown
+    setIsThemeDropdownOpen(false);
   };
   const toggleThemeDropdown = () => {
     setIsThemeDropdownOpen((prev) => !prev);
-    setIsTemplateDropdownOpen(false); // Close other dropdown
+    setIsTemplateDropdownOpen(false);
   };
   const toggleInfoPopup = () => setShowInfoPopup((prev) => !prev);
   const toggleShowWordCount = () => setShowWordCount((prev) => !prev);

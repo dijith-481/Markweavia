@@ -1,8 +1,5 @@
 import { marked } from "marked";
-import { SlideLayoutOptions } from "./local-storage"; // Import from local-storage
-
-// slideTemplates object is now in ./slide-templates.ts and not used directly by these functions.
-// The component/hook that calls loadTemplate (e.g., useFileHandling) will import it from there.
+import { SlideLayoutOptions } from "./local-storage";
 
 function splitMarkdownIntoSlides(markdown: string): string[] {
   const lines = markdown.split("\n");
@@ -40,7 +37,6 @@ function splitMarkdownIntoSlides(markdown: string): string[] {
   return slides;
 }
 
-// THE CONTENT OF THIS FUNCTION (HTML, CSS, JS TEMPLATE STRINGS) REMAINS UNCHANGED
 export async function exportToCustomSlidesHtml(
   fullMarkdown: string,
   themeVariables: Record<string, string>,
@@ -266,7 +262,6 @@ pre[class*="language-"].line-numbers>code{position:relative;white-space:inherit}
   return htmlOutput;
 }
 
-// THE CONTENT OF THIS FUNCTION (HTML, CSS, JS TEMPLATE STRINGS) REMAINS UNCHANGED
 export async function exportSingleSlideToHtml(
   slideMarkdown: string,
   themeVariables: Record<string, string>,
@@ -341,7 +336,7 @@ pre[class*="language-"].line-numbers>code{position:relative;white-space:inherit}
   for (const [key, value] of Object.entries(themeVariables)) {
     cssVariablesString += `  ${key}: ${value};\n`;
   }
-  cssVariablesString += "}\n"; // Added missing closing brace for :root
+  cssVariablesString += "}\n";
 
   const htmlOutput = `
 <!DOCTYPE html>

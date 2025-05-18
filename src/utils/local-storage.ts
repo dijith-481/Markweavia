@@ -27,7 +27,6 @@ export const baseFontSizesConfig: Record<
   "--slide-h3-size": { min: 0, idealVmin: 6.0, max: 144 },
 };
 export const LOCAL_STORAGE_FONT_MULTIPLIER_KEY = "markdown-editor-font-multiplier";
-// GOOGLE_FONTS_LIST and LOCAL_STORAGE_FONT_FAMILY_KEY as previously defined...
 
 const hexToRgbString = (hex: string): string => {
   const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);

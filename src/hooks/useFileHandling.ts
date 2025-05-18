@@ -2,7 +2,7 @@ import { useRef, useCallback, useEffect } from "react";
 import { Vim } from "@replit/codemirror-vim";
 import { getFilenameFromFirstH1, exportToCustomSlidesHtml } from "../utils/export-utils";
 import { slideTemplates } from "../utils/slide-templates";
-import { SlideLayoutOptions } from "../utils/local-storage"; // Ensure this type is exported
+import { SlideLayoutOptions } from "../utils/local-storage";
 
 export function useFileHandling(
   markdownText: string,
@@ -116,7 +116,6 @@ export function useFileHandling(
     setMarkdownText(slideTemplates[templateKey]);
   };
 
-  // Setup Vim commands
   useEffect(() => {
     Vim.defineEx("write", "w", handleDownloadMd);
     Vim.defineEx("wslide", "ws", handleSaveAsSlides);

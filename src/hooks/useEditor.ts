@@ -3,28 +3,46 @@ import { EditorView } from "@codemirror/view";
 import { debounce, countWords, countLetters } from "../utils/common";
 import { exportSingleSlideToHtml } from "../utils/export-utils";
 import { LOCAL_STORAGE_KEY } from "../constants";
-import { SlideLayoutOptions } from "../utils/local-storage"; // Ensure this type is exported
+import { SlideLayoutOptions } from "../utils/local-storage";
 
-const initialMarkdownContent = `# Welcome to Markdown Editor!
+const initialMarkdownContent = `# Welcome to Markweavia!
+*Markdown, beautifully woven.*
 
-Type your Markdown here. Changes will appear in the preview pane.
+Type your Markdown here. Your content will instantly appear as a slide preview on the right.
 
-## Features
-- Live Preview
-- Word Count
-- Font Scaling
-- Page Numbers
-- Header/Footers
-- Customizable Themes
-- vim keybindings
-- Auto-saving to Local Storage
+## Core Features
+- **Effortless Slide Creation:** Write content in Markdown; see it as a slide.
+- **Live Preview:** Instant feedback on your current slide's appearance.
+- **Vim Keybindings:** Edit with the speed and power of Vim.
+- **HTML Slide Export:** Download your entire presentation as a single, interactive HTML file. This file acts like a portable presentation software, complete with navigation (buttons & keyboard shortcuts), your chosen theme, and all your content, ready to be opened in any browser for a seamless presentation experience.
+- **Markdown (.md) Export:** Save your source text.
+
+## Core Features
+- **Customizable Themes:** Choose from Nord-inspired and minimalist themes.
+- **Font Scaling:** Adjust text size for readability.
+- **Page Numbers & Headers/Footers:** Add professional touches to your slides.
+- **Local Storage Saving:** Your work is automatically saved.
+- **File Upload:** Import existing Markdown files.
+
+## Getting Started
+1.  Use \`# Heading 1\` or \`## Heading 2\` to start a new slide.
+2.  Separate distinct slide content with \`---\` on a new line.
+3.  Explore the theme and layout options in the right-hand panel.
+4.  Use Vim commands like \`:w\` to save Markdown or \`:ws\` to save HTML slides.
+
+\`\`\`javascript
+function greet(name) {
+  console.log(\`Hello, \${name} from Markweavia!\`);
+}
+greet('World');
+\`\`\`
 `;
 
 export function useEditor(
   effectiveThemeVariables: Record<string, string>,
   slideLayoutOptions: SlideLayoutOptions,
   showWordCount: boolean,
-  codeMirrorRef: React.RefObject<any>, // Adjust type if you have a specific CodeMirror wrapper type
+  codeMirrorRef: React.RefObject<any>,
 ) {
   const [markdownText, setMarkdownText] = useState<string>("");
   const [markdownSlide, setMarkdownSlide] = useState<string>("");
@@ -37,6 +55,11 @@ export function useEditor(
     const savedContent = localStorage.getItem(LOCAL_STORAGE_KEY);
     setMarkdownText(savedContent || initialMarkdownContent);
   }, []);
+  useEffect(() => {
+    console.log("markdownText changed");
+    console.log(markdownText);
+    handleExtractCurrentSlide();
+  }, [markdownText]);
 
   useEffect(() => {
     const handler = setTimeout(() => {
@@ -54,6 +77,9 @@ export function useEditor(
     if (!view) {
       setCurrentPageInEditor(1);
       setTotalEditorPages(1);
+      setTimeout(() => {
+        updateEditorPageInfo();
+      }, 100);
       return;
     }
     const doc = view.state.doc;
@@ -77,7 +103,7 @@ export function useEditor(
       }
     }
     if (currentHeadingStartLine === -1) {
-      setCurrentPageInEditor(1); // Default to page 1 if no heading above/at cursor
+      setCurrentPageInEditor(1);
       return;
     }
     let headingsAboveCursor = 0;
@@ -94,6 +120,9 @@ export function useEditor(
     const view = codeMirrorRef.current?.view;
     if (!view) {
       setMarkdownSlide("");
+      setTimeout(() => {
+        handleExtractCurrentSlide();
+      }, 100);
       return;
     }
     const currentPos = view.state.selection.main.head;
@@ -112,7 +141,6 @@ export function useEditor(
       }
     }
     if (slideStartLineNumber === -1) {
-      // If no heading found searching upwards, search downwards
       for (let i = currentLineNumber; i <= doc.lines; i++) {
         const line = doc.line(i);
         const lineText = line.text.trimStart();
@@ -124,7 +152,6 @@ export function useEditor(
       }
     }
     if (slideStartLineNumber === -1) {
-      // Still no heading means whole doc or empty
       setMarkdownSlide(doc.toString());
       return;
     }
@@ -152,7 +179,7 @@ export function useEditor(
     } else {
       setWordOrLetterCount(countLetters(markdownText));
     }
-    updateEditorPageInfo(); // Update page info when text changes
+    updateEditorPageInfo();
   }, [markdownText, showWordCount, updateEditorPageInfo]);
 
   useEffect(() => {
@@ -187,9 +214,9 @@ export function useEditor(
     wordOrLetterCount,
     currentPageInEditor,
     totalEditorPages,
-    handleExtractCurrentSlide, // Export if needed directly
-    updateEditorPageInfo, // Export if needed directly
+    handleExtractCurrentSlide,
+    updateEditorPageInfo,
     editorUpdateListener,
-    initialMarkdownContent, // For resetting or templates
+    initialMarkdownContent,
   };
 }
