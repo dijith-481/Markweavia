@@ -1,11 +1,8 @@
 import { useRef, useCallback, useEffect } from "react";
 import { Vim } from "@replit/codemirror-vim";
-import {
-  getFilenameFromFirstH1,
-  exportToCustomSlidesHtml,
-  slideTemplates,
-} from "../utils/export-utils";
-import { SlideLayoutOptions } from "../utils/export-utils"; // Ensure this type is exported
+import { getFilenameFromFirstH1, exportToCustomSlidesHtml } from "../utils/export-utils";
+import { slideTemplates } from "../utils/slide-templates";
+import { SlideLayoutOptions } from "../utils/local-storage"; // Ensure this type is exported
 
 export function useFileHandling(
   markdownText: string,
@@ -124,7 +121,7 @@ export function useFileHandling(
     Vim.defineEx("write", "w", handleDownloadMd);
     Vim.defineEx("wslide", "ws", handleSaveAsSlides);
     Vim.defineEx("upload", "u", triggerFileUpload);
-  }, [handleDownloadMd, handleSaveAsSlides, triggerFileUpload]);
+  }, [handleDownloadMd, handleSaveAsSlides]);
 
   return {
     fileInputRef,

@@ -102,7 +102,6 @@ export default function HomePageClient() {
   return (
     <div className="flex flex-col h-screen bg-nordic text-nord4">
       {" "}
-      {/* Changed bg-nordic to bg-nord0 for consistency */}
       <AppHeader
         onUploadClick={triggerFileUpload}
         onDownloadMdClick={handleDownloadMd}
@@ -111,14 +110,12 @@ export default function HomePageClient() {
         fileInputRef={fileInputRef as React.RefObject<HTMLInputElement>}
       />
       <main className="flex flex-wrap gap-4 justify-evenly h-[calc(100vh-10rem)] md:h-[calc(100vh-8rem)] p-4">
-        {" "}
-        {/* Adjusted height and padding */}
         <EditorPanel
           markdownText={markdownText}
           onMarkdownChange={handleMarkdownChange}
           extensions={combinedEditorExtensions}
           codeMirrorRef={codeMirrorRef}
-          theme={nord} // Pass the nord theme directly
+          theme={nord}
         />
         <PreviewPanel
           previewHtml={previewHtml}

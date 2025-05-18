@@ -1,5 +1,5 @@
 import React from "react";
-import { slideTemplates } from "../../utils/export-utils";
+import { slideTemplates } from "../../utils/slide-templates";
 
 interface TemplateSelectorProps {
   onLoadTemplate: (templateKey: keyof typeof slideTemplates) => void;

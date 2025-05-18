@@ -12,7 +12,7 @@ import {
   HeaderFooterItem,
   HeaderFooterPosition,
 } from "../../utils/local-storage";
-import { slideTemplates } from "../../utils/export-utils";
+import { slideTemplates } from "../../utils/slide-templates";
 
 interface PreviewPanelProps {
   previewHtml: string;

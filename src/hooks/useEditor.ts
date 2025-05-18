@@ -1,9 +1,9 @@
-import { useState, useEffect, useCallback, useRef } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { EditorView } from "@codemirror/view";
 import { debounce, countWords, countLetters } from "../utils/common";
 import { exportSingleSlideToHtml } from "../utils/export-utils";
 import { LOCAL_STORAGE_KEY } from "../constants";
-import { SlideLayoutOptions } from "../utils/export-utils"; // Ensure this type is exported
+import { SlideLayoutOptions } from "../utils/local-storage"; // Ensure this type is exported
 
 const initialMarkdownContent = `# Welcome to Markdown Editor!
 
@@ -109,7 +109,7 @@ export function useEditor(
     }
     const currentPos = view.state.selection.main.head;
     const doc = view.state.doc;
-    let currentLineNumber = doc.lineAt(currentPos).number;
+    const currentLineNumber = doc.lineAt(currentPos).number;
     let slideStartLineNumber = -1;
     let slideStartIndex = -1;
 

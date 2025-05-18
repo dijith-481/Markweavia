@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from "react";
-import InfoPopup from "./UI/InfoPopup"; // Keep this import
+import InfoPopup from "./UI/InfoPopup";
 
 interface AppFooterProps {
-  showInfoPopup: boolean; // For the main InfoPopup modal
+  showInfoPopup: boolean;
   onToggleInfoPopup: () => void; // For the main InfoPopup modal
   infoPopupRef: React.RefObject<HTMLDivElement>; // For the main InfoPopup modal
   showWordCount: boolean;
