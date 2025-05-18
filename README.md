@@ -1,5 +1,5 @@
 <div align="center">
-  <img src="https://via.placeholder.com/150x150/2E3440/D8DEE9?text=M" alt="Markweavia Logo Placeholder - M in Nord Colors" width="120">
+  <img src="https://github.com/dijith-481/Markweavia/blob/main/public/logo.svg" alt="Markweavia Logo" width="120">
   <h1>Markweavia</h1>
   <p><i>Markdown, beautifully woven.</i></p>
   <p>Effortlessly craft minimalist, professional presentations directly from your Markdown files using familiar Vim motions.</p>
@@ -153,5 +153,6 @@ See the [LICENSE](LICENSE) file for details.
 
 <div align="center">
   <hr style="border-top: 1px solid #4C566A; margin: 20px 0;">
-  <p>Markweavia - Markdown, beautifully woven.</p>
+  <img src="https://github.com/dijith-481/Markweavia/blob/main/public/markweavia.svg" alt="Markweavia Logo" width="300">
+  <p> Markdown, beautifully woven.</p>
 </div>
