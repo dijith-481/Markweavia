@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from "react";
 import InfoPopup from "./UI/InfoPopup";
+import { useScreenSize } from "../hooks/useScreenSize";
 
 interface AppFooterProps {
   showInfoPopup: boolean;
-  onToggleInfoPopup: () => void;
+  onToggleInfoPopup: (val?: number) => void;
   infoPopupRef: React.RefObject<HTMLDivElement>;
+  infoButtonRef: React.RefObject<HTMLButtonElement>;
   showWordCount: boolean;
   count: number;
   onToggleCountType: () => void;
@@ -158,12 +160,14 @@ export default function AppFooter({
   showInfoPopup,
   onToggleInfoPopup,
   infoPopupRef,
+  infoButtonRef,
   showWordCount,
   count,
   onToggleCountType,
   currentPage,
   totalPages,
 }: AppFooterProps) {
+  const { isMobile } = useScreenSize();
   const [currentCyclingTipIndex, setCurrentCyclingTipIndex] = useState(0);
   const [cyclingTipOpacity, setCyclingTipOpacity] = useState(0);
 
@@ -191,9 +195,10 @@ export default function AppFooter({
       <div className="flex items-center gap-3">
         <div className="relative">
           <button
-            onClick={onToggleInfoPopup}
-            className="p-1.5 rounded-full hover:bg-nord3 focus:outline-none"
-            title="Show Info"
+            ref={infoButtonRef as React.RefObject<HTMLButtonElement>}
+            onMouseEnter={!isMobile ? () => onToggleInfoPopup(1) : undefined}
+            onClick={() => onToggleInfoPopup()}
+            className="p-1.5 rounded-md bg-nord3 focus:outline-none"
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -210,7 +215,11 @@ export default function AppFooter({
               />
             </svg>
           </button>
-          <InfoPopup show={showInfoPopup} onClose={onToggleInfoPopup} popupRef={infoPopupRef} />
+          <InfoPopup
+            show={showInfoPopup}
+            onClose={onToggleInfoPopup.bind(0)}
+            popupRef={infoPopupRef}
+          />
         </div>
 
         {/* Cycling Tips Area */}

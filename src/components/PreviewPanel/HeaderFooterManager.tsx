@@ -129,7 +129,7 @@ export default function HeaderFooterManager({
           {headerFooters.map((item) => (
             <li
               key={item.id}
-              className="flex justify-between items-center bg-nord1 p-1 px-2 rounded text-sm"
+              className="flex justify-between items-center bg-nord1 p-1 px-2  text-sm"
             >
               <span className="truncate w-[30%]" title={item.text}>
                 {item.text}

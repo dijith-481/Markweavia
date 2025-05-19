@@ -11,6 +11,7 @@ export default function InfoPopup({ show, onClose, popupRef }: InfoPopupProps) {
 
   return (
     <div
+      onMouseLeave={onClose}
       ref={popupRef}
       className="absolute bottom-full left-0 mb-2 w-72 sm:w-96 p-4 bg-nord1 rounded-md shadow-xl z-50 text-nord5 text-xs leading-relaxed"
     >
@@ -45,7 +46,7 @@ export default function InfoPopup({ show, onClose, popupRef }: InfoPopupProps) {
       </p>
       <button
         onClick={onClose}
-        className="absolute top-2 right-2 p-0.5 rounded-full hover:bg-nord3"
+        className="absolute top-2 right-2 p-0.5 rounded-full hover:bg-nord11"
         aria-label="Close info"
       >
         <svg

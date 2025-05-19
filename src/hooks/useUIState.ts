@@ -8,6 +8,7 @@ export function useUIState() {
   const themeDropdownRef = useRef<HTMLDivElement>(null);
   const [showInfoPopup, setShowInfoPopup] = useState<boolean>(false);
   const infoPopupRef = useRef<HTMLDivElement>(null);
+  const infoButtonRef = useRef<HTMLButtonElement>(null);
   const [showWordCount, setShowWordCount] = useState(true);
   const [showAddHeaderFooterForm, setShowAddHeaderFooterForm] = useState<boolean>(false);
   const newHeaderTextRef = useRef<HTMLInputElement>(null);
@@ -21,7 +22,17 @@ export function useUIState() {
     setIsThemeDropdownOpen((prev) => !prev);
     setIsTemplateDropdownOpen(false);
   };
-  const toggleInfoPopup = () => setShowInfoPopup((prev) => !prev);
+  const toggleInfoPopup = (val: number = 0) => {
+    if (val === 1) {
+      setShowInfoPopup(true);
+      return;
+    }
+    if (val === 2) {
+      setShowInfoPopup(false);
+      return;
+    }
+    setShowInfoPopup((prev) => !prev);
+  };
   const toggleShowWordCount = () => setShowWordCount((prev) => !prev);
 
   const closeAllPopups = useCallback(() => {
@@ -36,6 +47,7 @@ export function useUIState() {
       templateDropdownRef as React.RefObject<HTMLDivElement>,
       themeDropdownRef as React.RefObject<HTMLDivElement>,
       infoPopupRef as React.RefObject<HTMLDivElement>,
+      infoButtonRef as React.RefObject<HTMLButtonElement>,
     ],
     closeAllPopups,
     isTemplateDropdownOpen || isThemeDropdownOpen || showInfoPopup,
@@ -60,6 +72,7 @@ export function useUIState() {
     setShowInfoPopup,
     toggleInfoPopup,
     infoPopupRef,
+    infoButtonRef,
     showWordCount,
     toggleShowWordCount,
     closeAllPopups,

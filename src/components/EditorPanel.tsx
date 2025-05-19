@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useRef } from "react";
 import CodeMirror from "@uiw/react-codemirror";
 import { Extension } from "@codemirror/state";
 
@@ -17,12 +17,19 @@ export default function EditorPanel({
   codeMirrorRef,
   theme,
 }: EditorPanelProps) {
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
+
   return (
-    <div className="relative md:w-[47vw] w-full rounded-md overflow-y-auto flex flex-col h-full overflow-x-hidden">
-      <div className="flex-1 w-full md:overflow-y-auto ">
+    <div className="relative md:w-[47vw] w-full rounded-md flex flex-col h-full overflow-x-hidden">
+      <div
+        ref={scrollContainerRef}
+        className="flex-1 w-full overflow-y-auto"
+        style={{ maxHeight: "100%", minHeight: "0", overscrollBehavior: "contain" }}
+      >
         <CodeMirror
           value={markdownText}
-          height="100%"
+          height="auto"
+          minHeight="100%"
           extensions={extensions}
           onChange={onMarkdownChange}
           theme={theme}
@@ -33,7 +40,8 @@ export default function EditorPanel({
             highlightActiveLine: true,
             highlightActiveLineGutter: true,
           }}
-          className="h-full text-sm"
+          autoFocus
+          className="w-full text-sm"
           ref={codeMirrorRef}
           id="codeMirrorRef"
         />

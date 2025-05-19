@@ -8,7 +8,11 @@ interface SlidePreviewFrameProps {
 export default function SlidePreviewFrame({ previewHtml, onMouseEnter }: SlidePreviewFrameProps) {
   return (
     <div className="rounded">
-      <div className="w-full bg-black rounded overflow-hidden" onMouseEnter={onMouseEnter}>
+      <div
+        className="w-full bg-black rounded overflow-hidden"
+        style={{ maxHeight: "100%", minHeight: "0", overscrollBehavior: "contain" }}
+        onMouseEnter={onMouseEnter}
+      >
         <iframe
           srcDoc={previewHtml}
           title="Current Slide Preview"
