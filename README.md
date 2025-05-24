@@ -5,7 +5,7 @@
   <p>Effortlessly craft minimalist, professional presentations directly from your Markdown files using familiar Vim motions.</p>
 
   <p>
-    <img src="https://img.shields.io/badge/license-GPL--2.0-blue.svg?style=for-the-badge&logoColor=D8DEE9&color=5E81AC" alt="License: GPL-2.0">
+    <img src="https://img.shields.io/badge/license-GPL--3.0-blue.svg?style=for-the-badge&logoColor=D8DEE9&color=5E81AC" alt="License: GPL-3.0">
     <!-- Add other badges here: build status, version, etc. -->
     <!-- Example: <img src="https://img.shields.io/github/stars/YOUR_USERNAME/markweavia?style=for-the-badge&logo=github&logoColor=D8DEE9&color=88C0D0" alt="GitHub stars"> -->
     <!-- Example: <img src="https://img.shields.io/github/workflow/status/YOUR_USERNAME/markweavia/CI?style=for-the-badge&logo=githubactions&logoColor=D8DEE9&color=A3BE8C" alt="Build Status"> -->
