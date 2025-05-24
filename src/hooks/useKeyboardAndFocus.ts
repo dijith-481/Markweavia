@@ -4,7 +4,7 @@ export function useKeyboardAndFocus(
   codeMirrorRef: React.RefObject<any>,
   onDownloadMd: () => void,
   onSaveAsSlides: () => void,
-  onTriggerUpload: () => void,
+  // onTriggerUpload: () => void,
   closeAllPopups: () => void,
   isAnyPopupOpen: boolean,
 ) {
@@ -29,7 +29,7 @@ export function useKeyboardAndFocus(
       }
       if ((event.ctrlKey || event.metaKey) && event.key === "o") {
         event.preventDefault();
-        onTriggerUpload();
+        // onTriggerUpload();
       }
       if ((event.ctrlKey || event.metaKey) && event.shiftKey && event.key.toLowerCase() === "s") {
         event.preventDefault();
@@ -60,7 +60,7 @@ export function useKeyboardAndFocus(
   }, [
     onDownloadMd,
     onSaveAsSlides,
-    onTriggerUpload,
+    // onTriggerUpload,
     focusCodeMirror,
     closeAllPopups,
     isAnyPopupOpen,

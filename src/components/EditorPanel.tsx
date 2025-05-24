@@ -1,4 +1,4 @@
-import React, { useRef } from "react";
+import React from "react";
 import CodeMirror from "@uiw/react-codemirror";
 import { Extension } from "@codemirror/state";
 
@@ -17,35 +17,28 @@ export default function EditorPanel({
   codeMirrorRef,
   theme,
 }: EditorPanelProps) {
-  const scrollContainerRef = useRef<HTMLDivElement>(null);
 
   return (
-    <div className="relative md:w-[47vw] w-full rounded-md flex flex-col h-full overflow-x-hidden">
-      <div
-        ref={scrollContainerRef}
-        className="flex-1 w-full overflow-y-auto"
-        style={{ maxHeight: "100%", minHeight: "0", overscrollBehavior: "contain" }}
-      >
-        <CodeMirror
-          value={markdownText}
-          height="auto"
-          minHeight="100%"
-          extensions={extensions}
-          onChange={onMarkdownChange}
-          theme={theme}
-          basicSetup={{
-            lineNumbers: true,
-            foldGutter: false,
-            autocompletion: true,
-            highlightActiveLine: true,
-            highlightActiveLineGutter: true,
-          }}
-          autoFocus
-          className="w-full text-sm"
-          ref={codeMirrorRef}
-          id="codeMirrorRef"
-        />
-      </div>
-    </div>
+    <div className=" w-full rounded-md flex order-2 md:order-1 flex-col h-full  overflow-x-hidden  overscroll-contain   flex-1  "
+    >
+      <CodeMirror
+        value={markdownText}
+        height="auto"
+        minHeight="100%"
+        extensions={extensions}
+        onChange={onMarkdownChange}
+        theme={theme}
+        basicSetup={{
+          lineNumbers: true,
+          foldGutter: false,
+          autocompletion: true,
+          highlightActiveLine: true,
+          highlightActiveLineGutter: true,
+        }}
+        autoFocus
+        className="w-full h-full  text-sm"
+        ref={codeMirrorRef}
+      />
+    </div >
   );
 }

@@ -19,11 +19,12 @@ import { useFileHandling } from "../hooks/useFileHandling";
 import { useKeyboardAndFocus } from "../hooks/useKeyboardAndFocus";
 import { useKeyboardDetector } from "../hooks/useKeyboardDetector";
 import { useScreenSize } from "../hooks/useScreenSize";
+import { useFileUpload } from "../hooks/useFileUpload";
 
 export default function HomePageClient() {
   const codeMirrorRef = useRef<any>(null);
   const [mainStyle, setMainStyle] = useState<React.CSSProperties>({});
-
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const { isMobile } = useScreenSize();
   const { isKeyboardVisible, visualViewportHeight } = useKeyboardDetector(isMobile);
   useEffect(() => {
@@ -85,10 +86,11 @@ export default function HomePageClient() {
     editorUpdateListener,
   } = useEditor(effectiveThemeVariables, slideLayoutOptions, showWordCount, codeMirrorRef);
 
+  const { FileInput, triggerFileUpload } = useFileUpload(setMarkdownText);
+
   const {
-    fileInputRef,
     handleFileUpload,
-    triggerFileUpload,
+    // triggerFileUpload,
     handleDownloadMd,
     handleSaveAsSlides,
     handlePreviewFullSlides,
@@ -99,7 +101,7 @@ export default function HomePageClient() {
     codeMirrorRef,
     handleDownloadMd,
     handleSaveAsSlides,
-    triggerFileUpload,
+    // triggerFileUpload,
     closeAllPopups,
     isTemplateDropdownOpen || isThemeDropdownOpen || showInfoPopup || !!editingItemId,
   );
@@ -115,30 +117,27 @@ export default function HomePageClient() {
   );
 
   return (
-    <div className="flex flex-col   text-nord4   ">
+    <div className="h-[100dvh] w-[100dvw] overflow-hidden flex flex-col  ">
       {(!isMobile || (isMobile && !isKeyboardVisible)) && (
         <AppHeader
-          onUploadClick={triggerFileUpload}
           onDownloadMdClick={handleDownloadMd}
           onSaveAsSlidesClick={handleSaveAsSlides}
           onPreviewFullSlides={handlePreviewFullSlides}
-          onFileUpload={handleFileUpload}
-          fileInputRef={fileInputRef as React.RefObject<HTMLInputElement>}
+          triggerFileUpload={triggerFileUpload}
         />
       )}
       <main
-        className={`flex flex-col md:flex-row gap-4 justify-evenly p-4  md:h-[calc(100dvh-8rem)]  ${isMobile && !isKeyboardVisible ? "h-[calc(100dvh-6rem)] " : ""} `}
+        className={`flex flex-col  sm:flex-row  gap-4 justify-evenly p-4 flex-grow overflow-hidden`}
         style={isMobile && isKeyboardVisible ? mainStyle : {}}
       >
-        <div className="w-full md:w-[47vw] order-2 md:order-1 overflow-y-auto ">
-          <EditorPanel
-            markdownText={markdownText}
-            onMarkdownChange={handleMarkdownChange}
-            extensions={combinedEditorExtensions}
-            codeMirrorRef={codeMirrorRef}
-            theme={nord}
-          />
-        </div>
+
+        <EditorPanel
+          markdownText={markdownText}
+          onMarkdownChange={handleMarkdownChange}
+          extensions={combinedEditorExtensions}
+          codeMirrorRef={codeMirrorRef}
+          theme={nord}
+        />
         <div className="w-full md:w-[47vw] order-1 md:order-2 ">
           <PreviewPanel
             previewHtml={previewHtml}
@@ -192,6 +191,8 @@ export default function HomePageClient() {
           totalPages={totalEditorPages}
         />
       )}
+      <FileInput />
+
     </div>
   );
 }

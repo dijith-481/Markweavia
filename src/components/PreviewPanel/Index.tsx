@@ -88,7 +88,7 @@ export default function PreviewPanel({
     <div className="relative md:w-[47vw] w-full rounded-md overflow-x-hidden flex flex-col bg-nordic h-full gap-3">
       <SlidePreviewFrame previewHtml={previewHtml} onMouseEnter={onHidePopups} />
 
-      {(!isMobile || (isMobile && !isKeyboardVisible)) && (
+      {(!isMobile || (isMobile && (!isKeyboardVisible || showAddHeaderFooterForm))) && (
         <div
           className={` h-full  ${isMobileSettingsExpanded ? "bg-nord0" : ""} rounded-md    overflow-hidden  `}
         >

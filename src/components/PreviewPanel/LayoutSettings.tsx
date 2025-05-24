@@ -47,7 +47,7 @@ export default function LayoutSettings({
         type="button"
         onClick={onToggleShowPageNumbers}
         aria-pressed={showPageNumbers}
-        className={`w-full flex items-center justify-center gap-1.5 px-2 py-1.5 rounded-md text-xs font-medium transition-colors ${showPageNumbers ? "bg-nord8 text-nord0 hover:bg-nord7" : "bg-nord2 text-nord5 hover:bg-nord3"}`}
+        className={`px-3 gap-1 py-1.5 bg-nord10 hover:text-nordic text-sm rounded-md w-full min-w-45 flex items-center ${showPageNumbers ? "bg-nord8 text-nord0 hover:bg-nord7" : "bg-nord2 text-nord5 hover:bg-nord3"}`}
       >
         <CheckboxIcon checked={showPageNumbers} />
         Page Numbers
@@ -57,7 +57,7 @@ export default function LayoutSettings({
         onClick={onToggleHeaderFooterOnFirstPage}
         aria-pressed={headerfooterOnFirstPage}
         disabled={!canToggleFirstPageLayout}
-        className={`w-full flex items-center justify-center gap-1.5 px-2 py-1.5 rounded-md text-xs font-medium transition-colors ${headerfooterOnFirstPage ? "bg-nord8 text-nord0 hover:bg-nord7" : "bg-nord2 text-nord5 hover:bg-nord3"} ${!canToggleFirstPageLayout ? "opacity-50 cursor-not-allowed" : ""}`}
+        className={`px-3 gap-1 py-1.5 bg-nord10 hover:text-nordic text-sm rounded-md w-full min-w-45 flex items-center ${headerfooterOnFirstPage ? "bg-nord8 text-nord0 hover:bg-nord7" : "bg-nord2 text-nord5 hover:bg-nord3"} ${!canToggleFirstPageLayout ? "opacity-50 cursor-not-allowed" : ""}`}
       >
         <CheckboxIcon checked={headerfooterOnFirstPage} />
         Layout on First Page

@@ -2,13 +2,12 @@ import React, { useState, useRef } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { useClickOutside } from "../hooks/useClickOutside";
+import { useFileUpload } from "../hooks/useFileUpload";
 
 interface AppHeaderProps {
-  onUploadClick: () => void;
+  triggerFileUpload: () => void
   onDownloadMdClick: () => void;
   onSaveAsSlidesClick: () => void;
-  onFileUpload: (event: React.ChangeEvent<HTMLInputElement>) => void;
-  fileInputRef: React.RefObject<HTMLInputElement>;
   onPreviewFullSlides: () => void;
 }
 const UploadIcon = () => (
@@ -82,18 +81,16 @@ const SlidesIcon = () => (
 const AppHeader = React.forwardRef<HTMLDivElement, AppHeaderProps>(
   (
     {
-      onUploadClick,
+      triggerFileUpload,
       onDownloadMdClick,
       onSaveAsSlidesClick,
-
       onPreviewFullSlides,
-      onFileUpload,
-      fileInputRef,
     },
     _ref,
   ) => {
     const [isDownloadDropdownOpen, setIsDownloadDropdownOpen] = useState(false);
     const downloadDropdownRef = useRef<HTMLDivElement>(null);
+
 
     useClickOutside(
       downloadDropdownRef as React.RefObject<HTMLDivElement>,
@@ -103,38 +100,30 @@ const AppHeader = React.forwardRef<HTMLDivElement, AppHeaderProps>(
 
     const toggleDownloadDropdown = () => setIsDownloadDropdownOpen((prev) => !prev);
     return (
-      <header className="pt-2 px-4 pb-1 sm:pt-3 md:pb-2 md:pt-4   flex justify-between items-center text-nord9 md:px-8">
-        <Link href="/" className="flex flex-row items-baseline space-x-1">
-          <div className="transform scale-70 sm:scale-100 origin-left flex items-baseline space-x-1">
-            <Image
-              src="/logo.svg"
-              alt="Markweavia Logo"
-              className="m-0"
-              width={32}
-              height={32}
-              priority
-            />
-            <Image
-              src="/arkweavia.svg"
-              alt="Markweavia Text Logo"
-              className="block m-0"
-              width={100}
-              height={30}
-              priority
-            />
-          </div>
+      <header className="py-1 px-2  md:py-2 h-16    flex justify-between items-center text-nord9 md:px-4">
+        <Link href="/" className="flex flex-row  items-baseline space-x-1">
+          {/* <div className="    flex items-baseline  space-x-1"> */}
+          {/* <Image */}
+          {/*   src="/logo.svg" */}
+          {/*   alt="Markweavia Logo" */}
+          {/*   className="m-0 h-8  " */}
+          {/*   width={32} */}
+          {/*   height={32} */}
+          {/*   priority */}
+          {/* /> */}
+          <Image
+            src="/markweavia.svg"
+            alt="Markweavia Text Logo"
+            className="  block m-0 h-12  "
+            width={180}
+            height={40}
+            priority
+          />
+          {/* </div> */}
         </Link>
         <div className="flex items-center space-x-2 ">
-          <input
-            type="file"
-            accept=".md,text/markdown"
-            ref={fileInputRef}
-            onChange={onFileUpload}
-            style={{ display: "none" }}
-            aria-hidden="true"
-          />
           <button
-            onClick={onUploadClick}
+            onClick={triggerFileUpload}
             className="hidden md:flex px-3 py-1.5 bg-nord15/80  text-nord0 text-sm rounded-4xl focus:outline-none hover:rounded-md hover:bg-nord15 items-center transition-all ease-in-out duration-200"
             title="Upload a Markdown file (.md) (Ctrl+O)"
           >
@@ -159,7 +148,7 @@ const AppHeader = React.forwardRef<HTMLDivElement, AppHeaderProps>(
                 <DownloadIcon />
               </button>
               <button
-                onClick={onUploadClick}
+                onClick={triggerFileUpload}
                 className="p-1 px-3 bg-nord8 hover:bg-nord7 scale-80  text-nord0 rounded-full focus:outline-none flex items-center"
                 title="Upload a Markdown file (.md) (Ctrl+O)"
               >
