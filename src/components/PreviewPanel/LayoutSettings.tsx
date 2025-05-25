@@ -1,5 +1,6 @@
 import React from "react";
 import { HeaderFooterItem } from "../../utils/local-storage";
+import Button from "../UI/Button";
 
 interface LayoutSettingsProps {
   showPageNumbers: boolean;
@@ -42,26 +43,25 @@ export default function LayoutSettings({
   const canToggleFirstPageLayout =
     showPageNumbers || headerFooters.some((hf) => hf.id !== "8781pg-numslide");
   return (
-    <div className="grid grid-cols-1 gap-2 w-80">
-      <button
-        type="button"
+    <div className="flex flex-col gap-2 w-full md:w-auto justify-center">
+      <Button
         onClick={onToggleShowPageNumbers}
-        aria-pressed={showPageNumbers}
-        className={`px-3 gap-1 py-1.5 bg-nord10 hover:text-nordic text-sm rounded-md w-full min-w-45 flex items-center ${showPageNumbers ? "bg-nord8 text-nord0 hover:bg-nord7" : "bg-nord2 text-nord5 hover:bg-nord3"}`}
+        color={`${showPageNumbers ? "bg-nord8 text-nord0 " : "bg-nord1 text-nord4/80 hover:bg-nord8/70 "}    hover:text-nord0`}
       >
         <CheckboxIcon checked={showPageNumbers} />
-        Page Numbers
-      </button>
-      <button
-        type="button"
-        onClick={onToggleHeaderFooterOnFirstPage}
-        aria-pressed={headerfooterOnFirstPage}
-        disabled={!canToggleFirstPageLayout}
-        className={`px-3 gap-1 py-1.5 bg-nord10 hover:text-nordic text-sm rounded-md w-full min-w-45 flex items-center ${headerfooterOnFirstPage ? "bg-nord8 text-nord0 hover:bg-nord7" : "bg-nord2 text-nord5 hover:bg-nord3"} ${!canToggleFirstPageLayout ? "opacity-50 cursor-not-allowed" : ""}`}
+        Page Nunber
+      </Button>
+      <Button
+        onClick={() => {
+          if (!canToggleFirstPageLayout) return
+          onToggleHeaderFooterOnFirstPage();
+        }}
+        title="show header/footer on first page"
+        color={`${headerfooterOnFirstPage ? "bg-nord7 text-nord0 " : canToggleFirstPageLayout ? "bg-nord1 text-nord4/80 hover:bg-nord7/70 " : "hidden"}    hover:text-nord0`}
       >
         <CheckboxIcon checked={headerfooterOnFirstPage} />
-        Layout on First Page
-      </button>
+        Layout (Page 1)
+      </Button>
     </div>
   );
 }

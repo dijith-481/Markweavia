@@ -8,7 +8,7 @@ import HeaderFooterManager from "./HeaderFooterManager";
 import FullPreviewButton from "./FullPreviewButton";
 import { useKeyboardDetector } from "../../hooks/useKeyboardDetector";
 
-import { useScreenSize } from "../../hooks/useScreenSize";
+// import { useScreenSize } from "../../hooks/useScreenSize";
 import {
   themes as themeOptions,
   HeaderFooterItem,
@@ -50,16 +50,9 @@ interface PreviewPanelProps {
 
 export default function PreviewPanel({
   previewHtml,
-  onHidePopups,
   activeTheme,
   onLoadTheme,
-  isThemeDropdownOpen,
-  onToggleThemeDropdown,
-  themeDropdownRef,
   onLoadTemplate,
-  isTemplateDropdownOpen,
-  onToggleTemplateDropdown,
-  templateDropdownRef,
   fontSizeMultiplier,
   onIncreaseFontSize,
   onDecreaseFontSize,
@@ -81,60 +74,52 @@ export default function PreviewPanel({
 }: PreviewPanelProps) {
   const [isMobileSettingsExpanded, setIsMobileSettingsExpanded] = useState(false);
 
-  const { isMobile } = useScreenSize();
-  const { isKeyboardVisible } = useKeyboardDetector(isMobile);
+  // const { isMobile } = useScreenSize();
+  const { isKeyboardVisible } = useKeyboardDetector(true);
 
   return (
-    <div className="relative md:w-[47vw] w-full rounded-md overflow-x-hidden flex flex-col bg-nordic h-full gap-3">
-      <SlidePreviewFrame previewHtml={previewHtml} onMouseEnter={onHidePopups} />
-
-      {(!isMobile || (isMobile && (!isKeyboardVisible || showAddHeaderFooterForm))) && (
+    <div className="rounded-md  h-full w-full   md:w-max  md:max-w-1/2 md:overflow-y-scroll flex order-1 gap-2 md:order-2 flex-col      ">
+      <SlidePreviewFrame previewHtml={previewHtml} />
+      {(!isKeyboardVisible || showAddHeaderFooterForm) && (
         <div
-          className={` h-full  ${isMobileSettingsExpanded ? "bg-nord0" : ""} rounded-md    overflow-hidden  `}
+          className={`   ${isMobileSettingsExpanded ? "bg-nord0" : ""} rounded-md       `}
+
         >
-          <div className="block md:hidden">
-            <button
-              onClick={() => setIsMobileSettingsExpanded((prev) => !prev)}
-              className="w-full px-3 py-2 bg-nord0 text-nord5 text-sm rounded-md focus:outline-none flex items-center justify-between"
-              aria-expanded={isMobileSettingsExpanded}
-              aria-controls="collapsible-slide-settings-panel"
+          <button
+            onClick={() => setIsMobileSettingsExpanded((prev) => !prev)}
+            className=" md:hidden w-full px-2 py-1 bg-nord0 text-nord5 text-sm rounded-md  flex items-center justify-between"
+            aria-expanded={isMobileSettingsExpanded}
+            aria-controls="collapsible-slide-settings-panel"
+          >
+            <span>Customization Options</span>
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              className={`h-4 w-4 transform transition-transform duration-200 ${isMobileSettingsExpanded ? "rotate-180" : "rotate-0"}`}
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+              strokeWidth={2}
             >
-              <span>Customization Options</span>
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                className={`h-4 w-4 transform transition-transform duration-200 ${isMobileSettingsExpanded ? "rotate-180" : "rotate-0"}`}
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-                strokeWidth={2}
-              >
-                <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
-              </svg>
-            </button>
-          </div>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
+
+            </svg>
+          </button>
 
           <div
             id="collapsible-slide-settings-panel"
             className={`
-          ${isMobileSettingsExpanded ? "flex" : "hidden"} md:flex 
-          flex-col overflow-y-auto md:overflow-y-hidden gap-4 w-full md:h-full flex-1 md:flex-initial
-          p-2 md:p-0
-        `}
+            ${isMobileSettingsExpanded ? "flex" : "hidden"} md:flex 
+            flex-col overflow-y-auto  gap-2 w-full  flex-1 md:flex-initial  p-2 md:p-0
+          `}
           >
-            <div className="flex flex-row  gap-4 w-full md:h-auto md:flex-initial">
-              <div className="flex flex-col gap-2 w-full md:w-auto">
+            <div className="flex flex-row  gap-2 w-full  px-2 py-1 justify-between">
+              <div className="flex flex-col gap-2 w-full md:w-auto justify-center">
                 <ThemeSelector
                   activeTheme={activeTheme}
                   onLoadTheme={onLoadTheme}
-                  isDropdownOpen={isThemeDropdownOpen}
-                  onToggleDropdown={onToggleThemeDropdown}
-                  dropdownRef={themeDropdownRef}
                 />
                 <TemplateSelector
-                  onLoadTemplate={onLoadTemplate}
-                  isDropdownOpen={isTemplateDropdownOpen}
-                  onToggleDropdown={onToggleTemplateDropdown}
-                  dropdownRef={templateDropdownRef}
+                  onLoadTemplate={onLoadTemplate as any}
                 />
               </div>
               <FontScaler
@@ -164,12 +149,12 @@ export default function PreviewPanel({
                 onSetEditingItemId={onSetEditingItemId}
               />
             </div>
-            <div className="hidden md:block">
-              <FullPreviewButton onClick={onPreviewFullSlides} />
-            </div>
           </div>
         </div>
-      )}
-    </div>
+
+      )
+      }
+      <FullPreviewButton onClick={onPreviewFullSlides} />
+    </div >
   );
 }

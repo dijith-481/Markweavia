@@ -12,12 +12,12 @@ export default function FontScaler({
   onDecrease,
 }: FontScalerProps) {
   return (
-    <div className="flex items-center justify-center gap-2 w-full">
-      <span className="font-medium whitespace-nowrap text-nord4">Font Scale:</span>
+    <div className="flex items-center justify-center gap-2 flex-wrap  w-full bg-nord1 rounded-md px-2 py-1 max-w-60">
+      <span className="font-medium whitespace-nowrap text-nord4">Font Scale</span>
       <div className="flex items-center gap-1.5">
         <button
           onClick={onDecrease}
-          className="flex items-center justify-center w-7 h-7 bg-nord3 text-nord6 rounded-md hover:bg-nord2 transition-colors"
+          className="flex items-center justify-center w-7 h-7 bg-nord3 text-nord6 rounded-md hover:bg-nord9  transition-colors"
           title="Decrease font size"
         >
           <svg
@@ -36,7 +36,7 @@ export default function FontScaler({
         </span>
         <button
           onClick={onIncrease}
-          className="flex items-center justify-center w-7 h-7 bg-nord3 text-nord6 rounded-md hover:bg-nord2 transition-colors"
+          className="flex items-center justify-center w-7 h-7 bg-nord3 text-nord6 rounded-md hover:bg-nord9 transition-colors"
           title="Increase font size"
         >
           <svg
