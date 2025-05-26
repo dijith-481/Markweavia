@@ -1,23 +1,33 @@
-import React from "react";
+import React, { useRef, useEffect, useMemo } from "react";
+import { EditorView } from "@codemirror/view";
 import CodeMirror from "@uiw/react-codemirror";
-import { Extension } from "@codemirror/state";
+import { useEditor } from "@/hooks/useEditor";
+import { languages } from "@codemirror/language-data";
+import { vim } from "@replit/codemirror-vim";
+import { nord } from "@uiw/codemirror-theme-nord";
+import { markdown as markdownLang } from "@codemirror/lang-markdown";
 
-interface EditorPanelProps {
-  markdownText: string;
-  onMarkdownChange: (value: string) => void;
-  extensions: Extension[];
-  codeMirrorRef: React.RefObject<any>;
-  theme: Extension;
-}
 
-export default function EditorPanel({
-  markdownText,
-  onMarkdownChange,
-  extensions,
-  codeMirrorRef,
-  theme,
-}: EditorPanelProps) {
 
+export default function EditorPanel() {
+  const codeMirrorRef = useRef<any>(null);
+  const { markdownText, handleMarkdownChange, slideText, setIsEditorReady, editorUpdateListener } = useEditor(codeMirrorRef);
+
+  useEffect(() => {
+    if (codeMirrorRef.current && codeMirrorRef.current.view) {
+      setIsEditorReady(true)
+    }
+  }, [codeMirrorRef.current, setIsEditorReady]);
+
+  const extensions = useMemo(
+    () => [
+      vim(),
+      markdownLang({ codeLanguages: languages }),
+      EditorView.lineWrapping,
+      editorUpdateListener,
+    ],
+    [editorUpdateListener],
+  );
   return (
     <div className=" w-full rounded-md flex order-2 md:order-1 flex-col h-full  overflow-x-hidden  overscroll-contain   flex-1  "
     >
@@ -26,8 +36,8 @@ export default function EditorPanel({
         height="auto"
         minHeight="100%"
         extensions={extensions}
-        onChange={onMarkdownChange}
-        theme={theme}
+        onChange={handleMarkdownChange}
+        theme={nord}
         basicSetup={{
           lineNumbers: true,
           foldGutter: false,
@@ -38,6 +48,9 @@ export default function EditorPanel({
         autoFocus
         className="w-full h-full  text-sm"
         ref={codeMirrorRef}
+        onCreateEditor={() => {
+          setIsEditorReady(true);
+        }}
       />
     </div >
   );

@@ -1,7 +1,9 @@
 import { useState, useEffect, useMemo, useCallback } from "react";
 import { v4 as uuidv4 } from "uuid";
+import { initialMarkdownContent } from "../utils/slide-templates";
 import {
   themes,
+  LOCAL_STORAGE_MARKDOWN_TEXT_KEY,
   LOCAL_STORAGE_THEME_KEY,
   baseFontSizesConfig,
   LOCAL_STORAGE_FONT_MULTIPLIER_KEY,
@@ -15,6 +17,7 @@ import {
 import { PAGE_NUMBER_SLIDE_ID } from "../constants";
 
 export function usePersistentSettings() {
+  const [markdownText, setMarkdownText] = useState<string>("");
   const [activeTheme, setActiveTheme] = useState<string>("nordDark");
   const [fontSizeMultiplier, setFontSizeMultiplier] = useState<number>(1);
   const [showPageNumbers, setShowPageNumbers] = useState(true);
@@ -25,6 +28,9 @@ export function usePersistentSettings() {
   );
 
   useEffect(() => {
+
+    const savedMarkdown = localStorage.getItem(LOCAL_STORAGE_MARKDOWN_TEXT_KEY);
+    setMarkdownText(savedMarkdown || initialMarkdownContent);
     setActiveTheme(localStorage.getItem(LOCAL_STORAGE_THEME_KEY) || "nordDark");
     const storedMultiplier = localStorage.getItem(LOCAL_STORAGE_FONT_MULTIPLIER_KEY);
     setFontSizeMultiplier(storedMultiplier ? parseFloat(storedMultiplier) : 1);
@@ -48,6 +54,13 @@ export function usePersistentSettings() {
     };
     applyThemeVariables(activeTheme);
   }, [activeTheme]);
+
+  useEffect(() => {
+    const handler = setTimeout(() => {
+      localStorage.setItem(LOCAL_STORAGE_MARKDOWN_TEXT_KEY, markdownText);
+    }, 500);
+    return () => clearTimeout(handler);
+  }, [markdownText]);
 
   useEffect(() => {
     localStorage.setItem(LOCAL_STORAGE_FONT_MULTIPLIER_KEY, fontSizeMultiplier.toString());

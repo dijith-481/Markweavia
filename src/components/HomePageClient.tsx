@@ -86,7 +86,7 @@ export default function HomePageClient() {
     editorUpdateListener,
   } = useEditor(effectiveThemeVariables, slideLayoutOptions, showWordCount, codeMirrorRef);
 
-  const { FileInput, triggerFileUpload } = useFileUpload(setMarkdownText);
+  const { FileInput, triggerFileUpload } = useFileUpload();
 
   const {
     handleFileUpload,
@@ -101,7 +101,7 @@ export default function HomePageClient() {
     codeMirrorRef,
     handleDownloadMd,
     handleSaveAsSlides,
-    // triggerFileUpload,
+    triggerFileUpload,
     closeAllPopups,
     isTemplateDropdownOpen || isThemeDropdownOpen || showInfoPopup || !!editingItemId,
   );
@@ -138,6 +138,7 @@ export default function HomePageClient() {
           codeMirrorRef={codeMirrorRef}
           theme={nord}
         />
+        {/* <div className="w-full md:w-[47vw] order-1 md:order-2 "> */}
         <PreviewPanel
           previewHtml={previewHtml}
           onHidePopups={closeAllPopups}
@@ -190,7 +191,7 @@ export default function HomePageClient() {
         />
       )}
       <FileInput />
-
     </div>
+
   );
 }
