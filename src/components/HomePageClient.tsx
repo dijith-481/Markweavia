@@ -138,45 +138,43 @@ export default function HomePageClient() {
           codeMirrorRef={codeMirrorRef}
           theme={nord}
         />
-        <div className="w-full md:w-[47vw] order-1 md:order-2 ">
-          <PreviewPanel
-            previewHtml={previewHtml}
-            onHidePopups={closeAllPopups}
-            activeTheme={activeTheme}
-            onLoadTheme={(themeName) => {
-              loadTheme(themeName);
-              toggleThemeDropdown();
-            }}
-            isThemeDropdownOpen={isThemeDropdownOpen}
-            onToggleThemeDropdown={toggleThemeDropdown}
-            themeDropdownRef={themeDropdownRef as React.RefObject<HTMLDivElement>}
-            onLoadTemplate={(templateKey) => {
-              loadTemplate(templateKey);
-              toggleTemplateDropdown();
-            }}
-            isTemplateDropdownOpen={isTemplateDropdownOpen}
-            onToggleTemplateDropdown={toggleTemplateDropdown}
-            templateDropdownRef={templateDropdownRef as React.RefObject<HTMLDivElement>}
-            fontSizeMultiplier={fontSizeMultiplier}
-            onIncreaseFontSize={increaseFontSize}
-            onDecreaseFontSize={decreaseFontSize}
-            showPageNumbers={showPageNumbers}
-            onToggleShowPageNumbers={toggleShowPageNumbers}
-            headerfooterOnFirstPage={headerfooterOnFirstPage}
-            onToggleHeaderFooterOnFirstPage={toggleHeaderFooterOnFirstPage}
-            headerFooters={headerFooters}
-            availableHeaderFooterPositions={availableHeaderFooterPositions}
-            onAddHeaderFooterItem={addHeaderFooterItem}
-            onRemoveHeaderFooterItem={removeHeaderFooterItem}
-            onUpdateHeaderFooterItemPosition={updateHeaderFooterItemPosition}
-            showAddHeaderFooterForm={showAddHeaderFooterForm}
-            onToggleAddHeaderFooterForm={() => setShowAddHeaderFooterForm((p) => !p)}
-            newHeaderTextRef={newHeaderTextRef as React.RefObject<HTMLInputElement>}
-            editingItemId={editingItemId}
-            onSetEditingItemId={setEditingItemId}
-            onPreviewFullSlides={handlePreviewFullSlides}
-          />
-        </div>
+        <PreviewPanel
+          previewHtml={previewHtml}
+          onHidePopups={closeAllPopups}
+          activeTheme={activeTheme}
+          onLoadTheme={(themeName) => {
+            loadTheme(themeName);
+            toggleThemeDropdown();
+          }}
+          isThemeDropdownOpen={isThemeDropdownOpen}
+          onToggleThemeDropdown={toggleThemeDropdown}
+          themeDropdownRef={themeDropdownRef as React.RefObject<HTMLDivElement>}
+          onLoadTemplate={(templateKey) => {
+            loadTemplate(templateKey);
+            toggleTemplateDropdown();
+          }}
+          isTemplateDropdownOpen={isTemplateDropdownOpen}
+          onToggleTemplateDropdown={toggleTemplateDropdown}
+          templateDropdownRef={templateDropdownRef as React.RefObject<HTMLDivElement>}
+          fontSizeMultiplier={fontSizeMultiplier}
+          onIncreaseFontSize={increaseFontSize}
+          onDecreaseFontSize={decreaseFontSize}
+          showPageNumbers={showPageNumbers}
+          onToggleShowPageNumbers={toggleShowPageNumbers}
+          headerfooterOnFirstPage={headerfooterOnFirstPage}
+          onToggleHeaderFooterOnFirstPage={toggleHeaderFooterOnFirstPage}
+          headerFooters={headerFooters}
+          availableHeaderFooterPositions={availableHeaderFooterPositions}
+          onAddHeaderFooterItem={addHeaderFooterItem}
+          onRemoveHeaderFooterItem={removeHeaderFooterItem}
+          onUpdateHeaderFooterItemPosition={updateHeaderFooterItemPosition}
+          showAddHeaderFooterForm={showAddHeaderFooterForm}
+          onToggleAddHeaderFooterForm={() => setShowAddHeaderFooterForm((p) => !p)}
+          newHeaderTextRef={newHeaderTextRef as React.RefObject<HTMLInputElement>}
+          editingItemId={editingItemId}
+          onSetEditingItemId={setEditingItemId}
+          onPreviewFullSlides={handlePreviewFullSlides}
+        />
       </main>
       {(!isMobile || (isMobile && !isKeyboardVisible)) && (
         <AppFooter

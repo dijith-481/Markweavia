@@ -78,7 +78,7 @@ export default function PreviewPanel({
   const { isKeyboardVisible } = useKeyboardDetector(true);
 
   return (
-    <div className="rounded-md  h-full w-full   md:w-max  md:max-w-1/2 md:overflow-y-scroll flex order-1 gap-2 md:order-2 flex-col      ">
+    <div className="rounded-md   h-full w-full   md:w-max order-1 md:order-2  overflow-x-hidden   md:overflow-y-scroll flex max-w-1/2  gap-2  flex-col      ">
       <SlidePreviewFrame previewHtml={previewHtml} />
       {(!isKeyboardVisible || showAddHeaderFooterForm) && (
         <div
