@@ -3,7 +3,7 @@ import React from "react";
 interface InfoPopupProps {
   show: boolean;
   onClose: () => void;
-  popupRef: React.RefObject<HTMLDivElement>;
+  popupRef: React.RefObject<HTMLDivElement | null>;
 }
 
 export default function InfoPopup({ show, onClose, popupRef }: InfoPopupProps) {
