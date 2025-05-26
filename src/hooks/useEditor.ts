@@ -3,9 +3,8 @@ import { EditorView } from "@codemirror/view";
 import { countWords, countLetters } from "../utils/common";
 import { useSlideContext } from "../context/slideContext";
 
-export function useEditor(codeMirrorRef: React.RefObject<any>) {
+export function useEditor(codeMirrorRef: React.RefObject<any>, setSlideText: (text: string) => void) {
   const { markdownText, setMarkdownText, setCurrentSlide, setTotalSlides } = useSlideContext();
-  const [slideText, setSlideText] = useState("");
 
   const [isEditorReady, setIsEditorReady] = useState(false);
   const words = useMemo(() => countWords(markdownText), [markdownText]);
@@ -80,7 +79,6 @@ export function useEditor(codeMirrorRef: React.RefObject<any>) {
   return {
     markdownText,
     handleMarkdownChange,
-    slideText,
     words,
     letters,
     setIsEditorReady,

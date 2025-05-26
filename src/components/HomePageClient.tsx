@@ -11,6 +11,7 @@ import AppHeader from "./AppHeader";
 import EditorPanel from "./EditorPanel";
 import PreviewPanel from "./PreviewPanel/Index";
 import AppFooter from "./AppFooter";
+import SlidePreviewFrame from "./PreviewPanel/SlidePreviewFrame";
 
 import { usePersistentSettings } from "../hooks/usePersistentSettings";
 import { useUIState } from "../hooks/useUIState";
@@ -22,6 +23,7 @@ import { useScreenSize } from "../hooks/useScreenSize";
 import { useFileUpload } from "../hooks/useFileUpload";
 
 export default function HomePageClient() {
+  const [preivewText, setPreviewText] = useState("");
   const codeMirrorRef = useRef<any>(null);
   const [mainStyle, setMainStyle] = useState<React.CSSProperties>({});
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -75,16 +77,6 @@ export default function HomePageClient() {
     setEditingItemId,
   } = useUIState();
 
-  const {
-    markdownText,
-    setMarkdownText,
-    handleMarkdownChange,
-    previewHtml,
-    wordOrLetterCount,
-    currentPageInEditor,
-    totalEditorPages,
-    editorUpdateListener,
-  } = useEditor(effectiveThemeVariables, slideLayoutOptions, showWordCount, codeMirrorRef);
 
   const { FileInput, triggerFileUpload } = useFileUpload();
 
@@ -106,15 +98,6 @@ export default function HomePageClient() {
     isTemplateDropdownOpen || isThemeDropdownOpen || showInfoPopup || !!editingItemId,
   );
 
-  const combinedEditorExtensions = useMemo(
-    () => [
-      vim(),
-      markdownLang({ codeLanguages: languages }),
-      EditorView.lineWrapping,
-      editorUpdateListener,
-    ],
-    [editorUpdateListener],
-  );
 
   return (
     <div className="h-[100dvh] w-[100dvw] overflow-hidden flex flex-col  ">
@@ -131,16 +114,10 @@ export default function HomePageClient() {
         style={isMobile && isKeyboardVisible ? mainStyle : {}}
       >
 
-        <EditorPanel
-          markdownText={markdownText}
-          onMarkdownChange={handleMarkdownChange}
-          extensions={combinedEditorExtensions}
-          codeMirrorRef={codeMirrorRef}
-          theme={nord}
-        />
+        <EditorPanel setPreviewText={setPreviewText} />
         {/* <div className="w-full md:w-[47vw] order-1 md:order-2 "> */}
         <PreviewPanel
-          previewHtml={previewHtml}
+          previewText={preivewText}
           onHidePopups={closeAllPopups}
           activeTheme={activeTheme}
           onLoadTheme={(themeName) => {

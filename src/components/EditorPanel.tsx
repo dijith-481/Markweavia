@@ -8,10 +8,16 @@ import { nord } from "@uiw/codemirror-theme-nord";
 import { markdown as markdownLang } from "@codemirror/lang-markdown";
 
 
+interface EditorPanelProps {
+  setPreviewText: (text: string) => void;
+}
 
-export default function EditorPanel() {
+export default function EditorPanel({
+  setPreviewText
+
+}: EditorPanelProps) {
   const codeMirrorRef = useRef<any>(null);
-  const { markdownText, handleMarkdownChange, slideText, setIsEditorReady, editorUpdateListener } = useEditor(codeMirrorRef);
+  const { markdownText, handleMarkdownChange, setIsEditorReady, editorUpdateListener } = useEditor(codeMirrorRef, setPreviewText);
 
   useEffect(() => {
     if (codeMirrorRef.current && codeMirrorRef.current.view) {

@@ -108,6 +108,41 @@ This research investigates the causal relationship between independent variable 
 - Jones, C. (2022). *Book Title*. Publisher.
 `,
 };
+export const initialMarkdownContent = `# Welcome to Markweavia!
+*Markdown, beautifully woven.*
+
+Type your Markdown here. Your content will instantly appear as a slide preview on the right.
+> type \`\`\`ggdG\`\`\` to delete all content.
+
+## Core Features
+- **Effortless Slide Creation:** Write content in Markdown; see it as a slide.
+- **Live Preview:** Instant feedback on your current slide's appearance.
+- **Vim Keybindings:** Edit with the speed and power of Vim.
+- **HTML Slide Export:** Download your entire presentation as a single, interactive HTML file. This file acts like a portable presentation software, complete with navigation (buttons & keyboard shortcuts), your chosen theme, and all your content, ready to be opened in any browser for a seamless presentation experience.
+- **Markdown (.md) Export:** Save your source text.
+
+## Core Features
+- **Customizable Themes:** Choose from Nord-inspired and minimalist themes.
+- **Font Scaling:** Adjust text size for readability.
+- **Page Numbers & Headers/Footers:** Add professional touches to your slides.
+- **Local Storage Saving:** Your work is automatically saved.
+- **File Upload:** Import existing Markdown files.
+
+## Getting Started
+1.  Use \`# Heading 1\` or \`## Heading 2\` to start a new slide.
+2.  Separate distinct slide content with \`---\` on a new line.
+3.  Explore the theme and layout options in the right-hand panel.
+4.  Use Vim commands like \`:w\` to save Markdown or \`:ws\` to save HTML slides.
+
+\`\`\`javascript
+function greet(name) {
+  console.log(\`Hello, \${name} from Markweavia!\`);
+}
+greet('World');
+\`\`\`
+`;
+
+
 
 export function splitMarkdownIntoSlides(markdown: string): string[] {
   const lines = markdown.split("\n");

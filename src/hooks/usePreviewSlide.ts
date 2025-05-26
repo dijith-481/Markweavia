@@ -2,8 +2,9 @@ import { useState, useEffect, useCallback } from "react";
 import { useSlideContext } from "@/context/slideContext";
 import { exportSingleSlideToHtml } from "@/utils/export-utils";
 import { debounce } from "@/utils/common";
+import { SlideLayoutOptions } from "@/utils/local-storage";
 
-export function usePreviewSlide(currentSlideText: string, effectiveThemeVariables: Record<string, string>, slideLayoutOptions: Record<string, boolean>) {
+export function usePreviewSlide(currentSlideText: string, effectiveThemeVariables: Record<string, string>, slideLayoutOptions: SlideLayoutOptions) {
   const [previewHtml, setPreviewHtml] = useState<string>("");
   const { currentSlide } = useSlideContext();
 

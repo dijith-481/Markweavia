@@ -189,6 +189,7 @@ export const themes: Record<string, Record<string, string>> = {
 };
 
 export const LOCAL_STORAGE_THEME_KEY = "markdown-editor-theme";
+export const LOCAL_STORAGE_MARKDOWN_TEXT_KEY = "markdown-editor-markdown-text";
 export const LOCAL_STORAGE_PAGE_NUMBERS_KEY = "markdown-editor-page-numbers";
 export const LOCAL_STORAGE_PAGE_NUMBER_FIRST_PAGE_KEY = "markdown-editor-page-number-first-page";
 export const LOCAL_STORAGE_HEADER_FOOTERS_KEY = "markdown-editor-header-footers";

@@ -7,6 +7,7 @@ import LayoutSettings from "./LayoutSettings";
 import HeaderFooterManager from "./HeaderFooterManager";
 import FullPreviewButton from "./FullPreviewButton";
 import { useKeyboardDetector } from "../../hooks/useKeyboardDetector";
+import { usePersistentSettings } from "@/hooks/usePersistentSettings";
 
 // import { useScreenSize } from "../../hooks/useScreenSize";
 import {
@@ -17,7 +18,7 @@ import {
 import { slideTemplates } from "../../utils/slide-templates";
 
 interface PreviewPanelProps {
-  previewHtml: string;
+  previewText: string;
   onHidePopups: () => void;
   activeTheme: string;
   onLoadTheme: (themeName: keyof typeof themeOptions) => void;
@@ -49,7 +50,7 @@ interface PreviewPanelProps {
 }
 
 export default function PreviewPanel({
-  previewHtml,
+  previewText,
   activeTheme,
   onLoadTheme,
   onLoadTemplate,
@@ -73,13 +74,14 @@ export default function PreviewPanel({
   onPreviewFullSlides,
 }: PreviewPanelProps) {
   const [isMobileSettingsExpanded, setIsMobileSettingsExpanded] = useState(false);
+  const { effectiveThemeVariables, slideLayoutOptions } = usePersistentSettings();
 
   // const { isMobile } = useScreenSize();
   const { isKeyboardVisible } = useKeyboardDetector(true);
 
   return (
     <div className="rounded-md   h-full w-full   md:w-max order-1 md:order-2  overflow-x-hidden   md:overflow-y-scroll flex max-w-1/2  gap-2  flex-col      ">
-      <SlidePreviewFrame previewHtml={previewHtml} />
+      <SlidePreviewFrame previewText={previewText} effectiveThemeVariables={effectiveThemeVariables} slideLayoutOptions={slideLayoutOptions} />
       {(!isKeyboardVisible || showAddHeaderFooterForm) && (
         <div
           className={`   ${isMobileSettingsExpanded ? "bg-nord0" : ""} rounded-md       `}
