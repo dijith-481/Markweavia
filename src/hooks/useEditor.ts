@@ -1,7 +1,9 @@
-import { useMemo, useState, useCallback } from "react";
+import { useMemo, useState, useCallback, useEffect } from "react";
+import { Vim } from "@replit/codemirror-vim";
 import { EditorView } from "@codemirror/view";
 import { countWords, countLetters } from "../utils/common";
 import { useSlideContext } from "../context/slideContext";
+import { useFileHandling } from "./useFileHandling";
 
 export function useEditor(codeMirrorRef: React.RefObject<any>, setSlideText: (text: string) => void) {
   const { markdownText, setMarkdownText, setCurrentSlide, setTotalSlides } = useSlideContext();
@@ -9,6 +11,8 @@ export function useEditor(codeMirrorRef: React.RefObject<any>, setSlideText: (te
   const [isEditorReady, setIsEditorReady] = useState(false);
   const words = useMemo(() => countWords(markdownText), [markdownText]);
   const letters = useMemo(() => countLetters(markdownText), [markdownText]);
+
+  const { handleSaveAsSlides, handleDownloadMd, triggerFileUpload } = useFileHandling(markdownText);
 
   const handleMarkdownChange = useCallback((value: string) => {
     setMarkdownText(value);
@@ -75,6 +79,37 @@ export function useEditor(codeMirrorRef: React.RefObject<any>, setSlideText: (te
     }),
     [processEditorState, isEditorReady]
   );
+
+
+  const focusCodeMirror = useCallback(() => {
+    if (codeMirrorRef.current && codeMirrorRef.current.view) {
+      codeMirrorRef.current.view.focus();
+    }
+  }, [codeMirrorRef]);
+
+  useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "i") {
+        const activeElement = document.activeElement;
+        const isEditorFocused = codeMirrorRef.current?.view?.hasFocus;
+        if (!isEditorFocused && activeElement && activeElement.tagName !== "INPUT" && activeElement.tagName !== "TEXTAREA") {
+          event.preventDefault();
+          focusCodeMirror();
+        }
+      }
+    }
+    window.addEventListener("keydown", handleKeyDown);
+    return () => {
+      window.removeEventListener("keydown", handleKeyDown);
+    };
+
+  }, [focusCodeMirror, codeMirrorRef]);
+
+  useEffect(() => {
+    Vim.defineEx("write", "w", handleDownloadMd);
+    Vim.defineEx("wslide", "ws", handleSaveAsSlides);
+    Vim.defineEx("upload", "u", triggerFileUpload);
+  }, [handleDownloadMd, handleSaveAsSlides]);
 
   return {
     markdownText,
