@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect } from "react";
 import { useSlideContext } from "@/context/slideContext";
 import { exportSingleSlideToHtml } from "@/utils/export-utils";
 import { debounce } from "@/utils/common";
@@ -22,7 +22,7 @@ export function usePreviewSlide(currentSlideText: string, effectiveThemeVariable
     };
     const debouncedGeneratePreview = debounce(generatePreview, 300);
     debouncedGeneratePreview();
-  }, [currentSlideText, effectiveThemeVariables, slideLayoutOptions, currentPage]);
+  }, [currentSlideText, effectiveThemeVariables, slideLayoutOptions, currentSlide]);
 
   return {
     previewHtml,

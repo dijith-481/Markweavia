@@ -2,7 +2,7 @@ import React, { useState, useRef } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { useClickOutside } from "../hooks/useClickOutside";
-import { useFileUpload } from "../hooks/useFileUpload";
+import { useFileUpload } from "./UI/FileUpload";
 
 interface AppHeaderProps {
   triggerFileUpload: () => void

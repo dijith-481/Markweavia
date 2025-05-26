@@ -48,16 +48,6 @@ export const SlideContextProvider: React.FC<{ children: React.ReactNode }> = ({ 
   const [totalSlides, setTotalSlides] = useState(0)
   const [previewHtml, setpreviewHtml] = useState("")
 
-  // useEffect(() => {
-  //   localStorage.setItem("markdownText", markdownText)
-  //   localStorage.setItem("cursorPosition", cursorPosition.toString())
-  //   localStorage.setItem("currentTheme", theme)
-  //   localStorage.setItem("includeSlideNumber", includeSlideNumber.toString())
-  //   localStorage.setItem("slideLayoutOptions", JSON.stringify(slideLayoutOptions))
-  //   localStorage.setItem("currentSlide", currentSlide.toString())
-  //   localStorage.setItem("totalSlides", totalSlides.toString())
-  // }, [markdownText, cursorPosition, currentTheme, includeSlideNumber, slideLayoutOptions, currentSlide, totalSlides])
-
   const contextValue = {
     markdownText,
     previewHtml,

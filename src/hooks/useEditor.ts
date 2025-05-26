@@ -3,20 +3,33 @@ import { Vim } from "@replit/codemirror-vim";
 import { EditorView } from "@codemirror/view";
 import { countWords, countLetters } from "../utils/common";
 import { useSlideContext } from "../context/slideContext";
-import { useFileHandling } from "./useFileHandling";
+import { handleSaveAsSlides, handleDownloadMd } from "../utils/handleDownload";
 
-export function useEditor(codeMirrorRef: React.RefObject<any>, setSlideText: (text: string) => void) {
+
+export function useEditor(codeMirrorRef: React.RefObject<any>, setSlideText: (text: string) => void, fileUploadRef: React.RefObject<{ triggerFileUpload: () => void }>) {
   const { markdownText, setMarkdownText, setCurrentSlide, setTotalSlides } = useSlideContext();
 
   const [isEditorReady, setIsEditorReady] = useState(false);
   const words = useMemo(() => countWords(markdownText), [markdownText]);
   const letters = useMemo(() => countLetters(markdownText), [markdownText]);
 
-  const { handleSaveAsSlides, handleDownloadMd, triggerFileUpload } = useFileHandling(markdownText);
+
+  const saveAsSlides = useCallback(() => {
+    handleSaveAsSlides(markdownText, effectiveThemeVariables, slideLayoutOptions);
+  }, [handleSaveAsSlides]);
+
+  const saveAsMd = useCallback(() => {
+    handleDownloadMd(markdownText);
+  }, [handleSaveAsSlides]);
 
   const handleMarkdownChange = useCallback((value: string) => {
     setMarkdownText(value);
   }, [setMarkdownText]);
+
+  const triggerFileUpload = useCallback(() => {
+    if (!fileUploadRef.current) return
+    fileUploadRef.current?.triggerFileUpload();
+  }, [fileUploadRef]);
 
   const processEditorState = useCallback(() => {
     const view = codeMirrorRef.current?.view;
@@ -97,6 +110,19 @@ export function useEditor(codeMirrorRef: React.RefObject<any>, setSlideText: (te
           focusCodeMirror();
         }
       }
+      else if ((event.ctrlKey || event.metaKey) && event.key === "s" && !event.shiftKey) {
+        event.preventDefault();
+        saveAsMd()
+      }
+      if ((event.ctrlKey || event.metaKey) && event.key === "o") {
+        event.preventDefault();
+        triggerFileUpload()
+      }
+      if ((event.ctrlKey || event.metaKey) && event.shiftKey && event.key.toLowerCase() === "s") {
+        event.preventDefault();
+        saveAsSlides()
+      }
+
     }
     window.addEventListener("keydown", handleKeyDown);
     return () => {
@@ -105,9 +131,10 @@ export function useEditor(codeMirrorRef: React.RefObject<any>, setSlideText: (te
 
   }, [focusCodeMirror, codeMirrorRef]);
 
+
   useEffect(() => {
-    Vim.defineEx("write", "w", handleDownloadMd);
-    Vim.defineEx("wslide", "ws", handleSaveAsSlides);
+    Vim.defineEx("write", "w", saveAsMd);
+    Vim.defineEx("wslide", "ws", saveAsSlides);
     Vim.defineEx("upload", "u", triggerFileUpload);
   }, [handleDownloadMd, handleSaveAsSlides]);
 
@@ -117,7 +144,7 @@ export function useEditor(codeMirrorRef: React.RefObject<any>, setSlideText: (te
     words,
     letters,
     setIsEditorReady,
-    editorUpdateListener
+    editorUpdateListener,
 
   };
 }

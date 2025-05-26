@@ -8,6 +8,7 @@ import { EditorView } from "@codemirror/view";
 import { vim } from "@replit/codemirror-vim";
 
 import AppHeader from "./AppHeader";
+import FileUpload from "./UI/FileUpload";
 import EditorPanel from "./EditorPanel";
 import PreviewPanel from "./PreviewPanel/Index";
 import AppFooter from "./AppFooter";
@@ -20,7 +21,6 @@ import { useFileHandling } from "../hooks/useFileHandling";
 import { useKeyboardAndFocus } from "../hooks/useKeyboardAndFocus";
 import { useKeyboardDetector } from "../hooks/useKeyboardDetector";
 import { useScreenSize } from "../hooks/useScreenSize";
-import { useFileUpload } from "../hooks/useFileUpload";
 
 export default function HomePageClient() {
   const [preivewText, setPreviewText] = useState("");
@@ -29,6 +29,7 @@ export default function HomePageClient() {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { isMobile } = useScreenSize();
   const { isKeyboardVisible, visualViewportHeight } = useKeyboardDetector(isMobile);
+  const fileUploadRef = useRef<{ triggerFileUpload: () => void }>(null);
   useEffect(() => {
     if (isMobile && isKeyboardVisible && visualViewportHeight) {
       const newMainHeight = visualViewportHeight;
@@ -114,7 +115,7 @@ export default function HomePageClient() {
         style={isMobile && isKeyboardVisible ? mainStyle : {}}
       >
 
-        <EditorPanel setPreviewText={setPreviewText} />
+        <EditorPanel setPreviewText={setPreviewText}, fileUploadRef={fileUploadRef} />
         {/* <div className="w-full md:w-[47vw] order-1 md:order-2 "> */}
         <PreviewPanel
           previewText={preivewText}
@@ -167,7 +168,7 @@ export default function HomePageClient() {
           totalPages={totalEditorPages}
         />
       )}
-      <FileInput />
+      <FileUpload ref={fileUploadRef} />
     </div>
 
   );

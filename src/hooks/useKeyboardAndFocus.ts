@@ -36,21 +36,6 @@ export function useKeyboardAndFocus(
         onSaveAsSlides();
       }
 
-      if (event.key === "i") {
-        const activeElement = document.activeElement;
-        const isEditorFocused = codeMirrorRef.current?.view?.hasFocus;
-
-        if (
-          !isEditorFocused &&
-          activeElement &&
-          (activeElement.tagName !== "INPUT" ||
-            (activeElement as HTMLInputElement).type !== "text") &&
-          activeElement.tagName !== "TEXTAREA"
-        ) {
-          event.preventDefault();
-          focusCodeMirror();
-        }
-      }
     };
 
     window.addEventListener("keydown", handleKeyDown);

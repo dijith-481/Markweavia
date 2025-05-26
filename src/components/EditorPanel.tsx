@@ -8,16 +8,19 @@ import { nord } from "@uiw/codemirror-theme-nord";
 import { markdown as markdownLang } from "@codemirror/lang-markdown";
 
 
+
 interface EditorPanelProps {
   setPreviewText: (text: string) => void;
+  fileUploadRef: React.RefObject<{ triggerFileUpload: () => void }>;
 }
 
 export default function EditorPanel({
-  setPreviewText
+  setPreviewText,
+  fileUploadRef
 
 }: EditorPanelProps) {
   const codeMirrorRef = useRef<any>(null);
-  const { markdownText, handleMarkdownChange, setIsEditorReady, editorUpdateListener } = useEditor(codeMirrorRef, setPreviewText);
+  const { markdownText, handleMarkdownChange, setIsEditorReady, editorUpdateListener } = useEditor(codeMirrorRef, setPreviewText, fileUploadRef);
 
   useEffect(() => {
     if (codeMirrorRef.current && codeMirrorRef.current.view) {
