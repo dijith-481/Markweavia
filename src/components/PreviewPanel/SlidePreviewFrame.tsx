@@ -1,18 +1,9 @@
 import React from "react";
 import { usePreviewSlide } from "@/hooks/usePreviewSlide";
-import { SlideLayoutOptions } from "@/utils/local-storage";
 
-interface SlidePreviewFrameProps {
-  previewText: string;
-  effectiveThemeVariables: Record<string, string>;
-  slideLayoutOptions: SlideLayoutOptions
-}
 
-export default function SlidePreviewFrame({ previewText,
-  effectiveThemeVariables,
-  slideLayoutOptions,
-}: SlidePreviewFrameProps) {
-  const { previewHtml } = usePreviewSlide(previewText, effectiveThemeVariables, slideLayoutOptions);
+export default function SlidePreviewFrame() {
+  const { previewHtml } = usePreviewSlide();
 
   return (
     <div className="w-full ">

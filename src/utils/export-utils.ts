@@ -1,5 +1,5 @@
 import { marked } from "marked";
-import { SlideLayoutOptions } from "./local-storage";
+import { SlideLayoutOptions } from "./layoutOptions";
 
 function splitMarkdownIntoSlides(markdown: string): string[] {
   const lines = markdown.split("\n");
@@ -76,9 +76,6 @@ export async function exportToCustomSlidesHtml(
   } else {
     let fallbackLayoutAdditions = "";
     if (layoutOptions) {
-      if (layoutOptions.showPageNumbers && layoutOptions.layoutOnFirstPage) {
-        fallbackLayoutAdditions += `<div class="slide-page-number pos-bottom-right">1 / 1</div>`;
-      }
       layoutOptions.headerFooters.forEach((item) => {
         fallbackLayoutAdditions += `<div class="slide-header-footer-item pos-${item.position}">${item.text}</div>`;
       });
@@ -264,7 +261,7 @@ pre[class*="language-"].line-numbers>code{position:relative;white-space:inherit}
 
 export async function exportSingleSlideToHtml(
   slideMarkdown: string,
-  themeVariables: Record<string, string>,
+  // themeVariables: Record<string, string>,
   currentPageNo: number,
   layoutOptions?: SlideLayoutOptions,
 ): Promise<string> {
@@ -333,9 +330,9 @@ pre[class*="language-"].line-numbers>code{position:relative;white-space:inherit}
     "https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/plugins/line-numbers/prism-line-numbers.min.js";
 
   let cssVariablesString = ":root {\n";
-  for (const [key, value] of Object.entries(themeVariables)) {
-    cssVariablesString += `  ${key}: ${value};\n`;
-  }
+  // for (const [key, value] of Object.entries(themeVariables)) {
+  //   cssVariablesString += `  ${key}: ${value};\n`;
+  // }
   cssVariablesString += "}\n";
 
   const htmlOutput = `
@@ -403,24 +400,4 @@ pre[class*="language-"].line-numbers>code{position:relative;white-space:inherit}
   return htmlOutput;
 }
 
-export function getFilenameFromFirstH1(
-  markdownText: string,
-  defaultName: string = "document",
-): string {
-  if (!markdownText || typeof markdownText !== "string") {
-    return defaultName;
-  }
-  const lines = markdownText.split("\n");
-  for (const line of lines) {
-    const trimmedLine = line.trim();
-    if (trimmedLine.startsWith("# ")) {
-      let headingText = trimmedLine.substring(2).trim();
-      headingText = headingText
-        .replace(/[^\w\s-]/g, "")
-        .replace(/\s+/g, "_")
-        .substring(0, 50);
-      return headingText || defaultName;
-    }
-  }
-  return defaultName;
-}
+

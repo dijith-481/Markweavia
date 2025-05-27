@@ -1,30 +1,31 @@
 import React from "react";
-import { createContext, useState, useEffect, useContext } from "react";
-// import { SlideLayoutOptions } from "../utils/layoutOptions";
+import { createContext, useMemo, useState, useContext } from "react";
+import { SlideLayoutOptions } from "../utils/layoutOptions";
+import { usePersistentSettings } from "../hooks/usePersistentSettings";
+import { countWords, countLetters } from "../utils/common";
 
 export interface SlideContextState {
-  // fontSize: number;
   markdownText: string;
-  // cursorPosition: number;
-  theme: string;
-  previewHtml: string;
+  activeTheme: string;
+  fontSizeMultiplier: number;
+  currentSlideText: string;
   layoutOnFirstPage: boolean;
-  // slideLayoutOptions: SlideLayoutOptions;
+  slideLayoutOptions: SlideLayoutOptions;
   currentSlide: number;
-  totalSlides: number;
+  totalSlidesNumber: number;
+  words: number;
+  letters: number;
 }
 
 interface SlideContextType extends SlideContextState {
-  setFontSize: React.Dispatch<React.SetStateAction<number>>;
-  setLayoutOnFirstPage: React.Dispatch<React.SetStateAction<boolean>>;
-  // setFontSize: (fontSize: number) => void;
   setMarkdownText: (markdownText: string) => void;
-  setCursorPosition: (cursorPosition: number) => void;
-  setCurrentTheme: (currentTheme: string) => void;
-  // setSlideLayoutOptions: (slideLayoutOptions: Record<string, boolean>) => void;
+  setActiveTheme: (activeTheme: string) => void;
+  setFontSizeMultiplier: React.Dispatch<React.SetStateAction<number>>;
+  setCurrentSlideText: (currentSlideText: string) => void;
+  setLayoutOnFirstPage: React.Dispatch<React.SetStateAction<boolean>>;
+  setSlideLayoutOptions: React.Dispatch<React.SetStateAction<SlideLayoutOptions>>;
+  setTotalSlidesNumber: (totalSlidesNumber: number) => void;
   setCurrentSlide: (currentSlide: number) => void;
-  setTotalSlides: (totalSlides: number) => void;
-  setpreviewHtml: (previewHtml: string) => void;
 }
 
 const SlideContext = createContext<SlideContextType | null>(null)
@@ -38,35 +39,35 @@ export const useSlideContext = (): SlideContextType => {
 }
 
 export const SlideContextProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [fontSize, setFontSize] = useState<number>(1);
-  const [markdownText, setMarkdownText] = useState("")
-  const [cursorPosition, setCursorPosition] = useState(0)
-  const [theme, setCurrentTheme] = useState("nordDark")
-  const [layoutOnFirstPage, setLayoutOnFirstPage] = useState<boolean>(false)
-  // const [slideLayoutOptions, setSlideLayoutOptions] = useState<Record<string, boolean>>({})
-  const [currentSlide, setCurrentSlide] = useState(0)
-  const [totalSlides, setTotalSlides] = useState(0)
-  const [previewHtml, setpreviewHtml] = useState("")
+  const { markdownText, setMarkdownText, activeTheme, setActiveTheme, fontSizeMultiplier, setFontSizeMultiplier, layoutOnFirstPage, slideLayoutOptions, setLayoutOnFirstPage, setSlideLayoutOptions } = usePersistentSettings();
+
+  const [currentSlideText, setCurrentSlideText] = useState<string>("");
+  const [currentSlide, setCurrentSlide] = useState<number>(1);
+  const [totalSlidesNumber, setTotalSlidesNumber] = useState<number>(1);
+
+  const words = useMemo(() => countWords(markdownText), [markdownText]);
+  const letters = useMemo(() => countLetters(markdownText), [markdownText]);
+
 
   const contextValue = {
     markdownText,
-    previewHtml,
-    cursorPosition,
-    theme,
-    layoutOnFirstPage,
-    // slideLayoutOptions,
-    currentSlide,
-    totalSlides,
     setMarkdownText,
-    setCursorPosition,
-    setCurrentTheme,
-    setLayoutOnFirstPage,
-    // setSlideLayoutOptions,
+    activeTheme,
+    setActiveTheme,
+    fontSizeMultiplier,
+    setFontSizeMultiplier,
+    currentSlideText,
+    setCurrentSlideText,
+    currentSlide,
     setCurrentSlide,
-    setTotalSlides,
-    setpreviewHtml,
-    fontSize,
-    setFontSize
+    totalSlidesNumber,
+    setTotalSlidesNumber,
+    layoutOnFirstPage,
+    setLayoutOnFirstPage,
+    slideLayoutOptions,
+    setSlideLayoutOptions,
+    words,
+    letters,
   }
   return (
     <SlideContext.Provider value={contextValue}>

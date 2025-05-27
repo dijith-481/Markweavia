@@ -1,26 +1,15 @@
 import { useMemo, useState, useCallback, useEffect } from "react";
 import { Vim } from "@replit/codemirror-vim";
 import { EditorView } from "@codemirror/view";
-import { countWords, countLetters } from "../utils/common";
 import { useSlideContext } from "../context/slideContext";
-import { handleSaveAsSlides, handleDownloadMd } from "../utils/handleDownload";
+import useExportFunctions from "@/utils/handleDownload";
 
 
-export function useEditor(codeMirrorRef: React.RefObject<any>, setSlideText: (text: string) => void, fileUploadRef: React.RefObject<{ triggerFileUpload: () => void }>) {
-  const { markdownText, setMarkdownText, setCurrentSlide, setTotalSlides } = useSlideContext();
+export function useEditor(codeMirrorRef: React.RefObject<any>, fileUploadRef: React.RefObject<{ triggerFileUpload: () => void } | null>) {
+  const { markdownText, setMarkdownText, setCurrentSlide, setTotalSlidesNumber, setCurrentSlideText } = useSlideContext();
+  const { handleSaveAsSlides, handleDownloadMd, handlePreviewFullSlides } = useExportFunctions()
 
   const [isEditorReady, setIsEditorReady] = useState(false);
-  const words = useMemo(() => countWords(markdownText), [markdownText]);
-  const letters = useMemo(() => countLetters(markdownText), [markdownText]);
-
-
-  const saveAsSlides = useCallback(() => {
-    handleSaveAsSlides(markdownText, effectiveThemeVariables, slideLayoutOptions);
-  }, [handleSaveAsSlides]);
-
-  const saveAsMd = useCallback(() => {
-    handleDownloadMd(markdownText);
-  }, [handleSaveAsSlides]);
 
   const handleMarkdownChange = useCallback((value: string) => {
     setMarkdownText(value);
@@ -35,8 +24,8 @@ export function useEditor(codeMirrorRef: React.RefObject<any>, setSlideText: (te
     const view = codeMirrorRef.current?.view;
     if (!view) {
       setCurrentSlide(1);
-      setTotalSlides(1);
-      setSlideText("")
+      setTotalSlidesNumber(1);
+      setCurrentSlideText("")
       return;
     }
 
@@ -62,11 +51,11 @@ export function useEditor(codeMirrorRef: React.RefObject<any>, setSlideText: (te
       }
     }
 
-    setTotalSlides(Math.max(MainHeadings.length, 1));
+    setTotalSlidesNumber(Math.max(MainHeadings.length, 1));
     setCurrentSlide(Math.max(headingsAboveCursor, 1));
 
     if (slideStartIndex === -1) {
-      setSlideText(doc.toString());
+      setCurrentSlideText(doc.toString());
       return;
     }
 
@@ -76,7 +65,7 @@ export function useEditor(codeMirrorRef: React.RefObject<any>, setSlideText: (te
       : doc.length;
 
     const currentSlideText = doc.sliceString(slideStartPos, slideEndPos).trim();
-    setSlideText(currentSlideText);
+    setCurrentSlideText(currentSlideText);
   }, [codeMirrorRef]);
 
 
@@ -112,7 +101,7 @@ export function useEditor(codeMirrorRef: React.RefObject<any>, setSlideText: (te
       }
       else if ((event.ctrlKey || event.metaKey) && event.key === "s" && !event.shiftKey) {
         event.preventDefault();
-        saveAsMd()
+        handleDownloadMd();
       }
       if ((event.ctrlKey || event.metaKey) && event.key === "o") {
         event.preventDefault();
@@ -120,7 +109,7 @@ export function useEditor(codeMirrorRef: React.RefObject<any>, setSlideText: (te
       }
       if ((event.ctrlKey || event.metaKey) && event.shiftKey && event.key.toLowerCase() === "s") {
         event.preventDefault();
-        saveAsSlides()
+        handleSaveAsSlides()
       }
 
     }
@@ -133,18 +122,16 @@ export function useEditor(codeMirrorRef: React.RefObject<any>, setSlideText: (te
 
 
   useEffect(() => {
-    Vim.defineEx("write", "w", saveAsMd);
-    Vim.defineEx("wslide", "ws", saveAsSlides);
+    Vim.defineEx("write", "w", handleDownloadMd);
+    Vim.defineEx("wslide", "ws", handleSaveAsSlides);
     Vim.defineEx("upload", "u", triggerFileUpload);
+    Vim.defineEx("preview", "p", handlePreviewFullSlides);
   }, [handleDownloadMd, handleSaveAsSlides]);
 
   return {
     markdownText,
     handleMarkdownChange,
-    words,
-    letters,
     setIsEditorReady,
     editorUpdateListener,
-
   };
 }

@@ -203,17 +203,3 @@ export const headerFooterPositions = [
   { value: "bottom-right", label: "Bottom Right" },
 ] as const;
 
-export type HeaderFooterPosition = (typeof headerFooterPositions)[number]["value"];
-
-export interface HeaderFooterItem {
-  id: string;
-  text: string;
-  position: HeaderFooterPosition;
-}
-
-// Moved from export-utils.ts
-export interface SlideLayoutOptions {
-  showPageNumbers: boolean;
-  layoutOnFirstPage: boolean;
-  headerFooters: HeaderFooterItem[];
-}

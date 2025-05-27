@@ -1,15 +1,12 @@
 import React, { useState, useRef } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { useClickOutside } from "../hooks/useClickOutside";
-import { useFileUpload } from "./UI/FileUpload";
+import useExportFunctions from "@/utils/handleDownload";
 
 interface AppHeaderProps {
-  triggerFileUpload: () => void
-  onDownloadMdClick: () => void;
-  onSaveAsSlidesClick: () => void;
-  onPreviewFullSlides: () => void;
+  fileUploadRef: React.RefObject<{ triggerFileUpload: () => void } | null>;
 }
+
 const UploadIcon = () => (
   <svg
     xmlns="http://www.w3.org/2000/svg"
@@ -78,128 +75,116 @@ const SlidesIcon = () => (
   </svg>
 );
 
-const AppHeader = React.forwardRef<HTMLDivElement, AppHeaderProps>(
-  (
-    {
-      triggerFileUpload,
-      onDownloadMdClick,
-      onSaveAsSlidesClick,
-      onPreviewFullSlides,
-    },
-    _ref,
-  ) => {
-    const [isDownloadDropdownOpen, setIsDownloadDropdownOpen] = useState(false);
-    const downloadDropdownRef = useRef<HTMLDivElement>(null);
+export default function AppHeader({
+  fileUploadRef
+}: AppHeaderProps) {
+  const [isDownloadDropdownOpen, setIsDownloadDropdownOpen] = useState(false);
+  const downloadDropdownRef = useRef<HTMLDivElement>(null);
+  const toggleDownloadDropdown = () => setIsDownloadDropdownOpen((prev) => !prev);
+  const triggerFileUpload = () => fileUploadRef.current?.triggerFileUpload();
+
+  const { handleDownloadMd, handleSaveAsSlides, handlePreviewFullSlides } = useExportFunctions()
 
 
-    useClickOutside(
-      downloadDropdownRef as React.RefObject<HTMLDivElement>,
-      () => setIsDownloadDropdownOpen(false),
-      isDownloadDropdownOpen,
-    );
 
-    const toggleDownloadDropdown = () => setIsDownloadDropdownOpen((prev) => !prev);
-    return (
-      <header className="py-1 px-2  md:py-2 h-16    flex justify-between items-center text-nord9 md:px-4">
-        <Link href="/" className="flex flex-row  items-baseline space-x-1">
-          {/* <div className="    flex items-baseline  space-x-1"> */}
-          {/* <Image */}
-          {/*   src="/logo.svg" */}
-          {/*   alt="Markweavia Logo" */}
-          {/*   className="m-0 h-8  " */}
-          {/*   width={32} */}
-          {/*   height={32} */}
-          {/*   priority */}
-          {/* /> */}
-          <Image
-            src="/markweavia.svg"
-            alt="Markweavia Text Logo"
-            className="  block m-0 h-12  "
-            width={180}
-            height={40}
-            priority
-          />
-          {/* </div> */}
-        </Link>
-        <div className="flex items-center space-x-2 ">
-          <button
-            onClick={triggerFileUpload}
-            className="hidden md:flex px-3 py-1.5 bg-nord15/80  text-nord0 text-sm rounded-4xl focus:outline-none hover:rounded-md hover:bg-nord15 items-center transition-all ease-in-out duration-200"
-            title="Upload a Markdown file (.md) (Ctrl+O)"
-          >
-            <UploadIcon />
-            <span className="hidden sm:ml-1.5 sm:inline">Upload</span>
-          </button>
-          <div className="relative block md:hidden" ref={downloadDropdownRef}>
-            <div className="flex items-center space-x-0.5 flex-row ">
+  return (
+    <header className="py-1 px-2  md:py-2 h-16    flex justify-between items-center text-nord9 md:px-4">
+      <Link href="/" className="flex flex-row  items-baseline space-x-1">
+        {/* <div className="    flex items-baseline  space-x-1"> */}
+        {/* <Image */}
+        {/*   src="/logo.svg" */}
+        {/*   alt="Markweavia Logo" */}
+        {/*   className="m-0 h-8  " */}
+        {/*   width={32} */}
+        {/*   height={32} */}
+        {/*   priority */}
+        {/* /> */}
+        <Image
+          src="/markweavia.svg"
+          alt="Markweavia Text Logo"
+          className="  block m-0 h-12  "
+          width={180}
+          height={40}
+          priority
+        />
+        {/* </div> */}
+      </Link>
+      <div className="flex items-center space-x-2 ">
+        <button
+          onClick={triggerFileUpload}
+          className="hidden md:flex px-3 py-1.5 bg-nord15/80  text-nord0 text-sm rounded-4xl focus:outline-none hover:rounded-md hover:bg-nord15 items-center transition-all ease-in-out duration-200"
+          title="Upload a Markdown file (.md) (Ctrl+O)"
+        >
+          <UploadIcon />
+          <span className="hidden sm:ml-1.5 sm:inline">Upload</span>
+        </button>
+        <div className="relative block md:hidden" ref={downloadDropdownRef}>
+          <div className="flex items-center space-x-0.5 flex-row ">
+            <button
+              onClick={handlePreviewFullSlides}
+              className="p-1 px-3 bg-nord8 hover:bg-nord7 scale-80  text-nord0 rounded-full focus:outline-none flex items-center"
+              title="Download options"
+            >
+              Preview
+            </button>
+
+            <button
+              onClick={toggleDownloadDropdown}
+              className="p-1 px-3 bg-nord8 hover:bg-nord7 scale-80  text-nord0 rounded-full focus:outline-none flex items-center"
+              title="Download options"
+            >
+              <DownloadIcon />
+            </button>
+            <button
+              onClick={triggerFileUpload}
+              className="p-1 px-3 bg-nord8 hover:bg-nord7 scale-80  text-nord0 rounded-full focus:outline-none flex items-center"
+              title="Upload a Markdown file (.md) (Ctrl+O)"
+            >
+              <UploadIcon />
+            </button>
+          </div>
+
+          {isDownloadDropdownOpen && (
+            <div className="absolute right-0 mt-2 w-48     flex flex-col overflow-auto  rounded-xl shadow-lg  z-50 ">
               <button
-                onClick={onPreviewFullSlides}
-                className="p-1 px-3 bg-nord8 hover:bg-nord7 scale-80  text-nord0 rounded-full focus:outline-none flex items-center"
-                title="Download options"
+                onClick={() => {
+                  handleDownloadMd();
+                  setIsDownloadDropdownOpen(false);
+                }}
+                className="w-full text-left px-4 py-2 text-sm bg-nord3 text-nord5 hover:bg-nord7 hover:text-nord6 flex items-center"
               >
-                Preview
+                <MarkdownIcon /> <span className="ml-2">Markdown (.md)</span>
               </button>
-
               <button
-                onClick={toggleDownloadDropdown}
-                className="p-1 px-3 bg-nord8 hover:bg-nord7 scale-80  text-nord0 rounded-full focus:outline-none flex items-center"
-                title="Download options"
+                onClick={() => {
+                  handleSaveAsSlides()
+                  setIsDownloadDropdownOpen(false);
+                }}
+                className="w-full text-left px-4 py-2 text-sm text-nord5 bg-nord2 hover:bg-nord14 hover:text-nord6 flex items-center"
               >
-                <DownloadIcon />
-              </button>
-              <button
-                onClick={triggerFileUpload}
-                className="p-1 px-3 bg-nord8 hover:bg-nord7 scale-80  text-nord0 rounded-full focus:outline-none flex items-center"
-                title="Upload a Markdown file (.md) (Ctrl+O)"
-              >
-                <UploadIcon />
+                <SlidesIcon /> <span className="ml-2">HTML Slides</span>
               </button>
             </div>
-
-            {isDownloadDropdownOpen && (
-              <div className="absolute right-0 mt-2 w-48     flex flex-col overflow-auto  rounded-xl shadow-lg  z-50 ">
-                <button
-                  onClick={() => {
-                    onDownloadMdClick();
-                    setIsDownloadDropdownOpen(false);
-                  }}
-                  className="w-full text-left px-4 py-2 text-sm bg-nord3 text-nord5 hover:bg-nord7 hover:text-nord6 flex items-center"
-                >
-                  <MarkdownIcon /> <span className="ml-2">Markdown (.md)</span>
-                </button>
-                <button
-                  onClick={() => {
-                    onSaveAsSlidesClick();
-                    setIsDownloadDropdownOpen(false);
-                  }}
-                  className="w-full text-left px-4 py-2 text-sm text-nord5 bg-nord2 hover:bg-nord14 hover:text-nord6 flex items-center"
-                >
-                  <SlidesIcon /> <span className="ml-2">HTML Slides</span>
-                </button>
-              </div>
-            )}
-          </div>
-          <button
-            onClick={onDownloadMdClick}
-            className="hidden md:flex px-3 py-1.5 bg-nord7/80 hover:rounded-md  text-nord0 text-sm rounded-4xl focus:outline-none hover:bg-nord7 items-center transition-all ease-in-out duration-200"
-            title="Download as Markdown (.md) (Ctrl+S)"
-          >
-            <DownloadIcon />
-            <span className="ml-1.5">.md</span>
-          </button>
-          <button
-            onClick={onSaveAsSlidesClick}
-            className="hidden hover:rounded-md md:flex px-3 py-1.5 hover:bg-nord14 bg-nord14/80 text-nord0 text-sm rounded-4xl focus:outline-none  items-center transition-all ease-in-out duration-200"
-            title="Download as HTML Slides (.html) (Ctrl+Shift+S)"
-          >
-            <DownloadIcon />
-            <span className="ml-1.5">Slides</span>
-          </button>
+          )}
         </div>
-      </header>
-    );
-  },
-);
+        <button
+          onClick={handleDownloadMd}
+          className="hidden md:flex px-3 py-1.5 bg-nord7/80 hover:rounded-md  text-nord0 text-sm rounded-4xl focus:outline-none hover:bg-nord7 items-center transition-all ease-in-out duration-200"
+          title="Download as Markdown (.md) (Ctrl+S)"
+        >
+          <DownloadIcon />
+          <span className="ml-1.5">.md</span>
+        </button>
+        <button
+          onClick={handleSaveAsSlides}
+          className="hidden hover:rounded-md md:flex px-3 py-1.5 hover:bg-nord14 bg-nord14/80 text-nord0 text-sm rounded-4xl focus:outline-none  items-center transition-all ease-in-out duration-200"
+          title="Download as HTML Slides (.html) (Ctrl+Shift+S)"
+        >
+          <DownloadIcon />
+          <span className="ml-1.5">Slides</span>
+        </button>
+      </div>
+    </header>
+  );
+};
 
-AppHeader.displayName = "AppHeader";
-export default AppHeader;

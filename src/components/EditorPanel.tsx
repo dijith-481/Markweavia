@@ -10,17 +10,15 @@ import { markdown as markdownLang } from "@codemirror/lang-markdown";
 
 
 interface EditorPanelProps {
-  setPreviewText: (text: string) => void;
-  fileUploadRef: React.RefObject<{ triggerFileUpload: () => void }>;
+  fileUploadRef: React.RefObject<{ triggerFileUpload: () => void } | null>;
 }
 
 export default function EditorPanel({
-  setPreviewText,
   fileUploadRef
 
 }: EditorPanelProps) {
   const codeMirrorRef = useRef<any>(null);
-  const { markdownText, handleMarkdownChange, setIsEditorReady, editorUpdateListener } = useEditor(codeMirrorRef, setPreviewText, fileUploadRef);
+  const { markdownText, handleMarkdownChange, setIsEditorReady, editorUpdateListener } = useEditor(codeMirrorRef, fileUploadRef);
 
   useEffect(() => {
     if (codeMirrorRef.current && codeMirrorRef.current.view) {

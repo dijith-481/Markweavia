@@ -1,41 +1,73 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useMemo, useEffect } from "react";
+import { usePersistentSettings } from "@/hooks/usePersistentSettings";
+import { PAGE_NUMBER_SLIDE_ID } from "../../../constants";
 import {
   HeaderFooterItem,
   HeaderFooterPosition,
   headerFooterPositions,
-} from "../../utils/local-storage";
+} from "../../../utils/local-storage";
+import { useSlideContext } from "@/context/slideContext";
 
 interface HeaderFooterManagerProps {
-  headerFooters: HeaderFooterItem[];
-  availableHeaderFooterPositions: { value: HeaderFooterPosition; label: string }[];
   onAddItem: (text: string, position: HeaderFooterPosition) => boolean;
   onRemoveItem: (id: string) => void;
   onUpdateItemPosition: (id: string, position: HeaderFooterPosition) => void;
-  showAddForm: boolean;
-  onToggleAddForm: () => void;
   newItemTextRef: React.RefObject<HTMLInputElement>;
   editingItemId: string | null;
   onSetEditingItemId: (id: string | null) => void;
 }
 
 export default function HeaderFooterManager({
-  headerFooters,
-  availableHeaderFooterPositions,
-  onAddItem,
-  onRemoveItem,
-  onUpdateItemPosition,
-  showAddForm,
-  onToggleAddForm,
   newItemTextRef,
   editingItemId,
   onSetEditingItemId,
 }: HeaderFooterManagerProps) {
   const [newItemText, setNewItemText] = useState("");
+  const [formOpen, setFormOpen] = useState(false);
+  const { } = useSlideContext()
+
+  const availableHeaderFooterPositions = useMemo(() => {
+    const usedPositions = new Set(headerFooters.map((item) => item.position));
+    return headerFooterPositions.filter((pos) => !usedPositions.has(pos.value));
+  }, [headerFooters]);
+
+  const onAddItem = (text: string, position: HeaderFooterPosition) => {
+    if (!text.trim()) {
+      alert("Header/Footer text cannot be empty.");
+      return false;
+    }
+    setHeaderFooters((prev) => [...prev, { id: uuidv4(), text, position }]);
+    return true;
+  };
+
+
+
+  const onRemoveItem = (id: string) => {
+    if (id === PAGE_NUMBER_SLIDE_ID) {
+      setShowPageNumbers(false);
+    } else {
+      setHeaderFooters((prev) => prev.filter((item) => item.id !== id));
+    }
+  };
+
+
+  const onUpdateItemPosition = (id: string, newPosition: HeaderFooterPosition) => {
+    setHeaderFooters((prevItems) =>
+      prevItems.map((item) => (item.id === id ? { ...item, position: newPosition } : item)),
+    );
+  };
+
   const [newItemPosition, setNewItemPosition] = useState<HeaderFooterPosition>(
     availableHeaderFooterPositions.length > 0
       ? availableHeaderFooterPositions[0].value
       : "bottom-center",
   );
+
+
+
+  const onToggleAddForm = () => {
+    setFormOpen((prev) => !prev);
+  };
 
   useEffect(() => {
     if (
@@ -56,7 +88,7 @@ export default function HeaderFooterManager({
       if (availableHeaderFooterPositions.length > 1) {
         setNewItemPosition(
           availableHeaderFooterPositions.filter((p) => p.value !== newItemPosition)[0]?.value ||
-            "bottom-center",
+          "bottom-center",
         );
       } else if (availableHeaderFooterPositions.length === 0) {
       }
@@ -81,13 +113,13 @@ export default function HeaderFooterManager({
         {availableHeaderFooterPositions.length > 0 && (
           <button
             onClick={onToggleAddForm}
-            className={`px-2 py-1 text-nord0 rounded text-xs ${showAddForm ? "bg-nord11 hover:bg-nord12" : "bg-nord9 hover:bg-nord14"}`}
+            className={`px-2 py-1 text-nord0 rounded text-xs ${formOpen ? "bg-nord11 hover:bg-nord12" : "bg-nord9 hover:bg-nord14"}`}
           >
-            {showAddForm ? "Cancel" : "Add New"}
+            {formOpen ? "Cancel" : "Add New"}
           </button>
         )}
       </div>
-      {showAddForm && (
+      {formOpen && (
         <div className="w-full p-2 border-nord2 rounded bg-nord1 flex flex-col gap-2">
           <input
             type="text"
@@ -181,7 +213,7 @@ export default function HeaderFooterManager({
           ))}
         </ul>
       )}
-      {headerFooters.length === 0 && !showAddForm && (
+      {headerFooters.length === 0 && !formOpen && (
         <p className="text-nord3 text-xs italic mt-1">No headers or footers added.</p>
       )}
     </div>

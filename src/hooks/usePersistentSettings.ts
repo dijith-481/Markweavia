@@ -1,6 +1,7 @@
-import { useState, useEffect, useMemo, useCallback } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { v4 as uuidv4 } from "uuid";
 import { initialMarkdownContent } from "../utils/slide-templates";
+import { SlideLayoutOptions, layoutItemPosition } from "../utils/layoutOptions";
 import {
   themes,
   LOCAL_STORAGE_MARKDOWN_TEXT_KEY,
@@ -9,9 +10,7 @@ import {
   LOCAL_STORAGE_FONT_MULTIPLIER_KEY,
   LOCAL_STORAGE_PAGE_NUMBERS_KEY,
   LOCAL_STORAGE_PAGE_NUMBER_FIRST_PAGE_KEY,
-  LOCAL_STORAGE_HEADER_FOOTERS_KEY,
-  HeaderFooterItem,
-  HeaderFooterPosition,
+  LOCAL_STORAGE_HEADER_FOOTERS_KEY as LOCAL_STORAGE_LAYOUT_OPTIONS_KEY,
   headerFooterPositions,
 } from "../utils/local-storage";
 import { PAGE_NUMBER_SLIDE_ID } from "../constants";
@@ -21,8 +20,12 @@ export function usePersistentSettings() {
   const [activeTheme, setActiveTheme] = useState<string>("nordDark");
   const [fontSizeMultiplier, setFontSizeMultiplier] = useState<number>(1);
   const [showPageNumbers, setShowPageNumbers] = useState(true);
+  const [layoutOnFirstPage, setLayoutOnFirstPage] = useState<boolean>(false);
   const [headerfooterOnFirstPage, setPageNumberOnFirstPage] = useState<boolean>(false);
-  const [headerFooters, setHeaderFooters] = useState<HeaderFooterItem[]>([]);
+  const [slideLayoutOptions, setSlideLayoutOptions] = useState<SlideLayoutOptions>({
+    layoutOnFirstPage: false,
+    headerFooters: [],
+  });
   const [effectiveThemeVariables, setEffectiveThemeVariables] = useState<Record<string, string>>(
     {},
   );
@@ -38,8 +41,11 @@ export function usePersistentSettings() {
     setShowPageNumbers(storedPageNumbers ? JSON.parse(storedPageNumbers) : true);
     const storedFirstPage = localStorage.getItem(LOCAL_STORAGE_PAGE_NUMBER_FIRST_PAGE_KEY);
     setPageNumberOnFirstPage(storedFirstPage ? JSON.parse(storedFirstPage) : false);
-    const storedHeaderFooters = localStorage.getItem(LOCAL_STORAGE_HEADER_FOOTERS_KEY);
-    setHeaderFooters(storedHeaderFooters ? JSON.parse(storedHeaderFooters) : []);
+    const storedLayoutOptions = null//localStorage.getItem(LOCAL_STORAGE_LAYOUT_OPTIONS_KEY);
+    setSlideLayoutOptions(storedLayoutOptions ? JSON.parse(storedLayoutOptions) : {
+      layoutOnFirstPage: false,
+      headerFooters: [],
+    });
   }, []);
 
   useEffect(() => {
@@ -78,8 +84,8 @@ export function usePersistentSettings() {
   }, [headerfooterOnFirstPage]);
 
   useEffect(() => {
-    localStorage.setItem(LOCAL_STORAGE_HEADER_FOOTERS_KEY, JSON.stringify(headerFooters));
-  }, [headerFooters]);
+    localStorage.setItem(LOCAL_STORAGE_LAYOUT_OPTIONS_KEY, JSON.stringify(slideLayoutOptions.headerFooters));
+  }, [slideLayoutOptions.headerFooters]);
 
   useEffect(() => {
     const currentThemeColors = themes[activeTheme];
@@ -93,93 +99,66 @@ export function usePersistentSettings() {
     setEffectiveThemeVariables(computedVariables);
   }, [activeTheme, fontSizeMultiplier]);
 
-  const slideLayoutOptions = useMemo(
-    () => ({
-      showPageNumbers,
-      layoutOnFirstPage: headerfooterOnFirstPage,
-      headerFooters,
-    }),
-    [showPageNumbers, headerfooterOnFirstPage, headerFooters],
-  );
 
   const loadTheme = (themeName: keyof typeof themes) => setActiveTheme(themeName);
-  const increaseFontSize = () => setFontSizeMultiplier((prev) => Math.min(prev + 0.1, 2.5));
-  const decreaseFontSize = () => setFontSizeMultiplier((prev) => Math.max(prev - 0.1, 0.5));
 
   const toggleShowPageNumbers = useCallback(() => {
     setShowPageNumbers((prev) => {
       const newState = !prev;
       if (newState) {
-        setHeaderFooters((hf) => {
-          if (!hf.find((item) => item.id === PAGE_NUMBER_SLIDE_ID)) {
-            const usedPositions = new Set(hf.map((item) => item.position));
+        setSlideLayoutOptions((prevOptions) => {
+          if (!prevOptions.headerFooters.find((item) => item.id === PAGE_NUMBER_SLIDE_ID)) {
+            const usedPositions = new Set(prevOptions.headerFooters.map((item) => item.position));
             const availablePos = headerFooterPositions.find((p) => !usedPositions.has(p.value));
-            return [
-              ...hf,
-              {
-                id: PAGE_NUMBER_SLIDE_ID,
-                text: "Page No",
-                position: availablePos ? availablePos.value : "bottom-center",
-              },
-            ];
+            return {
+              ...prevOptions,
+              headerFooters: [
+                ...prevOptions.headerFooters,
+                {
+                  id: PAGE_NUMBER_SLIDE_ID,
+                  text: "Page No",
+                  position: availablePos ? availablePos.value : "bottom-center",
+                },
+              ],
+            };
           }
-          return hf;
+          return prevOptions;
         });
       } else {
-        setHeaderFooters((hf) => hf.filter((item) => item.id !== PAGE_NUMBER_SLIDE_ID));
+        setSlideLayoutOptions((prevOptions) => ({
+          ...prevOptions,
+          headerFooters: prevOptions.headerFooters.filter((item) => item.id !== PAGE_NUMBER_SLIDE_ID),
+        }));
       }
       return newState;
     });
-  }, [setHeaderFooters]);
+  }, [setSlideLayoutOptions]);
 
   const toggleHeaderFooterOnFirstPage = () => setPageNumberOnFirstPage((prev) => !prev);
 
-  const addHeaderFooterItem = (text: string, position: HeaderFooterPosition) => {
-    if (!text.trim()) {
-      alert("Header/Footer text cannot be empty.");
-      return false;
-    }
-    setHeaderFooters((prev) => [...prev, { id: uuidv4(), text, position }]);
-    return true;
-  };
 
-  const removeHeaderFooterItem = (id: string) => {
-    if (id === PAGE_NUMBER_SLIDE_ID) {
-      setShowPageNumbers(false);
-    } else {
-      setHeaderFooters((prev) => prev.filter((item) => item.id !== id));
-    }
+  const updateHeaderFooterItemPosition = (id: string, newPosition: layoutItemPosition) => {
+    setSlideLayoutOptions((prev) => ({ ...prev, headerFooters: prev.headerFooters.map((item) => (item.id === id ? { ...item, position: newPosition } : item)) }));
   };
-
-  const updateHeaderFooterItemPosition = (id: string, newPosition: HeaderFooterPosition) => {
-    setHeaderFooters((prevItems) =>
-      prevItems.map((item) => (item.id === id ? { ...item, position: newPosition } : item)),
-    );
-  };
-
-  const availableHeaderFooterPositions = useMemo(() => {
-    const usedPositions = new Set(headerFooters.map((item) => item.position));
-    return headerFooterPositions.filter((pos) => !usedPositions.has(pos.value));
-  }, [headerFooters]);
 
   return {
+    markdownText,
+    setMarkdownText,
     activeTheme,
+    setActiveTheme,
     loadTheme,
     themes,
     fontSizeMultiplier,
-    increaseFontSize,
-    decreaseFontSize,
+    setFontSizeMultiplier,
     effectiveThemeVariables,
     showPageNumbers,
     toggleShowPageNumbers,
     headerfooterOnFirstPage,
     toggleHeaderFooterOnFirstPage,
-    headerFooters,
-    setHeaderFooters,
-    addHeaderFooterItem,
-    removeHeaderFooterItem,
     updateHeaderFooterItemPosition,
     slideLayoutOptions,
-    availableHeaderFooterPositions,
+    setSlideLayoutOptions,
+    layoutOnFirstPage,
+    setLayoutOnFirstPage
   };
 }

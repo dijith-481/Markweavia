@@ -2,22 +2,19 @@ import React, { useState, useEffect, useRef, useCallback } from "react";
 import InfoPopup from "./UI/InfoPopup";
 import { useSlideContext } from "@/context/slideContext";
 import { cyclingTips } from "@/utils/cyclable-tips";
+import { infoIcon } from "@/components/UI/Icons";
 
-interface AppFooterProps {
-
-}
 
 
 const TIP_VISIBLE_DURATION = 4500;
 const TIP_FADE_DURATION = 500;
 
-export default function AppFooter({
-}: AppFooterProps) {
+export default function AppFooter() {
   const infoButtonRef = useRef<HTMLButtonElement>(null);
   const infoPopupRef = useRef<HTMLDivElement>(null);
   const [showInfoPopup, setShowInfoPopup] = useState(false);
   const [showWordCount, setShowWordCount] = useState(false);
-  const { currentSlide, totalSlides, words, letters, } = useSlideContext()
+  const { currentSlide, totalSlidesNumber: totalSlides, words, letters } = useSlideContext()
   const [currentCyclingTipIndex, setCurrentCyclingTipIndex] = useState(0);
   const [cyclingTipOpacity, setCyclingTipOpacity] = useState(0);
 
@@ -41,13 +38,13 @@ export default function AppFooter({
     };
   }, [currentCyclingTipIndex]);
 
-  const toggleInfoPopup = () => useCallback(() => {
+  const toggleInfoPopup = () => {
     setShowInfoPopup((prev) => !prev);
-  }, [showInfoPopup]);
+  };
 
-  const toggleWordCount = () => useCallback(() => {
+  const toggleWordCount = () => {
     setShowWordCount((prev) => !prev);
-  }, [showInfoPopup]);
+  };
 
   return (
     <footer className="p-2 px-4 flex justify-between items-center h-16 bg-amber-50 text-xs text-nord4">
@@ -59,20 +56,7 @@ export default function AppFooter({
             onClick={toggleInfoPopup}
             className="p-1.5 rounded-md bg-nord3 focus:outline-none"
           >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              className="h-4 w-4 text-nord8"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-              strokeWidth={2}
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-              />
-            </svg>
+            {infoIcon}
           </button>
           <InfoPopup
             show={showInfoPopup}
