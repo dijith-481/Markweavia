@@ -1,8 +1,8 @@
 import React from "react";
-import { handlePreviewFullSlides } from "@/utils/handleDownload";
-
+import useExportFunctions from "@/hooks/useExportFunctions";
 
 export default function FullPreviewButton() {
+  const { handlePreviewFullSlides } = useExportFunctions();
   return (
     <button
       onClick={handlePreviewFullSlides}

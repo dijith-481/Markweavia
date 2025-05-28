@@ -2,21 +2,20 @@ import { exportToCustomSlidesHtml } from "../utils/export-utils";
 import { useSlideContext } from "@/context/slideContext";
 
 export default function useExportFunctions() {
-  const { markdownText, themeVariables, slideLayoutOptions } = useSlideContext();
+  const { markdownText, slideLayoutOptions } = useSlideContext();
 
   async function createHtmlBlob(documentTitle: string): Promise<Blob> {
     if (!markdownText.trim()) {
       throw new Error("Nothing to process! Write some Markdown first.");
     }
-    if (!themeVariables || Object.keys(themeVariables).length === 0) {
-      throw new Error("Theme variables not ready. Please wait a moment.");
-    }
+    // if (!themeVariables || Object.keys(themeVariables).length === 0) {
+    //   throw new Error("Theme variables not ready. Please wait a moment.");
+    // }
     try {
       const htmlContent = await exportToCustomSlidesHtml(
         markdownText,
-        themeVariables,
         slideLayoutOptions,
-        documentTitle
+        documentTitle,
       );
       return new Blob([htmlContent], { type: "text/html;charset=utf-8;" });
     } catch (error) {
@@ -93,6 +92,6 @@ export default function useExportFunctions() {
     handleSaveAsSlides,
     handlePreviewFullSlides,
     handleDownloadMd,
-    getFilenameFromFirstH1
+    getFilenameFromFirstH1,
   };
 }

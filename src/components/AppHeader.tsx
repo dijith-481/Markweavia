@@ -1,7 +1,7 @@
 import React, { useState, useRef } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import useExportFunctions from "@/utils/handleDownload";
+import useExportFunctions from "@/hooks/useExportFunctions";
 
 interface AppHeaderProps {
   fileUploadRef: React.RefObject<{ triggerFileUpload: () => void } | null>;
@@ -75,17 +75,13 @@ const SlidesIcon = () => (
   </svg>
 );
 
-export default function AppHeader({
-  fileUploadRef
-}: AppHeaderProps) {
+export default function AppHeader({ fileUploadRef }: AppHeaderProps) {
   const [isDownloadDropdownOpen, setIsDownloadDropdownOpen] = useState(false);
   const downloadDropdownRef = useRef<HTMLDivElement>(null);
   const toggleDownloadDropdown = () => setIsDownloadDropdownOpen((prev) => !prev);
   const triggerFileUpload = () => fileUploadRef.current?.triggerFileUpload();
 
-  const { handleDownloadMd, handleSaveAsSlides, handlePreviewFullSlides } = useExportFunctions()
-
-
+  const { handleDownloadMd, handleSaveAsSlides, handlePreviewFullSlides } = useExportFunctions();
 
   return (
     <header className="py-1 px-2  md:py-2 h-16    flex justify-between items-center text-nord9 md:px-4">
@@ -157,7 +153,7 @@ export default function AppHeader({
               </button>
               <button
                 onClick={() => {
-                  handleSaveAsSlides()
+                  handleSaveAsSlides();
                   setIsDownloadDropdownOpen(false);
                 }}
                 className="w-full text-left px-4 py-2 text-sm text-nord5 bg-nord2 hover:bg-nord14 hover:text-nord6 flex items-center"
@@ -186,5 +182,4 @@ export default function AppHeader({
       </div>
     </header>
   );
-};
-
+}

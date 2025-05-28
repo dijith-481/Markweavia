@@ -7,22 +7,20 @@ import { vim } from "@replit/codemirror-vim";
 import { nord } from "@uiw/codemirror-theme-nord";
 import { markdown as markdownLang } from "@codemirror/lang-markdown";
 
-
-
 interface EditorPanelProps {
   fileUploadRef: React.RefObject<{ triggerFileUpload: () => void } | null>;
 }
 
-export default function EditorPanel({
-  fileUploadRef
-
-}: EditorPanelProps) {
+export default function EditorPanel({ fileUploadRef }: EditorPanelProps) {
   const codeMirrorRef = useRef<any>(null);
-  const { markdownText, handleMarkdownChange, setIsEditorReady, editorUpdateListener } = useEditor(codeMirrorRef, fileUploadRef);
+  const { markdownText, handleMarkdownChange, setIsEditorReady, editorUpdateListener } = useEditor(
+    codeMirrorRef,
+    fileUploadRef,
+  );
 
   useEffect(() => {
     if (codeMirrorRef.current && codeMirrorRef.current.view) {
-      setIsEditorReady(true)
+      setIsEditorReady(true);
     }
   }, [codeMirrorRef.current, setIsEditorReady]);
 
@@ -35,13 +33,11 @@ export default function EditorPanel({
     ],
     [editorUpdateListener],
   );
+
   return (
-    <div className=" w-full rounded-md flex order-2 md:order-1 flex-col h-full  overflow-x-hidden  overscroll-contain   flex-1  "
-    >
+    <div className="order-2 md:w-1/2 w-full rounded-md md:order-1 h-full overscroll-contain overflow-x-hidden">
       <CodeMirror
         value={markdownText}
-        height="auto"
-        minHeight="100%"
         extensions={extensions}
         onChange={handleMarkdownChange}
         theme={nord}
@@ -53,12 +49,12 @@ export default function EditorPanel({
           highlightActiveLineGutter: true,
         }}
         autoFocus
-        className="w-full h-full  text-sm"
+        className="text-sm"
         ref={codeMirrorRef}
         onCreateEditor={() => {
           setIsEditorReady(true);
         }}
       />
-    </div >
+    </div>
   );
 }

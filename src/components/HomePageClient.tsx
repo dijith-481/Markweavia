@@ -16,10 +16,9 @@ export default function HomePageClient() {
   const { isKeyboardVisible, visualViewportHeight } = useKeyboardDetector(isMobile);
   const fileUploadRef = useRef<{ triggerFileUpload: () => void }>(null);
 
-
   useEffect(() => {
-    setIsMobile(isMobileDevice())
-  }, [])
+    setIsMobile(isMobileDevice());
+  }, []);
 
   useEffect(() => {
     if (isMobile && isKeyboardVisible && visualViewportHeight) {
@@ -32,23 +31,16 @@ export default function HomePageClient() {
 
   return (
     <div className="h-[100dvh] w-[100dvw] overflow-hidden flex flex-col  ">
-      {(!isMobile || (isMobile && !isKeyboardVisible)) && (
-        <AppHeader fileUploadRef={fileUploadRef} />
-      )}
+      {!isKeyboardVisible && <AppHeader fileUploadRef={fileUploadRef} />}
       <main
-        className={`flex flex-col  sm:flex-row  gap-4 justify-evenly p-4 flex-grow overflow-hidden`}
-        style={isMobile && isKeyboardVisible ? mainStyle : {}}
+        className={`flex flex-col  md:flex-row  gap-4 justify-evenly p-4 overflow-hidden`}
+        style={isKeyboardVisible ? mainStyle : {}}
       >
-
         <EditorPanel fileUploadRef={fileUploadRef} />
-        {/* <div className="w-full md:w-[47vw] order-1 md:order-2 "> */}
         <PreviewPanel isMobile={isMobile} isKeyboardVisible={isKeyboardVisible} />
       </main>
-      {(!isMobile || (isMobile && !isKeyboardVisible)) && (
-        <AppFooter />
-      )}
+      {!isKeyboardVisible && <AppFooter />}
       <FileUpload ref={fileUploadRef} />
     </div>
-
   );
 }

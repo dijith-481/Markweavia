@@ -1,12 +1,11 @@
 import React from "react";
 import { usePreviewSlide } from "@/hooks/usePreviewSlide";
 
-
 export default function SlidePreviewFrame() {
   const { previewHtml } = usePreviewSlide();
 
   return (
-    <div className="w-full ">
+    <div className="w-full h-max   overflow-hidden rounded-md ">
       <iframe
         srcDoc={previewHtml}
         title="Current Slide Preview"
@@ -17,7 +16,7 @@ export default function SlidePreviewFrame() {
         //   height: "100%",
         //   border: "none",
         // }}
-        className="w-full border-0      aspect-video"
+        className="w-full h-auto border-0      aspect-video"
         sandbox="allow-scripts"
       />
     </div>

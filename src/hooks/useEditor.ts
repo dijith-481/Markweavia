@@ -2,21 +2,32 @@ import { useMemo, useState, useCallback, useEffect } from "react";
 import { Vim } from "@replit/codemirror-vim";
 import { EditorView } from "@codemirror/view";
 import { useSlideContext } from "../context/slideContext";
-import useExportFunctions from "@/utils/handleDownload";
+import useExportFunctions from "@/hooks/useExportFunctions";
 
-
-export function useEditor(codeMirrorRef: React.RefObject<any>, fileUploadRef: React.RefObject<{ triggerFileUpload: () => void } | null>) {
-  const { markdownText, setMarkdownText, setCurrentSlide, setTotalSlidesNumber, setCurrentSlideText } = useSlideContext();
-  const { handleSaveAsSlides, handleDownloadMd, handlePreviewFullSlides } = useExportFunctions()
+export function useEditor(
+  codeMirrorRef: React.RefObject<any>,
+  fileUploadRef: React.RefObject<{ triggerFileUpload: () => void } | null>,
+) {
+  const {
+    markdownText,
+    setMarkdownText,
+    setCurrentSlide,
+    setTotalSlidesNumber,
+    setCurrentSlideText,
+  } = useSlideContext();
+  const { handleSaveAsSlides, handleDownloadMd, handlePreviewFullSlides } = useExportFunctions();
 
   const [isEditorReady, setIsEditorReady] = useState(false);
 
-  const handleMarkdownChange = useCallback((value: string) => {
-    setMarkdownText(value);
-  }, [setMarkdownText]);
+  const handleMarkdownChange = useCallback(
+    (value: string) => {
+      setMarkdownText(value);
+    },
+    [setMarkdownText],
+  );
 
   const triggerFileUpload = useCallback(() => {
-    if (!fileUploadRef.current) return
+    if (!fileUploadRef.current) return;
     fileUploadRef.current?.triggerFileUpload();
   }, [fileUploadRef]);
 
@@ -25,7 +36,7 @@ export function useEditor(codeMirrorRef: React.RefObject<any>, fileUploadRef: Re
     if (!view) {
       setCurrentSlide(1);
       setTotalSlidesNumber(1);
-      setCurrentSlideText("")
+      setCurrentSlideText("");
       return;
     }
 
@@ -38,14 +49,18 @@ export function useEditor(codeMirrorRef: React.RefObject<any>, fileUploadRef: Re
     let slideEndIndex = -1;
     let headingsAboveCursor = 0;
 
+    console.log("currentline no", cursorLineNumber);
     for (let i = 1; i <= doc.lines; i++) {
       const lineText = doc.line(i).text.trimStart();
       if (lineText.startsWith("# ") || lineText.startsWith("## ")) {
+        console.log(i, "starts with markdown");
         MainHeadings.push(i);
         if (cursorLineNumber >= i) {
+          console.log("updating index");
           slideStartIndex = i;
           headingsAboveCursor++;
-        } else if (slideStartIndex === -1) {
+        } else if (slideEndIndex === -1) {
+          console.log("end index");
           slideEndIndex = i;
         }
       }
@@ -55,33 +70,31 @@ export function useEditor(codeMirrorRef: React.RefObject<any>, fileUploadRef: Re
     setCurrentSlide(Math.max(headingsAboveCursor, 1));
 
     if (slideStartIndex === -1) {
-      setCurrentSlideText(doc.toString());
+      // setCurrentSlideText(doc.toString());
+      setCurrentSlideText("");
       return;
     }
 
     const slideStartPos = doc.line(slideStartIndex).from;
-    const slideEndPos = slideEndIndex !== -1
-      ? doc.line(slideEndIndex).from
-      : doc.length;
+    const slideEndPos = slideEndIndex !== -1 ? doc.line(slideEndIndex).from : doc.length;
 
     const currentSlideText = doc.sliceString(slideStartPos, slideEndPos).trim();
+    console.log(currentSlideText);
     setCurrentSlideText(currentSlideText);
   }, [codeMirrorRef]);
 
-
-
   const editorUpdateListener = useMemo(
-    () => EditorView.updateListener.of((update) => {
-      if (isEditorReady) {
-        // Process on any update OR when editor first becomes ready
-        if (update.docChanged || update.selectionSet || !update.transactions.length) {
-          processEditorState();
+    () =>
+      EditorView.updateListener.of((update) => {
+        if (isEditorReady) {
+          // Process on any update OR when editor first becomes ready
+          if (update.docChanged || update.selectionSet || !update.transactions.length) {
+            processEditorState();
+          }
         }
-      }
-    }),
-    [processEditorState, isEditorReady]
+      }),
+    [processEditorState, isEditorReady],
   );
-
 
   const focusCodeMirror = useCallback(() => {
     if (codeMirrorRef.current && codeMirrorRef.current.view) {
@@ -94,32 +107,33 @@ export function useEditor(codeMirrorRef: React.RefObject<any>, fileUploadRef: Re
       if (event.key === "i") {
         const activeElement = document.activeElement;
         const isEditorFocused = codeMirrorRef.current?.view?.hasFocus;
-        if (!isEditorFocused && activeElement && activeElement.tagName !== "INPUT" && activeElement.tagName !== "TEXTAREA") {
+        if (
+          !isEditorFocused &&
+          activeElement &&
+          activeElement.tagName !== "INPUT" &&
+          activeElement.tagName !== "TEXTAREA"
+        ) {
           event.preventDefault();
           focusCodeMirror();
         }
-      }
-      else if ((event.ctrlKey || event.metaKey) && event.key === "s" && !event.shiftKey) {
+      } else if ((event.ctrlKey || event.metaKey) && event.key === "s" && !event.shiftKey) {
         event.preventDefault();
         handleDownloadMd();
       }
       if ((event.ctrlKey || event.metaKey) && event.key === "o") {
         event.preventDefault();
-        triggerFileUpload()
+        triggerFileUpload();
       }
       if ((event.ctrlKey || event.metaKey) && event.shiftKey && event.key.toLowerCase() === "s") {
         event.preventDefault();
-        handleSaveAsSlides()
+        handleSaveAsSlides();
       }
-
-    }
+    };
     window.addEventListener("keydown", handleKeyDown);
     return () => {
       window.removeEventListener("keydown", handleKeyDown);
     };
-
   }, [focusCodeMirror, codeMirrorRef]);
-
 
   useEffect(() => {
     Vim.defineEx("write", "w", handleDownloadMd);

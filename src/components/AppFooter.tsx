@@ -1,10 +1,8 @@
-import React, { useState, useEffect, useRef, useCallback } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import InfoPopup from "./UI/InfoPopup";
 import { useSlideContext } from "@/context/slideContext";
 import { cyclingTips } from "@/utils/cyclable-tips";
 import { infoIcon } from "@/components/UI/Icons";
-
-
 
 const TIP_VISIBLE_DURATION = 4500;
 const TIP_FADE_DURATION = 500;
@@ -14,7 +12,7 @@ export default function AppFooter() {
   const infoPopupRef = useRef<HTMLDivElement>(null);
   const [showInfoPopup, setShowInfoPopup] = useState(false);
   const [showWordCount, setShowWordCount] = useState(false);
-  const { currentSlide, totalSlidesNumber: totalSlides, words, letters } = useSlideContext()
+  const { currentSlide, totalSlidesNumber: totalSlides, words, letters } = useSlideContext();
   const [currentCyclingTipIndex, setCurrentCyclingTipIndex] = useState(0);
   const [cyclingTipOpacity, setCyclingTipOpacity] = useState(0);
 
@@ -22,7 +20,6 @@ export default function AppFooter() {
     const fadeInTimer = setTimeout(() => {
       setCyclingTipOpacity(1);
     }, 50);
-
 
     const visibleTimer = setTimeout(() => {
       setCyclingTipOpacity(0);
@@ -58,11 +55,7 @@ export default function AppFooter() {
           >
             {infoIcon}
           </button>
-          <InfoPopup
-            show={showInfoPopup}
-            onClose={toggleInfoPopup}
-            popupRef={infoPopupRef}
-          />
+          <InfoPopup show={showInfoPopup} onClose={toggleInfoPopup} popupRef={infoPopupRef} />
         </div>
 
         {/* Cycling Tips Area */}

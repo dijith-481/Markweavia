@@ -1,4 +1,3 @@
-
 export const cyclingTips = [
   {
     key: "focus",
@@ -34,7 +33,6 @@ export const cyclingTips = [
       </>
     ),
   },
-
   {
     key: "vimSaveSlides",
     content: (
@@ -71,7 +69,6 @@ export const cyclingTips = [
       </>
     ),
   },
-
   {
     key: "madeWithLove",
     content: (

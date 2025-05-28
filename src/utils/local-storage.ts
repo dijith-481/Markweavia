@@ -26,7 +26,6 @@ export const baseFontSizesConfig: Record<
   "--slide-h2-size": { min: 0, idealVmin: 8.0, max: 150 },
   "--slide-h3-size": { min: 0, idealVmin: 6.0, max: 144 },
 };
-export const LOCAL_STORAGE_FONT_MULTIPLIER_KEY = "markdown-editor-font-multiplier";
 
 const hexToRgbString = (hex: string): string => {
   const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
@@ -190,16 +189,5 @@ export const themes: Record<string, Record<string, string>> = {
 
 export const LOCAL_STORAGE_THEME_KEY = "markdown-editor-theme";
 export const LOCAL_STORAGE_MARKDOWN_TEXT_KEY = "markdown-editor-markdown-text";
-export const LOCAL_STORAGE_PAGE_NUMBERS_KEY = "markdown-editor-page-numbers";
-export const LOCAL_STORAGE_PAGE_NUMBER_FIRST_PAGE_KEY = "markdown-editor-page-number-first-page";
-export const LOCAL_STORAGE_HEADER_FOOTERS_KEY = "markdown-editor-header-footers";
-
-export const headerFooterPositions = [
-  { value: "top-left", label: "Top Left" },
-  { value: "top-center", label: "Top Center" },
-  { value: "top-right", label: "Top Right" },
-  { value: "bottom-left", label: "Bottom Left" },
-  { value: "bottom-center", label: "Bottom Center" },
-  { value: "bottom-right", label: "Bottom Right" },
-] as const;
-
+export const LOCAL_STORAGE_FONT_MULTIPLIER_KEY = "markdown-editor-font-multiplier";
+export const LOCAL_STORAGE_LAYOUT_OPTIONS_KEY = "markdown-editor-layout-options";

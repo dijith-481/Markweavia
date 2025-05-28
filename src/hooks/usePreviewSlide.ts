@@ -8,22 +8,22 @@ export function usePreviewSlide() {
   const { currentSlide, slideLayoutOptions, currentSlideText } = useSlideContext();
   // const { themeVariables } = useUIState();
 
-
   useEffect(() => {
     const generatePreview = async () => {
       // if (Object.keys(themeVariables).length > 0) {
       const html = await exportSingleSlideToHtml(
         currentSlideText,
         // themeVariables,
-        currentSlideText,
+        currentSlide,
         slideLayoutOptions,
       );
       setPreviewHtml(html);
       // }
     };
-    const debouncedGeneratePreview = debounce(generatePreview, 300);
-    debouncedGeneratePreview();
-  }, [currentSlideText, slideLayoutOptions, currentSlide]);
+    // const debouncedGeneratePreview = debounce(generatePreview, 300);
+    // debouncedGeneratePreview();
+    generatePreview();
+  }, [currentSlideText, slideLayoutOptions]);
 
   return {
     previewHtml,

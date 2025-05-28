@@ -7,42 +7,43 @@ export function useKeyboardDetector(enabled: boolean = true) {
   const [visualViewportHeight, setVisualViewportHeight] = useState<number | null>(null);
 
   const checkKeyboardStatus = useCallback(() => {
-    if (typeof window !== "undefined" && window.visualViewport && enabled) {
+    if (!enabled || typeof window === "undefined") {
+      setIsKeyboardVisible(false);
+      setVisualViewportHeight(null);
+      return;
+    }
+
+    if (window.visualViewport) {
       const vvHeight = window.visualViewport.height;
       const windowHeight = window.innerHeight;
-      setVisualViewportHeight(vvHeight);
 
-      if (windowHeight > 0 && vvHeight / windowHeight < KEYBOARD_THRESHOLD_PERCENTAGE) {
-        setIsKeyboardVisible(true);
-      } else {
-        setIsKeyboardVisible(false);
-      }
+      setVisualViewportHeight(vvHeight);
+      setIsKeyboardVisible(vvHeight / windowHeight < KEYBOARD_THRESHOLD_PERCENTAGE);
     } else {
+      // Fallback for browsers without visualViewport
+      const currentHeight = window.innerHeight;
+      setVisualViewportHeight(currentHeight);
       setIsKeyboardVisible(false);
-      setVisualViewportHeight(typeof window !== "undefined" ? window.innerHeight : null);
     }
   }, [enabled]);
 
   useEffect(() => {
-    if (typeof window !== "undefined" && window.visualViewport && enabled) {
-      const visualViewport = window.visualViewport;
-      checkKeyboardStatus();
-      visualViewport.addEventListener("resize", checkKeyboardStatus);
-      return () => {
-        visualViewport.removeEventListener("resize", checkKeyboardStatus);
-      };
-    } else if (enabled && typeof window !== "undefined") {
-      setVisualViewportHeight(window.innerHeight);
-      setIsKeyboardVisible(false);
+    if (!enabled || typeof window === "undefined") return;
+
+    checkKeyboardStatus();
+
+    if (window.visualViewport) {
+      window.visualViewport.addEventListener("resize", checkKeyboardStatus);
+      return () => window.visualViewport?.removeEventListener("resize", checkKeyboardStatus);
+    } else {
+      window.addEventListener("resize", checkKeyboardStatus);
+      return () => window.removeEventListener("resize", checkKeyboardStatus);
     }
   }, [enabled, checkKeyboardStatus]);
 
   return { isKeyboardVisible, visualViewportHeight };
 }
 
-
 export function isMobileDevice() {
-  return /Android|webOS|iPhone|iPad|iPod|BlackBerry|Windows Phone/i.test(
-    navigator.userAgent,
-  );
+  return /Android|webOS|iPhone|iPad|iPod|BlackBerry|Windows Phone/i.test(navigator.userAgent);
 }
