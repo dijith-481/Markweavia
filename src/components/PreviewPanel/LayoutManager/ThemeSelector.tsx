@@ -3,9 +3,6 @@ import { themes } from "../../../utils/local-storage";
 import DropDownButton from "../../UI/DropDownButton";
 import { useSlideContext } from "@/context/slideContext";
 
-
-
-
 const formatThemeNameForDisplay = (themeKey: string): string => {
   if (themeKey === "nordDark") return "Nord Dark (Default)";
   if (themeKey === "nordLight") return "Nord Light";
@@ -23,7 +20,6 @@ Object.keys(themes).forEach((themeKey) => {
   themeOptions[themeKey] = formatThemeNameForDisplay(themeKey);
 });
 
-
 export default function ThemeSelector() {
   const { activeTheme, setActiveTheme } = useSlideContext();
   const changeTheme = (themeName: keyof typeof themeOptions) => {
@@ -39,6 +35,5 @@ export default function ThemeSelector() {
     >
       Theme
     </DropDownButton>
-
   );
 }

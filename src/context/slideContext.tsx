@@ -9,7 +9,6 @@ export interface SlideContextState {
   activeTheme: string;
   fontSizeMultiplier: number;
   currentSlideText: string;
-  layoutOnFirstPage: boolean;
   slideLayoutOptions: SlideLayoutOptions;
   currentSlide: number;
   totalSlidesNumber: number;
@@ -22,24 +21,32 @@ interface SlideContextType extends SlideContextState {
   setActiveTheme: (activeTheme: string) => void;
   setFontSizeMultiplier: React.Dispatch<React.SetStateAction<number>>;
   setCurrentSlideText: (currentSlideText: string) => void;
-  setLayoutOnFirstPage: React.Dispatch<React.SetStateAction<boolean>>;
   setSlideLayoutOptions: React.Dispatch<React.SetStateAction<SlideLayoutOptions>>;
   setTotalSlidesNumber: (totalSlidesNumber: number) => void;
   setCurrentSlide: (currentSlide: number) => void;
 }
 
-const SlideContext = createContext<SlideContextType | null>(null)
+const SlideContext = createContext<SlideContextType | null>(null);
 
 export const useSlideContext = (): SlideContextType => {
-  const context = useContext(SlideContext)
+  const context = useContext(SlideContext);
   if (!context) {
-    throw new Error('useSlideContext must be used within a SlideContextProvider')
+    throw new Error("useSlideContext must be used within a SlideContextProvider");
   }
-  return context
-}
+  return context;
+};
 
 export const SlideContextProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const { markdownText, setMarkdownText, activeTheme, setActiveTheme, fontSizeMultiplier, setFontSizeMultiplier, layoutOnFirstPage, slideLayoutOptions, setLayoutOnFirstPage, setSlideLayoutOptions } = usePersistentSettings();
+  const {
+    markdownText,
+    setMarkdownText,
+    activeTheme,
+    setActiveTheme,
+    fontSizeMultiplier,
+    setFontSizeMultiplier,
+    slideLayoutOptions,
+    setSlideLayoutOptions,
+  } = usePersistentSettings();
 
   const [currentSlideText, setCurrentSlideText] = useState<string>("");
   const [currentSlide, setCurrentSlide] = useState<number>(1);
@@ -47,7 +54,6 @@ export const SlideContextProvider: React.FC<{ children: React.ReactNode }> = ({ 
 
   const words = useMemo(() => countWords(markdownText), [markdownText]);
   const letters = useMemo(() => countLetters(markdownText), [markdownText]);
-
 
   const contextValue = {
     markdownText,
@@ -62,17 +68,10 @@ export const SlideContextProvider: React.FC<{ children: React.ReactNode }> = ({ 
     setCurrentSlide,
     totalSlidesNumber,
     setTotalSlidesNumber,
-    layoutOnFirstPage,
-    setLayoutOnFirstPage,
     slideLayoutOptions,
     setSlideLayoutOptions,
     words,
     letters,
-  }
-  return (
-    <SlideContext.Provider value={contextValue}>
-      {children}
-    </SlideContext.Provider>
-  )
-}
-
+  };
+  return <SlideContext.Provider value={contextValue}>{children}</SlideContext.Provider>;
+};

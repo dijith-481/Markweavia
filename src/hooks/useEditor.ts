@@ -104,7 +104,11 @@ export function useEditor(
 
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
-      if (event.key === "i") {
+      if (event.key === "Escape") {
+        event.preventDefault();
+        focusCodeMirror();
+      }
+      if (event.key === "i" || event.key === "Enter") {
         const activeElement = document.activeElement;
         const isEditorFocused = codeMirrorRef.current?.view?.hasFocus;
         if (

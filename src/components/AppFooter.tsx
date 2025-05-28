@@ -44,8 +44,8 @@ export default function AppFooter() {
   };
 
   return (
-    <footer className="p-2 px-4 flex justify-between items-center h-16 bg-amber-50 text-xs text-nord4">
-      <div className="flex items-center gap-3">
+    <footer className="p-2  px-4 flex justify-between items-center flex-col md:flex-row gap-2  text-xs text-nord4">
+      <div className="flex  items-center gap-3">
         <div className="relative">
           <button
             ref={infoButtonRef}

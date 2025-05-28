@@ -1,4 +1,10 @@
 export type layoutItemPosition = (typeof headerFooterPositions)[number]["value"];
+export type layoutItemLabel = (typeof headerFooterPositions)[number]["label"];
+
+export type HeaderFooterPosition = {
+  value: layoutItemPosition;
+  label: layoutItemLabel;
+};
 
 export interface layoutItem {
   id: string;
@@ -19,4 +25,3 @@ export const headerFooterPositions = [
   { value: "bottom-center", label: "Bottom Center" },
   { value: "bottom-right", label: "Bottom Right" },
 ] as const;
-

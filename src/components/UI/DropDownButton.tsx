@@ -27,7 +27,7 @@ export default function DropDownButton({
         {children}
 
         <span
-          className={`ml-1 transform transition-transform duration-200 ${isDropdownOpen ? "rotate-180" : "rotate-0"}`}
+          className={`ml-1 transform transition-transform duration-300 ${isDropdownOpen ? "rotate-180" : "rotate-0"}`}
         >
           <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -47,8 +47,8 @@ export default function DropDownButton({
         onSelect={onSelect}
         triggerRef={dropdownRef}
         onClose={toggleDropdown}
-        isOpen={isDropdownOpen} />
-
+        isOpen={isDropdownOpen}
+      />
     </div>
   );
 }

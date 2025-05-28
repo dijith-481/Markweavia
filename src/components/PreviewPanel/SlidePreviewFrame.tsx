@@ -5,20 +5,11 @@ export default function SlidePreviewFrame() {
   const { previewHtml } = usePreviewSlide();
 
   return (
-    <div className="w-full h-max   overflow-hidden rounded-md ">
-      <iframe
-        srcDoc={previewHtml}
-        title="Current Slide Preview"
-        // style={{
-        //   aspectRatio: "16/9",
-        //   pointerEvents: "none",
-        //   width: "100%",
-        //   height: "100%",
-        //   border: "none",
-        // }}
-        className="w-full h-auto border-0      aspect-video"
-        sandbox="allow-scripts"
-      />
-    </div>
+    <iframe
+      srcDoc={previewHtml}
+      title="Current Slide Preview"
+      className="w-full h-auto border-0 aspect-video rounded-md"
+      sandbox="allow-scripts"
+    />
   );
 }

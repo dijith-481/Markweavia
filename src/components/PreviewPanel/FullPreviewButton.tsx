@@ -6,10 +6,10 @@ export default function FullPreviewButton() {
   return (
     <button
       onClick={handlePreviewFullSlides}
-      className="hidden md:flex px-3 w-full py-4 bg-nord9  text-nord0 font-bold ease-in-out duration-200 transition-all rounded-4xl hover:rounded-md hover:bg-nord14 text-xs"
+      className="bg-nord9/80 flex items-center justify-center py-2 rounded-4xl transition-all duration-300 ease-in-out hover:rounded-md hover:bg-nord9"
       title="Preview all slides in a new tab"
     >
-      Preview Full Slides
+      Preview All
     </button>
   );
 }

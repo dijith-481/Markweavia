@@ -33,7 +33,7 @@ export default function HomePageClient() {
     <div className="h-[100dvh] w-[100dvw] overflow-hidden flex flex-col  ">
       {!isKeyboardVisible && <AppHeader fileUploadRef={fileUploadRef} />}
       <main
-        className={`flex flex-col  md:flex-row  gap-4 justify-evenly p-4 overflow-hidden`}
+        className={`flex flex-col  md:flex-row  gap-4 justify-evenly px-4 overflow-hidden`}
         style={isKeyboardVisible ? mainStyle : {}}
       >
         <EditorPanel fileUploadRef={fileUploadRef} />

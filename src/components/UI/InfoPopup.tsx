@@ -11,7 +11,6 @@ export default function InfoPopup({ show, onClose, popupRef }: InfoPopupProps) {
 
   return (
     <div
-      onMouseLeave={onClose}
       ref={popupRef}
       className="absolute bottom-full left-0 mb-2 w-72 sm:w-96 p-4 bg-nord1 rounded-md shadow-xl z-50 text-nord5 text-xs leading-relaxed"
     >
