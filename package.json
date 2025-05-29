@@ -17,6 +17,8 @@
     "@uiw/codemirror-theme-nord": "^4.23.12",
     "@uiw/react-codemirror": "^4.23.12",
     "marked": "^15.0.11",
+    "marked-code-format": "^1.1.6",
+    "marked-katex-extension": "^5.1.4",
     "next": "15.3.2",
     "postcss": "^8.5.3",
     "react": "^19.0.0",

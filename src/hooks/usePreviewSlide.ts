@@ -1,29 +1,49 @@
 import { useState, useEffect } from "react";
 import { useSlideContext } from "@/context/slideContext";
-import { exportSingleSlideToHtml } from "@/utils/export-utils";
+import { exportSingleSlideToHtmlbody, exportSingleSlideToHtml } from "@/utils/export-utils";
 import { debounce } from "@/utils/common";
+import { themes } from "@/utils/themes";
 
-export function usePreviewSlide() {
+export function usePreviewSlide(iframeRef: React.RefObject<HTMLIFrameElement | null>) {
   const [previewHtml, setPreviewHtml] = useState<string>("");
-  const { currentSlide, slideLayoutOptions, currentSlideText } = useSlideContext();
-  // const { themeVariables } = useUIState();
+  const { currentSlide, slideLayoutOptions, currentSlideText, fontSizeMultiplier, activeTheme } =
+    useSlideContext();
+  const [firstLoad, setFirstLoad] = useState(true);
 
   useEffect(() => {
     const generatePreview = async () => {
-      // if (Object.keys(themeVariables).length > 0) {
-      const html = await exportSingleSlideToHtml(
+      const theme = themes[activeTheme as keyof typeof themes];
+      const html = await exportSingleSlideToHtml(theme, fontSizeMultiplier);
+
+      setPreviewHtml(html);
+    };
+    setFirstLoad(true);
+    generatePreview();
+  }, [activeTheme, fontSizeMultiplier]);
+
+  useEffect(() => {
+    const generatePreview = async () => {
+      const html = await exportSingleSlideToHtmlbody(
         currentSlideText,
-        // themeVariables,
         currentSlide,
         slideLayoutOptions,
       );
-      setPreviewHtml(html);
-      // }
+
+      if (iframeRef.current) {
+        if (iframeRef.current.contentWindow) {
+          if (firstLoad) {
+            setTimeout(() => {
+              iframeRef.current?.contentWindow?.postMessage(html, "*");
+            }, 300);
+          } else {
+            iframeRef.current.contentWindow.postMessage(html, "*");
+          }
+        }
+      }
     };
-    // const debouncedGeneratePreview = debounce(generatePreview, 300);
-    // debouncedGeneratePreview();
+
     generatePreview();
-  }, [currentSlideText, slideLayoutOptions]);
+  }, [currentSlideText, slideLayoutOptions, firstLoad, activeTheme, fontSizeMultiplier]);
 
   return {
     previewHtml,

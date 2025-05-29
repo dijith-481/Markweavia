@@ -1,5 +1,5 @@
 import React from "react";
-import { themes } from "../../../utils/local-storage";
+import { themes } from "@/utils/themes";
 import DropDownButton from "../../UI/DropDownButton";
 import { useSlideContext } from "@/context/slideContext";
 

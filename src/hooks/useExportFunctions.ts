@@ -1,21 +1,24 @@
 import { exportToCustomSlidesHtml } from "../utils/export-utils";
 import { useSlideContext } from "@/context/slideContext";
+import { themes } from "@/utils/themes";
 
 export default function useExportFunctions() {
-  const { markdownText, slideLayoutOptions } = useSlideContext();
+  const { markdownText, slideLayoutOptions, fontSizeMultiplier, activeTheme, fontCache } =
+    useSlideContext();
 
   async function createHtmlBlob(documentTitle: string): Promise<Blob> {
+    const theme = themes[activeTheme as keyof typeof themes];
     if (!markdownText.trim()) {
       throw new Error("Nothing to process! Write some Markdown first.");
     }
-    // if (!themeVariables || Object.keys(themeVariables).length === 0) {
-    //   throw new Error("Theme variables not ready. Please wait a moment.");
-    // }
     try {
       const htmlContent = await exportToCustomSlidesHtml(
         markdownText,
+        fontCache,
         slideLayoutOptions,
         documentTitle,
+        theme,
+        fontSizeMultiplier,
       );
       return new Blob([htmlContent], { type: "text/html;charset=utf-8;" });
     } catch (error) {

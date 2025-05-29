@@ -23,7 +23,7 @@ export function usePersistentSettings() {
     setActiveTheme(localStorage.getItem(LOCAL_STORAGE_THEME_KEY) || "nordDark");
     const storedMultiplier = localStorage.getItem(LOCAL_STORAGE_FONT_MULTIPLIER_KEY);
     setFontSizeMultiplier(storedMultiplier ? parseFloat(storedMultiplier) : 1);
-    const storedLayoutOptions = null; //localStorage.getItem(LOCAL_STORAGE_LAYOUT_OPTIONS_KEY);
+    const storedLayoutOptions = localStorage.getItem(LOCAL_STORAGE_LAYOUT_OPTIONS_KEY);
     setSlideLayoutOptions(
       storedLayoutOptions
         ? JSON.parse(storedLayoutOptions)
@@ -46,10 +46,7 @@ export function usePersistentSettings() {
   }, [fontSizeMultiplier]);
 
   useEffect(() => {
-    localStorage.setItem(
-      LOCAL_STORAGE_LAYOUT_OPTIONS_KEY,
-      JSON.stringify(slideLayoutOptions.headerFooters),
-    );
+    localStorage.setItem(LOCAL_STORAGE_LAYOUT_OPTIONS_KEY, JSON.stringify(slideLayoutOptions));
   }, [slideLayoutOptions.headerFooters]);
 
   useEffect(() => {

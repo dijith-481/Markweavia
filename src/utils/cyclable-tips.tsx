@@ -3,7 +3,7 @@ export const cyclingTips = [
     key: "focus",
     content: (
       <>
-        Press <kbd className="kbd-style-footer">i</kbd> to focus editor
+        Press &nbsp; <kbd>i</kbd> to focus editor
       </>
     ),
   },
@@ -11,8 +11,8 @@ export const cyclingTips = [
     key: "dd",
     content: (
       <>
-        Vim: <kbd className="kbd-style-footer">dd</kbd>
-        to delete your regrets one at a time &lt;3
+        Vim: <kbd>dd</kbd>
+        to delete your regrets one at a time <kbd>&lt;3</kbd>
       </>
     ),
   },
@@ -20,8 +20,7 @@ export const cyclingTips = [
     key: "vimSaveMd",
     content: (
       <>
-        Vim: <kbd className="kbd-style-footer">:w</kbd> or{" "}
-        <kbd className="kbd-style-footer">Ctrl+S</kbd> to save .md
+        Vim: &nbsp; <kbd>:w</kbd> to save .md
       </>
     ),
   },
@@ -29,7 +28,7 @@ export const cyclingTips = [
     key: "replace",
     content: (
       <>
-        Wanna <kbd className="kbd-style-footer">:%s/alone/together/g</kbd>
+        <kbd>:%s/alone/together/g</kbd>
       </>
     ),
   },
@@ -37,8 +36,7 @@ export const cyclingTips = [
     key: "vimSaveSlides",
     content: (
       <>
-        Vim: <kbd className="kbd-style-footer">:ws</kbd> or{" "}
-        <kbd className="kbd-style-footer">Ctrl+Shift+S</kbd> to save Slides
+        Vim: &nbsp;<kbd>:ws</kbd> to save Slides
       </>
     ),
   },
@@ -46,7 +44,7 @@ export const cyclingTips = [
     key: "hjklGoBrrr",
     content: (
       <>
-        Not making slides? Then <code className="code-style-footer">hjkl</code> go hlkj;hkl;!
+        Not making slides? Then <code>hjkl</code> go hlkj;hkl;!
       </>
     ),
   },
@@ -54,7 +52,16 @@ export const cyclingTips = [
     key: "vimUpload",
     content: (
       <>
-        Vim: <kbd className="kbd-style-footer">:u</kbd>
+        Vim: &nbsp; <kbd>:u</kbd>
+        to upload file
+      </>
+    ),
+  },
+  {
+    key: "vimpreview",
+    content: (
+      <>
+        Vim: &nbsp; <kbd>:p</kbd>
         to upload file
       </>
     ),
@@ -63,9 +70,7 @@ export const cyclingTips = [
     key: "slidesSyntax",
     content: (
       <>
-        Slides: Use <code className="code-style-footer"># Title</code> /{" "}
-        <code className="code-style-footer">## Heading</code>. Separate with{" "}
-        <code className="code-style-footer">---</code>
+        Slides: Use <code># Title</code> / <code>## Heading</code>.
       </>
     ),
   },
@@ -73,14 +78,13 @@ export const cyclingTips = [
     key: "madeWithLove",
     content: (
       <>
-        Made with <span style={{ color: "#bf616a" }}>❤</span> & Vim by{" "}
         <a
+          className="  px-1 py-0.5 underline"
           href="https://dijith.vercel.app"
           target="_blank"
           rel="noopener noreferrer"
-          className="link-style-footer"
         >
-          Dijith
+          Made with <span style={{ color: "#bf616a" }}>❤</span> & Vim by Dijith
         </a>
       </>
     ),
@@ -89,16 +93,9 @@ export const cyclingTips = [
     key: "githubStar",
     content: (
       <>
-        Enjoying Markweavia? Give it a <span style={{ color: "#5e81ac" }}>★</span> on{" "}
-        <a
-          href="https://github.com/dijit-481/markweavia"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="link-style-footer"
-        >
-          GitHub
+        <a href="https://github.com/dijit-481/markweavia" target="_blank" rel="noopener noreferrer">
+          Enjoying Markweavia? Give it a <span style={{ color: "#5e81ac" }}>★</span> on GitHub !
         </a>
-        !
       </>
     ),
   },
@@ -106,21 +103,16 @@ export const cyclingTips = [
     key: "ggVg",
     content: (
       <>
-        Vim:<kbd className="kbd-style-footer">ggVG</kbd>
+        Vim:<kbd>ggVG</kbd>
         to select all your deepest desires at once
       </>
     ),
   },
   {
     key: "tagline",
-    content: <>Markweavia: Markdown, beautifully woven.</>,
-  },
-  {
-    key: "vimquote",
     content: (
       <>
-        Every <kbd className="kbd-style-footer">:w</kbd> in Vim is like a little pat on your
-        document's head.
+        Markweavia: <i> Markdown, beautifully woven. </i>
       </>
     ),
   },
@@ -128,7 +120,7 @@ export const cyclingTips = [
     key: "deleteAllContent",
     content: (
       <>
-        Vim: <kbd className="kbd-style-footer">ggdG</kbd>
+        Vim: <kbd>ggdG</kbd>
         to delete all content
       </>
     ),

@@ -1,8 +1,9 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { createContext, useMemo, useState, useContext } from "react";
 import { SlideLayoutOptions } from "../utils/layoutOptions";
 import { usePersistentSettings } from "../hooks/usePersistentSettings";
 import { countWords, countLetters } from "../utils/common";
+import { FontCache, getEncodedFonts } from "@/utils/fontDownload";
 
 export interface SlideContextState {
   markdownText: string;
@@ -14,6 +15,7 @@ export interface SlideContextState {
   totalSlidesNumber: number;
   words: number;
   letters: number;
+  fontCache: FontCache | null;
 }
 
 interface SlideContextType extends SlideContextState {
@@ -51,9 +53,18 @@ export const SlideContextProvider: React.FC<{ children: React.ReactNode }> = ({ 
   const [currentSlideText, setCurrentSlideText] = useState<string>("");
   const [currentSlide, setCurrentSlide] = useState<number>(1);
   const [totalSlidesNumber, setTotalSlidesNumber] = useState<number>(1);
+  const [fontCache, setFontCache] = useState<FontCache | null>(null);
 
   const words = useMemo(() => countWords(markdownText), [markdownText]);
   const letters = useMemo(() => countLetters(markdownText), [markdownText]);
+
+  useEffect(() => {
+    const loadFonts = async () => {
+      const fonts = await getEncodedFonts();
+      setFontCache(fonts);
+    };
+    loadFonts();
+  }, []);
 
   const contextValue = {
     markdownText,
@@ -72,6 +83,7 @@ export const SlideContextProvider: React.FC<{ children: React.ReactNode }> = ({ 
     setSlideLayoutOptions,
     words,
     letters,
+    fontCache,
   };
   return <SlideContext.Provider value={contextValue}>{children}</SlideContext.Provider>;
 };

@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import ThemeSelector from "@/components/PreviewPanel/LayoutManager/ThemeSelector";
 import TemplateSelector from "@/components/PreviewPanel/LayoutManager/TemplateSelector";
 import FontScaler from "@/components/PreviewPanel/LayoutManager/FontScaler";
@@ -14,8 +14,10 @@ interface LayoutManagerProps {
 }
 
 export default function LayoutManager({ isMobile, isKeyboardVisible }: LayoutManagerProps) {
-  const [isMobileSettingsExpanded, setIsMobileSettingsExpanded] = useState(!isMobile);
-  const [showPageNumbers, setShowPageNumbers] = useState(false);
+  const [isMobileSettingsExpanded, setIsMobileSettingsExpanded] = useState(true);
+  useEffect(() => {
+    setIsMobileSettingsExpanded(!isMobile);
+  }, [isMobile]);
 
   const { slideLayoutOptions } = useSlideContext();
   const availableHeaderFooterPositions = useMemo(() => {
@@ -35,16 +37,9 @@ export default function LayoutManager({ isMobile, isKeyboardVisible }: LayoutMan
             <TemplateSelector />
           </div>
           <FontScaler />
-          <LayoutSettings
-            setShowPageNumbers={setShowPageNumbers}
-            showPageNumbers={showPageNumbers}
-            availableHeaderFooterPositions={availableHeaderFooterPositions}
-          />
+          <LayoutSettings availableHeaderFooterPositions={availableHeaderFooterPositions} />
         </div>
-        <HeaderFooterManager
-          setShowPageNumbers={setShowPageNumbers}
-          availableHeaderFooterPositions={availableHeaderFooterPositions}
-        />
+        <HeaderFooterManager availableHeaderFooterPositions={availableHeaderFooterPositions} />
       </ToggleExpand>
     )
   );

@@ -1,5 +1,5 @@
-import { useState, useEffect } from "react";
-import { PAGE_NUMBER_SLIDE_ID } from "../../../constants";
+import { useState, useEffect, useRef } from "react";
+import { PAGE_NUMBER_SLIDE_ID } from "@/utils/local-storage";
 import { useSlideContext } from "@/context/slideContext";
 import {
   headerFooterPositions,
@@ -12,15 +12,15 @@ import { Vim } from "@replit/codemirror-vim";
 import DropDownButton from "@/components/UI/DropDownButton";
 
 export default function HeaderFooterManager({
-  setShowPageNumbers,
   availableHeaderFooterPositions,
 }: {
-  setShowPageNumbers: (showPageNumbers: boolean) => void;
   availableHeaderFooterPositions: HeaderFooterPosition[];
 }) {
   const [newItemText, setNewItemText] = useState("");
   const [formOpen, setFormOpen] = useState(false);
   const { slideLayoutOptions, setSlideLayoutOptions } = useSlideContext();
+  const [isEditingText, setIsEditingText] = useState("");
+  const newItemTextRef = useRef<HTMLInputElement>(null);
 
   const onAddItem = (text: string, position: layoutItemPosition) => {
     if (!text.trim()) {
@@ -35,9 +35,6 @@ export default function HeaderFooterManager({
   };
 
   const onRemoveItem = (id: string) => {
-    if (id === PAGE_NUMBER_SLIDE_ID) {
-      setShowPageNumbers(false);
-    }
     setSlideLayoutOptions((prev) => ({
       ...prev,
       headerFooters: prev.headerFooters.filter((item) => item.id !== id),
@@ -49,6 +46,15 @@ export default function HeaderFooterManager({
       ...prev,
       headerFooters: prev.headerFooters.map((item) =>
         item.id === id ? { ...item, position: newPosition } : item,
+      ),
+    }));
+  };
+
+  const onUpdateItemText = (id: string, newText: string) => {
+    setSlideLayoutOptions((prev) => ({
+      ...prev,
+      headerFooters: prev.headerFooters.map((item) =>
+        item.id === id ? { ...item, text: newText } : item,
       ),
     }));
   };
@@ -95,7 +101,7 @@ export default function HeaderFooterManager({
   };
 
   useEffect(() => {
-    Vim.defineEx("page", "page", onToggleAddForm);
+    Vim.defineEx("header", "h", onToggleAddForm);
   }, [onToggleAddForm]);
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
@@ -109,10 +115,6 @@ export default function HeaderFooterManager({
     };
   }, [formOpen]);
 
-  const handleItemPositionChangeViaSelect = (itemId: string, newPosition: layoutItemPosition) => {
-    onUpdateItemPosition(itemId, newPosition);
-  };
-
   const layoutItemMap: Record<layoutItemPosition, layoutItemLabel> =
     availableHeaderFooterPositions.reduce(
       (acc, option) => {
@@ -125,6 +127,18 @@ export default function HeaderFooterManager({
   const changeItemPosition = (position: string) => {
     setNewItemPosition(position as layoutItemPosition);
   };
+
+  const handleClickOutside = (event: MouseEvent) => {
+    if (newItemTextRef.current && !newItemTextRef.current.contains(event.target as Node)) {
+      setIsEditingText("");
+      setNewItemText("");
+    }
+  };
+
+  useEffect(() => {
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, [handleClickOutside]);
 
   return (
     <div className="w-full flex flex-col  gap-2 bg-nord1 text-nord4 px-4 py-2 overflow-y-hidden rounded">
@@ -172,15 +186,48 @@ export default function HeaderFooterManager({
           )}
         </div>
       ) : slideLayoutOptions.headerFooters.length > 0 ? (
-        <ul className="w-full list-none p-0  space-y-1 overflow-y-auto rounded-md max-h-23">
+        <ul className="w-full list-none p-0  space-y-1 overflow-y-auto rounded-md max-h-28">
           {slideLayoutOptions.headerFooters.map((item) => (
             <li
               key={item.id}
               className="flex justify-between items-center bg-nord0 p-1 px-2  text-sm"
             >
-              <span className="truncate w-[30%]" title={item.text}>
-                {item.text}
-              </span>
+              {isEditingText === item.id && item.id !== PAGE_NUMBER_SLIDE_ID ? (
+                <input
+                  ref={newItemTextRef}
+                  type="text"
+                  value={newItemText}
+                  autoFocus
+                  onChange={(e) => {
+                    setNewItemText(e.target.value);
+                  }}
+                  onKeyDown={(e) => {
+                    if (e.key === "Escape") {
+                      setIsEditingText("");
+                      setNewItemText("");
+                    }
+                    if (e.key === "Enter") {
+                      onUpdateItemText(item.id, newItemText);
+                      setNewItemText("");
+                      setIsEditingText("");
+                    }
+                  }}
+                  className="text-nord4/80 italic rounded px-2  outline-none w-max bg-nord3 placeholder:text-nord4/30"
+                />
+              ) : (
+                <div className="w-[30%] flex flex-col">
+                  <span
+                    className={`truncate w-full ${item.id !== PAGE_NUMBER_SLIDE_ID ? " underline text-nord4/80  text-sm  hover:text-nord4/50" : ""}`}
+                    onClick={() => {
+                      setNewItemText(item.text);
+                      setIsEditingText(item.id);
+                    }}
+                    title={item.text}
+                  >
+                    {item.text}
+                  </span>
+                </div>
+              )}
               {availableHeaderFooterPositions.length === 0 ? (
                 <span className="text-nord4/40 text-xs italic">{item.position}</span>
               ) : (
@@ -189,7 +236,7 @@ export default function HeaderFooterManager({
                   options={layoutItemMap}
                   selectedOption={item.position}
                   onSelect={(val) => {
-                    handleItemPositionChangeViaSelect(item.id, val as layoutItemPosition);
+                    onUpdateItemPosition(item.id, val as layoutItemPosition);
                   }}
                 >
                   <span className="text-nord4/40 text-xs italic">{item.position}</span>
@@ -197,7 +244,7 @@ export default function HeaderFooterManager({
               )}
               <button
                 onClick={() => onRemoveItem(item.id)}
-                className="ml-2 px-1.5 py-0.5 bg-nord11/70 text-nord0 rounded hover:bg-nord11 text-xs"
+                className="ml-2 px-1.5 py-0.5  text-nord4 bg-nord1/50 transition-colors ease-in-out duration-300 hover:text-nord0 rounded hover:bg-nord11 text-xs"
                 title="Remove item"
               >
                 ✕

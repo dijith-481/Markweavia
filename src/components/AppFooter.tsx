@@ -49,16 +49,15 @@ export default function AppFooter() {
         <div className="relative">
           <button
             ref={infoButtonRef}
-            // onMouseEnter={!isMobile ? () => onToggleInfoPopup(1) : undefined}
             onClick={toggleInfoPopup}
-            className="p-1.5 rounded-md bg-nord3 focus:outline-none"
+            className="p-1.5 rounded-md bg-nord0/30 focus:outline-none  text-nord9"
+            title="about Markweavia"
           >
             {infoIcon}
           </button>
           <InfoPopup show={showInfoPopup} onClose={toggleInfoPopup} popupRef={infoPopupRef} />
         </div>
 
-        {/* Cycling Tips Area */}
         <div className="min-h-[1.5em] w-auto max-w-[250px] sm:max-w-[350px] overflow-hidden">
           <span
             className="italic text-nord3 whitespace-nowrap"
@@ -73,15 +72,12 @@ export default function AppFooter() {
       </div>
 
       <div className="flex items-center gap-3 text-nord5">
-        <span>
-          {showWordCount ? "Words" : "Letters"}:{" "}
-          <button
-            onClick={toggleWordCount}
-            className="font-semibold hover:text-nord8 focus:outline-none"
-          >
-            {showWordCount ? words : letters}
-          </button>
-        </span>
+        <button
+          onClick={toggleWordCount}
+          className="font-semibold hover:text-nord8 focus:outline-none"
+        >
+          {showWordCount ? ` ${words} Words` : ` ${letters} Letters`}
+        </button>
         <span className="text-nord3">|</span>
         <span>
           Page: {currentSlide} / {totalSlides}

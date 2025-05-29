@@ -49,18 +49,14 @@ export function useEditor(
     let slideEndIndex = -1;
     let headingsAboveCursor = 0;
 
-    console.log("currentline no", cursorLineNumber);
     for (let i = 1; i <= doc.lines; i++) {
       const lineText = doc.line(i).text.trimStart();
       if (lineText.startsWith("# ") || lineText.startsWith("## ")) {
-        console.log(i, "starts with markdown");
         MainHeadings.push(i);
         if (cursorLineNumber >= i) {
-          console.log("updating index");
           slideStartIndex = i;
           headingsAboveCursor++;
         } else if (slideEndIndex === -1) {
-          console.log("end index");
           slideEndIndex = i;
         }
       }
@@ -79,7 +75,6 @@ export function useEditor(
     const slideEndPos = slideEndIndex !== -1 ? doc.line(slideEndIndex).from : doc.length;
 
     const currentSlideText = doc.sliceString(slideStartPos, slideEndPos).trim();
-    console.log(currentSlideText);
     setCurrentSlideText(currentSlideText);
   }, [codeMirrorRef]);
 

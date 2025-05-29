@@ -33,10 +33,11 @@ body {
 }
 
 @layer components {
-  .kbd-style-footer {
+  kbd {
     @apply px-1 py-0.5 text-xs font-semibold inline-block  text-nord0 bg-nord9 rounded-sm not-italic;
   }
-  .code-style-footer {
+
+  code {
     @apply text-nord0 px-1 py-0.5 text-xs font-semibold inline-block  bg-nord9 rounded-sm;
   }
 }
