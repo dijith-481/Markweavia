@@ -44,7 +44,6 @@ export default function AppFooter() {
   };
 
   const handleClickOutside = (event: MouseEvent) => {
-    console.log(infoPopupRef.current, infoButtonRef.current, event.target);
     if (
       infoPopupRef.current &&
       infoButtonRef.current &&

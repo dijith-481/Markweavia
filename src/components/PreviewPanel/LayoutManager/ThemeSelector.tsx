@@ -27,11 +27,8 @@ export default function ThemeSelector() {
     setActiveTheme(themeName);
   };
   const nextTheme = () => {
-    console.log(activeTheme);
     const currentIndex = Object.keys(themeOptions).indexOf(activeTheme);
-    console.log(currentIndex);
     const nextIndex = (currentIndex + 1) % Object.keys(themeOptions).length;
-    console.log(nextIndex);
     changeTheme(Object.keys(themeOptions)[nextIndex]);
   };
 

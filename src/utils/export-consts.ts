@@ -23,7 +23,6 @@ export async function getprismJs() {
     return "";
   }
   const js = await response.text();
-  console.log(js);
   return js;
 }
 

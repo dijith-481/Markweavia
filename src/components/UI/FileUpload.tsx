@@ -6,7 +6,7 @@ export type FileUploadHandle = { triggerFileUpload: () => void };
 
 const handleFileUpload = (
   event: React.ChangeEvent<HTMLInputElement>,
-  onContentLoaded: (content: string) => void
+  onContentLoaded: (content: string) => void,
 ): void => {
   const file = event.target.files?.[0];
   if (file) {
@@ -14,7 +14,6 @@ const handleFileUpload = (
       const reader = new FileReader();
       reader.onload = (e) => {
         const newContent = e.target?.result as string;
-        console.log(newContent);
         onContentLoaded(newContent);
       };
       reader.onerror = () => alert("Failed to read the file.");
@@ -39,16 +38,18 @@ const FileUpload = forwardRef((_props, ref: ForwardedRef<FileUploadHandle>) => {
     (event: React.ChangeEvent<HTMLInputElement>) => {
       handleFileUpload(event, (content) => {
         if (content) {
-          if (markdownText.trim() && !confirm("This will replace your current content. Are you sure?")) {
+          if (
+            markdownText.trim() &&
+            !confirm("This will replace your current content. Are you sure?")
+          ) {
             if (fileInputRef.current) fileInputRef.current.value = "";
             return;
           }
           setMarkdownText(content);
         }
       });
-
     },
-    [markdownText, setMarkdownText]
+    [markdownText, setMarkdownText],
   );
 
   React.useImperativeHandle(ref, () => ({
