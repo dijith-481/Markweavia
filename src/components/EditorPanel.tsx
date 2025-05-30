@@ -9,14 +9,18 @@ import { markdown as markdownLang } from "@codemirror/lang-markdown";
 
 interface EditorPanelProps {
   fileUploadRef: React.RefObject<{ triggerFileUpload: () => void } | null>;
+  isMobile: boolean;
 }
 
-export default function EditorPanel({ fileUploadRef }: EditorPanelProps) {
+export default function EditorPanel({ fileUploadRef, isMobile }: EditorPanelProps) {
   const codeMirrorRef = useRef<any>(null);
-  const { markdownText, handleMarkdownChange, setIsEditorReady, editorUpdateListener } = useEditor(
-    codeMirrorRef,
-    fileUploadRef,
-  );
+  const {
+    markdownText,
+    handleMarkdownChange,
+    setIsEditorReady,
+    editorUpdateListener,
+    isEditorReady,
+  } = useEditor(codeMirrorRef, fileUploadRef);
 
   useEffect(() => {
     if (codeMirrorRef.current && codeMirrorRef.current.view) {
@@ -24,18 +28,27 @@ export default function EditorPanel({ fileUploadRef }: EditorPanelProps) {
     }
   }, [codeMirrorRef.current, setIsEditorReady]);
 
-  const extensions = useMemo(
-    () => [
-      vim(),
-      markdownLang({ codeLanguages: languages }),
-      EditorView.lineWrapping,
-      editorUpdateListener,
-    ],
-    [editorUpdateListener],
-  );
+  const extensions = isMobile
+    ? useMemo(
+        () => [
+          markdownLang({ codeLanguages: languages }),
+          EditorView.lineWrapping,
+          editorUpdateListener,
+        ],
+        [editorUpdateListener],
+      )
+    : useMemo(
+        () => [
+          vim(),
+          markdownLang({ codeLanguages: languages }),
+          EditorView.lineWrapping,
+          editorUpdateListener,
+        ],
+        [editorUpdateListener],
+      );
 
   return (
-    <div className="order-2 md:w-1/2 w-full rounded-md md:order-1 h-full overscroll-contain overflow-x-hidden">
+    <div className="order-2 md:w-1/2 w-full rounded-md md:order-1 h-full min-h-24 bg-nord0  overscroll-contain overflow-x-hidden">
       <CodeMirror
         value={markdownText}
         extensions={extensions}

@@ -38,6 +38,6 @@ body {
   }
 
   code {
-    @apply text-nord0 px-1 py-0.5 text-xs font-semibold inline-block  bg-nord9 rounded-sm;
+    @apply text-nord0 px-1 py-0.5 text-xs font-semibold inline-block  bg-nord7 rounded-sm;
   }
 }

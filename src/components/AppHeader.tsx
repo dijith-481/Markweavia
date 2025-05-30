@@ -15,7 +15,7 @@ export default function AppHeader({ fileUploadRef }: AppHeaderProps) {
 
   return (
     <header className="py-1 px-2  md:py-2 h-16    flex justify-between items-center text-nord9 md:px-4">
-      <Link href="/" className=" px-2">
+      <Link href="/" className=" px-2 w-full">
         <Image
           src="/logo.svg"
           alt="Markweavia Text Logo"
@@ -33,7 +33,7 @@ export default function AppHeader({ fileUploadRef }: AppHeaderProps) {
           priority
         />
       </Link>
-      <div className="flex items-center space-x-2 ">
+      <div className="flex items-center justify-center space-x-2 w-full ">
         <div
           className="flex flex-row items-center group transition-all  px-1 py-1 rounded-md ease-in-out duration-700  w-10 hover:w-32 overflow-hidden"
           title="Upload a Markdown file (.md) (Ctrl+O)"
@@ -75,17 +75,20 @@ export default function AppHeader({ fileUploadRef }: AppHeaderProps) {
           </span>
         </button>{" "}
       </div>
-      <a
-        href="https://github.com/dijith-481/markweavia"
-        className="flex flex-row items-center group transition-all  px-1 py-1 rounded-md ease-in-out duration-700  w-10 hover:w-24 overflow-hidden"
-      >
-        <span className="flex-shrink-0">
-          <GitHubIcon />
-        </span>
-        <span className="ml-1.5 whitespace-nowrap  opacity-0   group-hover:opacity-100 transition-opacity duration-700">
-          Github
-        </span>
-      </a>{" "}
+
+      <div className="flex items-center justify-end space-x-2 w-full ">
+        <a
+          href="https://github.com/dijith-481/markweavia"
+          className="flex flex-row items-center group transition-all  px-1 py-1 rounded-md ease-in-out duration-700  w-10 hover:w-24 overflow-hidden"
+        >
+          <span className="flex-shrink-0">
+            <GitHubIcon />
+          </span>
+          <span className="ml-1.5 whitespace-nowrap  opacity-0   group-hover:opacity-100 transition-opacity duration-700">
+            Github
+          </span>
+        </a>{" "}
+      </div>
     </header>
   );
 }

@@ -43,35 +43,28 @@ export default function AppFooter() {
     setShowWordCount((prev) => !prev);
   };
 
+  const handleClickOutside = (event: MouseEvent) => {
+    console.log(infoPopupRef.current, infoButtonRef.current, event.target);
+    if (
+      infoPopupRef.current &&
+      infoButtonRef.current &&
+      !(
+        infoPopupRef.current.contains(event.target as Node) ||
+        infoButtonRef.current.contains(event.target as Node)
+      )
+    ) {
+      toggleInfoPopup();
+    }
+  };
+
+  useEffect(() => {
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, [handleClickOutside]);
+
   return (
-    <footer className="p-2  px-4 flex justify-between items-center flex-col md:flex-row gap-2  text-xs text-nord4">
-      <div className="flex  items-center gap-3">
-        <div className="relative">
-          <button
-            ref={infoButtonRef}
-            onClick={toggleInfoPopup}
-            className="p-1.5 rounded-md bg-nord0/30 focus:outline-none  text-nord9"
-            title="about Markweavia"
-          >
-            {infoIcon}
-          </button>
-          <InfoPopup show={showInfoPopup} onClose={toggleInfoPopup} popupRef={infoPopupRef} />
-        </div>
-
-        <div className="min-h-[1.5em] w-auto max-w-[250px] sm:max-w-[350px] overflow-hidden">
-          <span
-            className="italic text-nord3 whitespace-nowrap"
-            style={{
-              opacity: cyclingTipOpacity,
-              transition: `opacity ${TIP_FADE_DURATION}ms ease-in-out`,
-            }}
-          >
-            {cyclingTips[currentCyclingTipIndex].content}
-          </span>
-        </div>
-      </div>
-
-      <div className="flex items-center gap-3 text-nord5">
+    <footer className="p-2  px-6 flex justify-between items-center flex-col md:flex-row gap-2  text-xs text-nord4">
+      <div className="flex items-center gap-3 text-nord5 w-full justify-center md:justify-start">
         <button
           onClick={toggleWordCount}
           className="font-semibold hover:text-nord8 focus:outline-none"
@@ -82,6 +75,30 @@ export default function AppFooter() {
         <span>
           Page: {currentSlide} / {totalSlides}
         </span>
+      </div>
+      <div className="flex flex-row justify-between  items-center gap-3 w-full md:justify-end">
+        <div className="min-h-[1.5em] w-auto max-w-[250px] md:max-w-[350px] overflow-hidden">
+          <span
+            className="italic text-nord3 whitespace-nowrap"
+            style={{
+              opacity: cyclingTipOpacity,
+              transition: `opacity ${TIP_FADE_DURATION}ms ease-in-out`,
+            }}
+          >
+            {cyclingTips[currentCyclingTipIndex].content}
+          </span>
+        </div>
+        <div className="relative">
+          <button
+            ref={infoButtonRef}
+            onClick={toggleInfoPopup}
+            className="p-1.5 rounded-md bg-nord0/30 focus:outline-none  text-nord9 hover:bg-nord0/80"
+            title="about Markweavia"
+          >
+            {infoIcon}
+          </button>
+          <InfoPopup show={showInfoPopup} onClose={toggleInfoPopup} popupRef={infoPopupRef} />
+        </div>
       </div>
     </footer>
   );

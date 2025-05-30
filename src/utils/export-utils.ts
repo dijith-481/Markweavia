@@ -16,9 +16,8 @@ marked.use(markedKatex(options));
 const defaultTheme = themes.nordDark;
 
 // Generate CSS variables with all required derived colors
-function generateCssVariables(theme?: Theme, fontSizeMultiplier?: number): string {
+export function generateThemeCss(theme?: Theme): string {
   const coreTheme = theme || defaultTheme;
-  const multiplier = fontSizeMultiplier || 1;
 
   // Define all necessary CSS variables using core colors
   const finalTheme: Record<string, string> = {
@@ -31,24 +30,37 @@ function generateCssVariables(theme?: Theme, fontSizeMultiplier?: number): strin
     "--code-text": "#d8dee9",
     "--hr-color": coreTheme["--primary-color"],
     "--table-border-color": coreTheme["--primary-color"],
-    "--table-header-background": coreTheme["--primary-color"],
+    "--table-header-background": coreTheme["--accent-color"],
     "--table-even-row-background": `${coreTheme["--background-color-secondary"]}`, // Slightly transparent
     "--link-color": coreTheme["--accent-color"],
     "--link-hover-color": coreTheme["--primary-color"],
     "--header-footer-color": `${coreTheme["--primary-color"]}b0`,
     "--navigation-button-background": coreTheme["--primary-color"],
-    "--navigation-button-color": coreTheme["--text-color"],
+    "--navigation-button-color": coreTheme["--background-color"],
     "--navigation-button-hover-background": coreTheme["--secondary-color"],
     "--navigation-counter-background": coreTheme["--background-color"],
     "--navigation-counter-color": coreTheme["--text-color"],
-    "--slide-font-size": `calc(2.4vw * ${multiplier})`,
-    "--slide-h1-size": `calc(6vw * ${multiplier})`,
-    "--slide-h2-size": `calc(4vw * ${multiplier})`,
-    "--slide-h3-size": `calc(3vw * ${multiplier})`,
   };
 
   let css = ":root {\n";
   for (const [key, value] of Object.entries(finalTheme)) {
+    css += `  ${key}: ${value};\n`;
+  }
+  css += "}\n";
+  return css;
+}
+
+export function generateFontSizesCss(fontSizeMultiplier: number | undefined): string {
+  const fontSizes = {
+    "--slide-font-size": `calc(2.4dvw * ${fontSizeMultiplier})`,
+    "--slide-inline-code-size": `calc(1.8dvw * ${fontSizeMultiplier})`,
+    "--slide-h1-size": `calc(6dvw * ${fontSizeMultiplier})`,
+    "--slide-h2-size": `calc(4dvw * ${fontSizeMultiplier})`,
+    "--slide-h3-size": `calc(3dvw * ${fontSizeMultiplier})`,
+  };
+
+  let css = ":root {\n";
+  for (const [key, value] of Object.entries(fontSizes)) {
     css += `  ${key}: ${value};\n`;
   }
   css += "}\n";
@@ -97,28 +109,24 @@ html, body {
   color: var(--text-color);
 }
 .slides-container {
-  width: 100vw;
-  height: 100vh;
+  width: 100dvw;
+  height: 100dvh;
   position: relative;
   overflow: hidden;
 }
 .slide {
   width: 100%;
-  height: 100%;
-    padding: 8vmin 12vmin;
+aspect-ratio: 16/9;
   box-sizing: border-box;
   position: absolute;
   top: 0;
   left: 0;
   opacity: 0;
   visibility: hidden;
-  overflow-y: auto;
+overflow:hidden;
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: flex-start;
-}
-#first-slide {
   justify-content: center;
 }
 .slide.active {
@@ -128,67 +136,89 @@ html, body {
 }
 .slide-content-wrapper {
   transition: opacity 0.3s ease-in-out;
-  max-width: 80vw;
-  width: 100%;
-padding: 1em;
+  width: 85%;
+min-height: 75%;
+padding: 2%;
   text-align: left;
   font-size: var(--slide-font-size);
+display: flex;
+flex-direction: column;
+justify-content: flex-start;
+align-items: flex-start;
+gap:5%;
+}
+#first-slide .slide-content-wrapper {
+justify-content: center;
+align-items: center;
 }
 .slide h1, .slide h2, .slide h3, .slide h4, .slide h5, .slide h6 {
-  font-weight: bold;
-  margin: 0.4em 0;
+  font-weight: 400;
+font-style:bold;
+margin: 0;
   color: var(--heading-color);
 }
 .slide h1 {
   font-size: var(--slide-h1-size);
+border:none;
 font-weight:700;
-  padding-bottom: 0.2em;
-  border-bottom: 1px solid var(--table-border-color);
+  padding-bottom: 0;
   text-align: center;
 }
 .slide h2 {
   font-size: var(--slide-h2-size);
-font-weight:700;
-  padding-bottom: 0.15em;
+font-weight:500;
+  padding-bottom: 1%;
   border-bottom: 1px solid var(--table-border-color);
 }
 .slide h3 {
   font-size: var(--slide-h3-size);
 }
 .slide p {
-  margin: 0.7em 0;
-font-weight:700;
+padding-left: 5%;
+  margin:  0;
+font-weight:400;
   line-height: 1.6;
+text-align:justify;
 }
 #first-slide pre {
   background-color: transparent !important;
   box-shadow: none !important;
+font-color:var(--primary-color) !important;
+border:none !important;
   font-style: italic;
   text-align: center;
+}
+#first-slide pre code{
+font-family: 'Inter';
+ color:var(--text-color) !important;
 }
 #first-slide p {
   text-align: center;
 }
 .slide ul, .slide ol {
-  margin: 0.7em 0;
-  padding-left: 2.5em;
+padding-left: 1.8em;
+width: 100%;
+  margin: 0;
 }
 .slide li {
 font-weight:500;
-  margin-bottom: 0.3em;
+padding-left: 0.6em;
+  padding-bottom: 0.2em;
 }
 .slide blockquote {
   border-left: 5px solid var(--heading-color);
+border-radius: 4px ;
   padding: 0.8em 1.5em;
-  margin: 1em 0;
   background-color: var(--blockquote-background);
   color: var(--blockquote-text);
-  border-radius: 0 4px 4px 0;
   font-style: italic;
+min-width: 70% ;
+max-width: 93%;
 }
 .slide a {
   color: var(--link-color);
   text-decoration: none;
+border-bottom: 1px dashed var(--link-color);
   font-weight: 500;
 }
 .slide a:hover {
@@ -196,17 +226,21 @@ font-weight:500;
   text-decoration: underline;
 }
 .slide pre {
-  
-  margin: 1em  0;
+  margin:   0 !important;
+justtify-self: center;
+align-self: center;
+height: content;
+min-width: 70% ;
   border-radius: 6px;
   overflow-x: auto;
+overflow-y: hidden;
 color: var(--code-text);
   background-color: var(--code-background) !important;
   font-size: calc(var(--slide-font-size) * 0.85); 
   border: 1px solid #81a1c1;
   
   position: relative;
-  padding: 1em 1em 1em 1em; 
+  padding:  2%; 
 }
 
 .slide pre code {
@@ -216,11 +250,11 @@ color: var(--code-text);
 .slide code:not(pre code) {
   background-color: var(--inline-code-background);
   color: var(--inline-code-text);
-  padding: 0.2em 0.4em;
+  padding: 0.5% 1%;
   border-radius: 4px;
-  font-family: 'Iosevka', Consolas, 'Liberation Mono', Menlo, Courier, monospace;
-font-weight:400;
-  font-size: 0.9em;
+font-family: 'Iosevka', Consolas, 'Liberation Mono', Menlo, Courier, monospace;
+font-size: calc(var(--slide-inline-code-size) * 0.9);
+font-weight:300;
 }
 .slide table {
   width: 100%;
@@ -255,8 +289,8 @@ padding:0 0 0 0;
   border-left: none;
 }
 .slide img {
-  max-width: 70vw;
-  max-height: 30vh;
+  max-width: 70dvw;
+  max-height: 30dvh;
   height: auto;
   border-radius: 4px;
   margin: 1em auto;
@@ -279,13 +313,21 @@ background-color: var(--background-color-secondary);
   border: 0;
   border-top: 1px solid var(--hr-color);
 }
+.slide del {
+  text-decoration: line-through;
+  opacity: 0.9;
+  font-style: italic;
+text-decoration-style: wavy;
+text-decoration-thickness: 5%;
+}
 .slide-header-footer-item, .slide-page-number {
   position: absolute;
-  font-size: 1vw;
+  font-size: 1.2dvw;
   color: var(--header-footer-color);
   padding: 3vmin 3.5vmin;
   z-index: 10;
-  pointer-events: none;
+font-family: 'Inter';
+font-weight:400;
   white-space: nowrap;
 }
 .pos-top-left { top: 0; left: 0; text-align: left; }
@@ -297,130 +339,20 @@ background-color: var(--background-color-secondary);
 }
 `;
 
-const mdSharedCss = `
-@media (max-width: 768px) and (orientation: portrait) {
-  
-  .slide {
-    padding: 10vh 5vw; 
-    height: 100vh; 
-    box-sizing: border-box; 
-    overflow-y: auto;
-    overflow-x: hidden; 
-  }
-
-  
-  .slide-content-wrapper {
-    font-size: calc(3vh + 1vw); 
-    max-width: 95vw; 
-    margin: 0 auto; 
-  }
-
-  
-  .slide h1 {
-    font-size: calc(6vh + 2vw); 
-    margin: 3vh 0; 
-  }
-  .slide h2 {
-    font-size: calc(5vh + 1.5vw);
-    margin: 2.5vh 0;
-  }
-  .slide h3 {
-    font-size: calc(4vh + 1vw);
-    margin: 2vh 0;
-  }
-  .slide h4 {
-    font-size: calc(3.5vh + 0.5vw);
-    margin: 1.5vh 0;
-  }
-
-  
-  .slide p {
-    font-size: calc(3vh + 0.5vw); 
-    margin: 2vh 0;
-    line-height: 5vh; 
-  }
-
-  
-  .slide ul, .slide ol {
-    padding-left: 8vw; 
-    margin: 2vh 0;
-  }
-  .slide li {
-    font-size: calc(3vh + 0.5vw);
-    margin-bottom: 1.5vh;
-  }
-
-  
-  .slide blockquote {
-    font-size: calc(3vh + 1vw);
-    padding: 3vh 5vw;
-    margin: 2vh 2vw;
-    border-left: 1vw solid; 
-  }
-
-  
-  .slide pre {
-    font-size: calc(2.5vh + 0.5vw); 
-    padding: 3vh 4vw;
-    margin: 2vh 0;
-    overflow-x: auto; 
-  }
-  .slide code:not(pre code) {
-    font-size: calc(2.5vh + 0.5vw);
-    padding: 0.5vh 1vw;
-  }
-
-  
-  .slide table {
-    font-size: calc(2.5vh + 0.5vw);
-    width: 100%; 
-    margin: 2vh 0;
-  }
-  .slide th, .slide td {
-    padding: 2vh 3vw;
-    border: 0.2vw solid; 
-  }
-
-  
-  .slide img {
-    max-width: 100vw; 
-    max-height: 70vh; 
-    margin: 2vh auto;
-    display: block;
-  }
-
-  
-  .slide hr {
-    margin: 4vh 0;
-    border-width: 0.3vh; 
-  }
-
-  
-  .slide-header-footer-item, .slide-page-number {
-    font-size: calc(2vh + 1vw); 
-    padding: 2vh 3vw;
-  }
-
-  
-  #first-slide .slide-content-wrapper {
-    font-size: calc(4vh + 1vw); 
-  }
-}
-`;
 // Multi-slide CSS
 const multiSlideCss = `
 .slide-navigation {
   position: fixed;
-  bottom: 2vh;
+  bottom: 2dvh;
   left: 0;
-  width: 100vw;
+  width: 100dvw;
   display: flex;
   flex-direction: row;
   justify-content: center;
   align-items: center; 
-  gap: 1vh;
+  gap: 1dvh;
   z-index: 1000;
-  opacity: 0;
+  opacity: 1;
   transition: opacity 0.3s ease-in-out;
 }
 
@@ -433,7 +365,7 @@ const multiSlideCss = `
   background-color: var(--navigation-button-background);
   color: var(--navigation-button-color);
   border: none;
-  padding: 0.5vh 1vw;
+  padding: 0.5dvh 1dvw;
   border-radius: 20px; 
   cursor: pointer;
   display: flex;
@@ -461,9 +393,9 @@ const multiSlideCss = `
 #slide-counter {
   background-color: var(--navigation-counter-background);
   color: var(--navigation-counter-color);
-  padding: 0.5vh 1vw;
+  padding: 0.5dvh 1dvw;
   border-radius: 20px; 
-  font-size: 1vw;
+  font-size: 1dvw;
   font-weight: 500;
   display: flex;
   align-items: center;
@@ -476,7 +408,7 @@ const multiSlideCss = `
 
 export async function exportToCustomSlidesHtml(
   fullMarkdown: string,
-  fontCache: FontCache | null,
+  fontCache: Promise<FontCache> | null,
   layoutOptions?: SlideLayoutOptions,
   documentTitle?: string,
   theme?: Theme,
@@ -496,8 +428,9 @@ export async function exportToCustomSlidesHtml(
     interItalic,
     interThin,
     iosevka,
-  } = fontCache;
-  const cssVariablesString = generateCssVariables(theme, fontSizeMultiplier);
+  } = await fontCache;
+  const cssVariablesString = generateThemeCss(theme);
+  const fontSizesCss = generateFontSizesCss(fontSizeMultiplier);
 
   const styles = `
     <style>
@@ -534,7 +467,6 @@ export async function exportToCustomSlidesHtml(
       @font-face {
         font-family: 'Inter';
         src: url('data:font/ttf;base64,${interItalic}') format('truetype');
-        font-weight: 400;
         font-style: italic;
       }
       @font-face {
@@ -549,12 +481,10 @@ export async function exportToCustomSlidesHtml(
         font-weight: 400;
         font-style: normal;
       }
-     
-
+${fontSizesCss}
       ${cssVariablesString}
-      ${sharedCss}
-${mdSharedCss}
       ${multiSlideCss}
+      ${sharedCss}
       ${hasCode ? await getprsmCss() : ""}
 ${await getKatexCss()}
     </style>
@@ -591,7 +521,7 @@ ${await getKatexCss()}
         let fontSize = parseFloat(getComputedStyle(contentWrapper).fontSize) / window.innerWidth * 100;
         while (contentWrapper.scrollHeight > slide.clientHeight && fontSize > 0.5) {
           fontSize -= 0.1;
-          contentWrapper.style.fontSize = \`\${fontSize}vw\`;
+          contentWrapper.style.fontSize = \`\${fontSize}dvw\`;
         }
       }
 
@@ -616,7 +546,7 @@ ${await getKatexCss()}
         nextBtn.addEventListener('click', () => showSlideByIndex(currentSlideIdx + 1));
         endBtn.addEventListener('click', () => showSlideByIndex(slideElements.length - 1));
 
-        document.addEventListener('click', (e) => {
+        document.addEventListener('dblclick', (e) => {
           if (!e.target.closest('.slide-navigation')) {
             showSlideByIndex(currentSlideIdx + 1);
           }
@@ -690,6 +620,40 @@ ${await getKatexCss()}
       </div>
     `;
   }
+  slidesHtmlContent += `
+        <div data-slide-index="${slideMarkdownArray.length}" class="slide">
+          <div class="slide-content-wrapper" style="height: 100%; width: 100%;"> 
+            <div style="display: flex; flex-direction:column; justify-content: end; align-items: center; gap: 0.4em; font-size: var(--slide-font-size); font-weight:300; font-style: italic; width: 100%; height:100%; opacity:0.5; ">
+<div style="opacity: 0.3;">
+<svg width="117.792" height="94.875" viewBox="0 0 235.792 189.375" xmlns="http://www.w3.org/2000/svg"><g id="svgGroup" stroke-linecap="round" fill-rule="evenodd" font-size="9pt" stroke="#00000000" stroke-width="0.25mm" fill="currentColor" style="stroke:#00000000;stroke-width:0.25mm;fill:#81a1c1"><path d="M 6.667 164.875 L 11.417 153.875 L 62.792 0 L 118.042 106.75 L 171.667 0 L 235.792 184.875 L 168.667 184.875 L 137.667 89.375 L 89.667 189.375 L 39.167 99.375 L 21.667 154 A 161.562 161.562 0 0 0 19.111 159.948 Q 18.026 162.632 17.196 165.02 A 70.807 70.807 0 0 0 15.792 169.5 Q 14.042 175.875 12.917 179.375 A 18.426 18.426 0 0 1 11.704 182.35 Q 9.382 186.78 5.342 186.78 A 7.79 7.79 0 0 1 4.667 186.75 Q 2.292 186.5 1.042 184.625 A 5.984 5.984 0 0 1 0 181.24 A 6.694 6.694 0 0 1 0.042 180.5 A 22.7 22.7 0 0 1 1.984 174.223 A 21.213 21.213 0 0 1 2.417 173.375 A 406.22 406.22 0 0 0 3.233 171.852 Q 4.37 169.719 4.979 168.5 Q 5.792 166.875 6.667 164.875 Z" vector-effect="non-scaling-stroke"/></g></svg>
+</div>
+              <div>
+                 Made with <a href="https://markweavia.vercel.app">Markweavia</a>
+              </div>
+              <div style="font-size: 1.4dvw; color: var(--primary-color);">
+                Markdown, beautifully woven.
+              </div>
+            </div>
+          </div>
+
+<div class="slide-header-footer-item pos-top-right">
+<a href="https://github.com/dijith-481/markweavia" style="text-decoration:none;">
+
+<svg
+    xmlns="http://www.w3.org/2000/svg"
+    x="0px"
+    y="0px"
+    width="24"
+    height="24"
+    viewBox="0 0 30 30"
+    fill="currentColor"
+  >
+    <path d="M15,3C8.373,3,3,8.373,3,15c0,5.623,3.872,10.328,9.092,11.63C12.036,26.468,12,26.28,12,26.047v-2.051 c-0.487,0-1.303,0-1.508,0c-0.821,0-1.551-0.353-1.905-1.009c-0.393-0.729-0.461-1.844-1.435-2.526 c-0.289-0.227-0.069-0.486,0.264-0.451c0.615,0.174,1.125,0.596,1.605,1.222c0.478,0.627,0.703,0.769,1.596,0.769 c0.433,0,1.081-0.025,1.691-0.121c0.328-0.833,0.895-1.6,1.588-1.962c-3.996-0.411-5.903-2.399-5.903-5.098 c0-1.162,0.495-2.286,1.336-3.233C9.053,10.647,8.706,8.73,9.435,8c1.798,0,2.885,1.166,3.146,1.481C13.477,9.174,14.461,9,15.495,9 c1.036,0,2.024,0.174,2.922,0.483C18.675,9.17,19.763,8,21.565,8c0.732,0.731,0.381,2.656,0.102,3.594 c0.836,0.945,1.328,2.066,1.328,3.226c0,2.697-1.904,4.684-5.894,5.097C18.199,20.49,19,22.1,19,23.313v2.734 c0,0.104-0.023,0.179-0.035,0.268C23.641,24.676,27,20.236,27,15C27,8.373,21.627,3,15,3z"></path>
+  </svg>
+</a>
+        </div>
+        </div>
+`;
   slidesHtmlContent += "</div>";
 
   const titleForHtml = documentTitle || "Markdown Slides";
@@ -765,20 +729,91 @@ export async function exportSingleSlideToHtmlbody(
     <div class="slides-container">${slidesHtmlContent}</div>
 `;
 }
-export async function exportSingleSlideToHtml(theme?: Theme, fontSizeMultiplier?: number) {
-  const cssVariablesString = generateCssVariables(theme, fontSizeMultiplier);
+export async function exportSingleSlideToHtml(
+  theme: Theme,
+  fontSizeMultiplier: number,
+  fontCache: Promise<FontCache>,
+  slideMarkdown: string,
+  currentPageNo: number,
+  layoutOptions?: SlideLayoutOptions,
+) {
+  const themeCss = generateThemeCss(theme);
+  const fontSizesCss = generateFontSizesCss(fontSizeMultiplier);
   const prismCss = await getprsmCss();
   const prismJs = await getprismJs();
   const katexCss = await getKatexCss();
+  const {
+    interRegular,
+    interBold,
+    interLight,
+    interMedium,
+    interExtraBold,
+    interItalic,
+    interThin,
+    iosevka,
+  } = await fontCache;
+  const body = await exportSingleSlideToHtmlbody(slideMarkdown, currentPageNo, layoutOptions);
 
   const styles = `
     <style>
+      @font-face{
+        font-family: 'Inter';
+        src: url('data:font/ttf;base64,${interRegular}') format('truetype');
+        font-weight: 400;
+        font-style: normal;
+      }
+      @font-face {
+        font-family: 'Inter';
+        src: url('data:font/ttf;base64,${interBold}') format('truetype');
+        font-weight: 700;
+        font-style: normal;
+      }
+ @font-face {
+        font-family: 'Inter';
+        src: url('data:font/ttf;base64,${interLight}') format('truetype');
+        font-weight: 300;
+        font-style: normal;
+      }
+      @font-face {
+        font-family: 'Inter';
+        src: url('data:font/ttf;base64,${interMedium}') format('truetype');
+        font-weight: 500;
+        font-style: normal;
+      }
+      @font-face {
+        font-family: 'Inter';
+        src: url('data:font/ttf;base64,${interExtraBold}') format('truetype');
+        font-weight: 800;
+        font-style: normal;
+      }
+      @font-face {
+        font-family: 'Inter';
+        src: url('data:font/ttf;base64,${interItalic}') format('truetype');
+        font-style: italic;
+      }
+      @font-face {
+        font-family: 'Inter';
+        src: url('data:font/ttf;base64,${interThin}') format('truetype');
+        font-weight: 100;
+        font-style: normal;
+      }
+      @font-face {
+        font-family: 'Iosevka
+        src: url('data:font/ttf;base64,${iosevka}') format('truetype');
+        font-weight: 400;
+        font-style: normal;
+      }
 ${prismCss}
 ${katexCss}
-      ${cssVariablesString}
+      ${themeCss}
       ${sharedCss}
-${mdSharedCss}
     </style>
+<style class="font-size-css">
+${fontSizesCss} 
+</style>
+<style class="theme-css">
+${themeCss} 
+</style>  
   `;
 
   const scripts = `
@@ -798,13 +833,25 @@ ${mdSharedCss}
         const contentWrapper = slide.querySelector('.slide-content-wrapper');
         if (!contentWrapper) return;
         let fontSize = parseFloat(getComputedStyle(contentWrapper).fontSize) / window.innerWidth * 100;
-        while (contentWrapper.scrollHeight > slide.clientHeight && fontSize > 0.5) {
-          fontSize -= 0.1;
-          contentWrapper.style.fontSize = \`\${fontSize}vw\`;
+        while (contentWrapper.scrollHeight > slide.clientHeight * 0.95 && fontSize > 0.5) {
+          fontSize -= 0.05;
+          contentWrapper.style.fontSize = \`\${fontSize}dvw\`;
         }
       }
 window.addEventListener('message', (event) => {
-          document.body.innerHTML = event.data;
+if (event.data.type === 'body') {
+document.body.innerHTML = event.data.data;
+} else if (event.data.type === 'fontSize') {
+document.getElementsByClassName('font-size-css')[0].innerHTML = event.data.data;
+}else if (event.data.type === 'theme') {  
+document.getElementsByClassName('theme-css')[0].innerHTML = event.data.data;
+}
+
+const slide = document.querySelector('.slide');
+if (slide) {
+  adjustFontSizeIfOverflow(slide);
+}
+
         Prism.highlightAll(); 
       });
     </script>
@@ -816,11 +863,11 @@ window.addEventListener('message', (event) => {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<link rel="stylesheet" href="fonts.css">
     <title>Slide Preview</title>
     ${styles}
 </head>
 <body>
+${body}
     ${scripts}
 </body>
 </html>

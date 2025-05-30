@@ -75,7 +75,7 @@ export const expandIcon = (
 export const UploadIcon = () => (
   <svg
     xmlns="http://www.w3.org/2000/svg"
-    className="h-5 w-5 sm:h-4 sm:w-4"
+    className="h-5 w-5 md:h-4 md:w-4"
     fill="none"
     viewBox="0 0 24 24"
     stroke="currentColor"
@@ -92,7 +92,7 @@ export const UploadIcon = () => (
 export const DownloadIcon = () => (
   <svg
     xmlns="http://www.w3.org/2000/svg"
-    className="h-5 w-5 sm:h-4 sm:w-4"
+    className="h-5 w-5 md:h-4 md:w-4"
     fill="none"
     viewBox="0 0 24 24"
     stroke="currentColor"

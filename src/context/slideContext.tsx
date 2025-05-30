@@ -15,7 +15,7 @@ export interface SlideContextState {
   totalSlidesNumber: number;
   words: number;
   letters: number;
-  fontCache: FontCache | null;
+  fontCache: Promise<FontCache>;
 }
 
 interface SlideContextType extends SlideContextState {
@@ -53,18 +53,10 @@ export const SlideContextProvider: React.FC<{ children: React.ReactNode }> = ({ 
   const [currentSlideText, setCurrentSlideText] = useState<string>("");
   const [currentSlide, setCurrentSlide] = useState<number>(1);
   const [totalSlidesNumber, setTotalSlidesNumber] = useState<number>(1);
-  const [fontCache, setFontCache] = useState<FontCache | null>(null);
+  const [fontCache] = useState<Promise<FontCache>>(getEncodedFonts());
 
   const words = useMemo(() => countWords(markdownText), [markdownText]);
   const letters = useMemo(() => countLetters(markdownText), [markdownText]);
-
-  useEffect(() => {
-    const loadFonts = async () => {
-      const fonts = await getEncodedFonts();
-      setFontCache(fonts);
-    };
-    loadFonts();
-  }, []);
 
   const contextValue = {
     markdownText,

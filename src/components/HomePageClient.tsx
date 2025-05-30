@@ -36,7 +36,7 @@ export default function HomePageClient() {
         className={`flex flex-col  md:flex-row  gap-4 justify-evenly px-4 overflow-hidden`}
         style={isKeyboardVisible ? mainStyle : {}}
       >
-        <EditorPanel fileUploadRef={fileUploadRef} />
+        <EditorPanel fileUploadRef={fileUploadRef} isMobile={isMobile} />
         <PreviewPanel isMobile={isMobile} isKeyboardVisible={isKeyboardVisible} />
       </main>
       {!isKeyboardVisible && <AppFooter />}

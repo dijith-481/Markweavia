@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from "react";
 
-const KEYBOARD_THRESHOLD_PERCENTAGE = 0.75;
+const KEYBOARD_THRESHOLD_PERCENTAGE = 0.8;
 
 export function useKeyboardDetector(enabled: boolean = true) {
   const [isKeyboardVisible, setIsKeyboardVisible] = useState(false);

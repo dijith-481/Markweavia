@@ -146,5 +146,6 @@ export function useEditor(
     handleMarkdownChange,
     setIsEditorReady,
     editorUpdateListener,
+    isEditorReady,
   };
 }

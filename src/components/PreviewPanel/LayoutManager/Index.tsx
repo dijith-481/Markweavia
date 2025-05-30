@@ -15,6 +15,7 @@ interface LayoutManagerProps {
 
 export default function LayoutManager({ isMobile, isKeyboardVisible }: LayoutManagerProps) {
   const [isMobileSettingsExpanded, setIsMobileSettingsExpanded] = useState(true);
+  const [isEditing, setIsEditing] = useState(false);
   useEffect(() => {
     setIsMobileSettingsExpanded(!isMobile);
   }, [isMobile]);
@@ -26,7 +27,7 @@ export default function LayoutManager({ isMobile, isKeyboardVisible }: LayoutMan
   }, [slideLayoutOptions]);
 
   return (
-    (!isKeyboardVisible || isMobileSettingsExpanded) && (
+    (!isKeyboardVisible || isEditing) && (
       <ToggleExpand
         isExpanded={isMobileSettingsExpanded}
         setIsExpanded={setIsMobileSettingsExpanded}
@@ -39,7 +40,10 @@ export default function LayoutManager({ isMobile, isKeyboardVisible }: LayoutMan
           <FontScaler />
           <LayoutSettings availableHeaderFooterPositions={availableHeaderFooterPositions} />
         </div>
-        <HeaderFooterManager availableHeaderFooterPositions={availableHeaderFooterPositions} />
+        <HeaderFooterManager
+          availableHeaderFooterPositions={availableHeaderFooterPositions}
+          setIsEditing={setIsEditing}
+        />
       </ToggleExpand>
     )
   );

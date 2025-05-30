@@ -62,7 +62,7 @@ export const cyclingTips = [
     content: (
       <>
         Vim: &nbsp; <kbd>:p</kbd>
-        to upload file
+        to Start Slide Show
       </>
     ),
   },

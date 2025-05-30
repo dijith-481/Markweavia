@@ -13,8 +13,10 @@ import DropDownButton from "@/components/UI/DropDownButton";
 
 export default function HeaderFooterManager({
   availableHeaderFooterPositions,
+  setIsEditing,
 }: {
   availableHeaderFooterPositions: HeaderFooterPosition[];
+  setIsEditing: React.Dispatch<React.SetStateAction<boolean>>;
 }) {
   const [newItemText, setNewItemText] = useState("");
   const [formOpen, setFormOpen] = useState(false);
@@ -69,6 +71,7 @@ export default function HeaderFooterManager({
     if (availableHeaderFooterPositions.length === 0) {
       alert("No header/footer positions available.Try deleting some");
     } else {
+      setIsEditing((prev) => !prev);
       setFormOpen((prev) => !prev);
     }
   };
@@ -130,6 +133,7 @@ export default function HeaderFooterManager({
 
   const handleClickOutside = (event: MouseEvent) => {
     if (newItemTextRef.current && !newItemTextRef.current.contains(event.target as Node)) {
+      setIsEditing(false);
       setIsEditingText("");
       setNewItemText("");
     }
@@ -204,10 +208,12 @@ export default function HeaderFooterManager({
                   onKeyDown={(e) => {
                     if (e.key === "Escape") {
                       setIsEditingText("");
+                      setIsEditing(false);
                       setNewItemText("");
                     }
                     if (e.key === "Enter") {
                       onUpdateItemText(item.id, newItemText);
+                      setIsEditing(false);
                       setNewItemText("");
                       setIsEditingText("");
                     }
@@ -220,6 +226,7 @@ export default function HeaderFooterManager({
                     className={`truncate w-full ${item.id !== PAGE_NUMBER_SLIDE_ID ? " underline text-nord4/80  text-sm  hover:text-nord4/50" : ""}`}
                     onClick={() => {
                       setNewItemText(item.text);
+                      setIsEditing(true);
                       setIsEditingText(item.id);
                     }}
                     title={item.text}

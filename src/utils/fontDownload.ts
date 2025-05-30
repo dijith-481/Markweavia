@@ -73,13 +73,13 @@ export async function getEncodedFonts(): Promise<FontCache> {
   try {
     // Fetch and encode both fonts in parallel
     const [
-      regularBase64,
       boldBase64,
       lightBase64,
+      thinBase64,
       mediumBase64,
       extraBoldBase64,
       italicBase64,
-      thinBase64,
+      regularBase64,
       iosevkaBase64,
     ] = await Promise.all([
       fontCache.interBold || fetchAndEncodeFont("/Inter_24pt-Bold.ttf"),

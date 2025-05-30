@@ -1,7 +1,8 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { themes } from "@/utils/themes";
 import DropDownButton from "../../UI/DropDownButton";
 import { useSlideContext } from "@/context/slideContext";
+import { Vim } from "@replit/codemirror-vim";
 
 const formatThemeNameForDisplay = (themeKey: string): string => {
   if (themeKey === "nordDark") return "Nord Dark (Default)";
@@ -25,6 +26,18 @@ export default function ThemeSelector() {
   const changeTheme = (themeName: keyof typeof themeOptions) => {
     setActiveTheme(themeName);
   };
+  const nextTheme = () => {
+    console.log(activeTheme);
+    const currentIndex = Object.keys(themeOptions).indexOf(activeTheme);
+    console.log(currentIndex);
+    const nextIndex = (currentIndex + 1) % Object.keys(themeOptions).length;
+    console.log(nextIndex);
+    changeTheme(Object.keys(themeOptions)[nextIndex]);
+  };
+
+  useEffect(() => {
+    Vim.defineEx("theme", "t", nextTheme);
+  }, [nextTheme]);
 
   return (
     <DropDownButton
