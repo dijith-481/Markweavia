@@ -6,7 +6,6 @@ import {
   generateFontSizesCss,
   generateThemeCss,
 } from "@/utils/export-utils";
-import { debounce } from "@/utils/common";
 import { themes } from "@/utils/themes";
 
 export function usePreviewSlide(iframeRef: React.RefObject<HTMLIFrameElement | null>) {

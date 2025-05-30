@@ -150,6 +150,7 @@ gap:5%;
 #first-slide .slide-content-wrapper {
 justify-content: center;
 align-items: center;
+gap:2%;
 }
 .slide h1, .slide h2, .slide h3, .slide h4, .slide h5, .slide h6 {
   font-weight: 400;
@@ -160,9 +161,13 @@ margin: 0;
 .slide h1 {
   font-size: var(--slide-h1-size);
 border:none;
-font-weight:700;
+font-weight:500;
+width:100%;
   padding-bottom: 0;
   text-align: center;
+}
+.slide h1 a{
+border-bottom: none;
 }
 .slide h2 {
   font-size: var(--slide-h2-size);
@@ -218,7 +223,6 @@ max-width: 93%;
 .slide a {
   color: var(--link-color);
   text-decoration: none;
-border-bottom: 1px dashed var(--link-color);
   font-weight: 500;
 }
 .slide a:hover {
@@ -240,7 +244,8 @@ color: var(--code-text);
   border: 1px solid #81a1c1;
   
   position: relative;
-  padding:  2%; 
+  padding-left:  2%; 
+  padding-right:  2%; 
 }
 
 .slide pre code {
@@ -311,7 +316,8 @@ background-color: var(--background-color-secondary);
 .slide hr {
   margin: 1.5em 0;
   border: 0;
-  border-top: 1px solid var(--hr-color);
+  border-top: 2px solid var(--hr-color);
+width:100%;
 }
 .slide del {
   text-decoration: line-through;
@@ -352,7 +358,7 @@ const multiSlideCss = `
   align-items: center; 
   gap: 1dvh;
   z-index: 1000;
-  opacity: 1;
+  opacity: 0;
   transition: opacity 0.3s ease-in-out;
 }
 

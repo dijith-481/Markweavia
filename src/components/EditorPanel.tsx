@@ -1,4 +1,4 @@
-import React, { useRef, useEffect, useMemo } from "react";
+import React, { useRef, useEffect, useMemo, useState } from "react";
 import { EditorView } from "@codemirror/view";
 import CodeMirror from "@uiw/react-codemirror";
 import { useEditor } from "@/hooks/useEditor";
@@ -6,6 +6,8 @@ import { languages } from "@codemirror/language-data";
 import { vim } from "@replit/codemirror-vim";
 import { nord } from "@uiw/codemirror-theme-nord";
 import { markdown as markdownLang } from "@codemirror/lang-markdown";
+import { CheckboxIcon } from "./UI/Icons";
+import Button from "./UI/Button";
 
 interface EditorPanelProps {
   fileUploadRef: React.RefObject<{ triggerFileUpload: () => void } | null>;
@@ -14,41 +16,49 @@ interface EditorPanelProps {
 
 export default function EditorPanel({ fileUploadRef, isMobile }: EditorPanelProps) {
   const codeMirrorRef = useRef<any>(null);
-  const {
-    markdownText,
-    handleMarkdownChange,
-    setIsEditorReady,
-    editorUpdateListener,
-    isEditorReady,
-  } = useEditor(codeMirrorRef, fileUploadRef);
-
+  const [isVimMode, setIsVimMode] = useState(true);
+  const { markdownText, handleMarkdownChange, setIsEditorReady, editorUpdateListener } = useEditor(
+    codeMirrorRef,
+    fileUploadRef,
+  );
   useEffect(() => {
     if (codeMirrorRef.current && codeMirrorRef.current.view) {
       setIsEditorReady(true);
     }
   }, [codeMirrorRef.current, setIsEditorReady]);
 
-  const extensions = isMobile
-    ? useMemo(
-        () => [
-          markdownLang({ codeLanguages: languages }),
-          EditorView.lineWrapping,
-          editorUpdateListener,
-        ],
-        [editorUpdateListener],
-      )
-    : useMemo(
-        () => [
-          vim(),
-          markdownLang({ codeLanguages: languages }),
-          EditorView.lineWrapping,
-          editorUpdateListener,
-        ],
-        [editorUpdateListener],
-      );
+  useEffect(() => {
+    if (isMobile) {
+      setIsVimMode(false);
+    }
+  }, []);
+
+  const extensions = useMemo(
+    () => [
+      isVimMode ? vim() : [],
+      markdownLang({ codeLanguages: languages }),
+      EditorView.lineWrapping,
+      editorUpdateListener,
+    ],
+    [editorUpdateListener, isVimMode],
+  );
 
   return (
-    <div className="order-2 md:w-1/2 w-full rounded-md md:order-1 h-full min-h-24 bg-nord0  overscroll-contain overflow-x-hidden">
+    <div className="order-2 relative md:w-1/2 w-full rounded-md md:order-1 h-full min-h-48 bg-nord0  overscroll-contain overflow-x-hidden">
+      <div className="sticky top-2 right-2 z-10 w-full  flex items-end justify-end  ">
+        <div className="w-10 mr-2">
+          <Button
+            onClick={() => {
+              setIsVimMode((prev) => !prev);
+            }}
+            title="toggle vim mode"
+            color={`${isVimMode ? "bg-nord9 text-nord0  hover:text-nord0 " : "bg-nord1  text-nord4/80  "}    opacity-50 hover:opacity-100`}
+          >
+            <CheckboxIcon checked={isVimMode} />
+            vim
+          </Button>
+        </div>
+      </div>
       <CodeMirror
         value={markdownText}
         extensions={extensions}
@@ -62,7 +72,7 @@ export default function EditorPanel({ fileUploadRef, isMobile }: EditorPanelProp
           highlightActiveLineGutter: true,
         }}
         autoFocus
-        className="text-sm"
+        className="text-sm overflow-y-hidden w-full h-full"
         ref={codeMirrorRef}
         onCreateEditor={() => {
           setIsEditorReady(true);

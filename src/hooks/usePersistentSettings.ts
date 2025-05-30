@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { initialMarkdownContent } from "../utils/slide-templates";
+import { slideTemplates } from "../utils/slide-templates";
 import { SlideLayoutOptions } from "../utils/layoutOptions";
 import {
   LOCAL_STORAGE_MARKDOWN_TEXT_KEY,
@@ -19,7 +19,7 @@ export function usePersistentSettings() {
 
   useEffect(() => {
     const savedMarkdown = localStorage.getItem(LOCAL_STORAGE_MARKDOWN_TEXT_KEY);
-    setMarkdownText(savedMarkdown || initialMarkdownContent);
+    setMarkdownText(savedMarkdown || slideTemplates.initialMarkdown);
     setActiveTheme(localStorage.getItem(LOCAL_STORAGE_THEME_KEY) || "nordDark");
     const storedMultiplier = localStorage.getItem(LOCAL_STORAGE_FONT_MULTIPLIER_KEY);
     setFontSizeMultiplier(storedMultiplier ? parseFloat(storedMultiplier) : 1);

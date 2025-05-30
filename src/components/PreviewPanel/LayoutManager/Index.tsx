@@ -9,16 +9,18 @@ import { useSlideContext } from "@/context/slideContext";
 import { headerFooterPositions } from "@/utils/layoutOptions";
 
 interface LayoutManagerProps {
-  isMobile: boolean;
   isKeyboardVisible: boolean;
 }
 
-export default function LayoutManager({ isMobile, isKeyboardVisible }: LayoutManagerProps) {
+export default function LayoutManager({ isKeyboardVisible }: LayoutManagerProps) {
   const [isMobileSettingsExpanded, setIsMobileSettingsExpanded] = useState(true);
   const [isEditing, setIsEditing] = useState(false);
   useEffect(() => {
-    setIsMobileSettingsExpanded(!isMobile);
-  }, [isMobile]);
+    if (window.visualViewport) {
+      const windowWidth = window.visualViewport.width;
+      setIsMobileSettingsExpanded(windowWidth > 768);
+    }
+  }, []);
 
   const { slideLayoutOptions } = useSlideContext();
   const availableHeaderFooterPositions = useMemo(() => {

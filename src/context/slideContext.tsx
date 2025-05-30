@@ -1,4 +1,3 @@
-import React, { useEffect } from "react";
 import { createContext, useMemo, useState, useContext } from "react";
 import { SlideLayoutOptions } from "../utils/layoutOptions";
 import { usePersistentSettings } from "../hooks/usePersistentSettings";
