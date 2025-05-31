@@ -104,7 +104,8 @@ html, body {
   margin: 0;
   padding: 0;
   overflow: hidden;
-  font-family: 'Inter', sans-serif;
+  font-family: 'Inter', sans-serif ;
+
   background-color: var(--background-color);
   color: var(--text-color);
 }
@@ -194,7 +195,7 @@ border:none !important;
   text-align: center;
 }
 #first-slide pre code{
-font-family: 'Inter';
+font-family: Inter !important;
  color:var(--text-color) !important;
 }
 #first-slide p {
@@ -220,6 +221,11 @@ border-radius: 4px ;
 min-width: 70% ;
 max-width: 93%;
 }
+.slide blockquote code:not(pre code) {
+font-style: normal;
+font-size:inherit;
+}
+
 .slide a {
   color: var(--link-color);
   text-decoration: none;
@@ -251,14 +257,15 @@ color: var(--code-text);
 .slide pre code {
   background-color: transparent;
   color: var(--code-text);
+font-family: Iosevka, monospace !important;
 }
 .slide code:not(pre code) {
   background-color: var(--inline-code-background);
   color: var(--inline-code-text);
   padding: 0.5% 1%;
   border-radius: 4px;
-font-family: 'Iosevka', Consolas, 'Liberation Mono', Menlo, Courier, monospace;
-font-size: calc(var(--slide-inline-code-size) * 0.9);
+font-family: Iosevka, monospace !important;
+font-size: calc(var(--text-size) *0.9 );
 font-weight:300;
 }
 .slide table {
@@ -332,7 +339,7 @@ text-decoration-thickness: 5%;
   color: var(--header-footer-color);
   padding: 3vmin 3.5vmin;
   z-index: 10;
-font-family: 'Inter';
+font-family: Inter;
 font-weight:400;
   white-space: nowrap;
 }
@@ -362,6 +369,9 @@ const multiSlideCss = `
   transition: opacity 0.3s ease-in-out;
 }
 
+.slide-navigation.simulated-hover { 
+  opacity: 1;
+}
 .slide-navigation:hover {
   opacity: 1;
 }
@@ -425,16 +435,8 @@ export async function exportToCustomSlidesHtml(
     alert("Font cache is not available. Please try again later.");
     return "";
   }
-  const {
-    interRegular,
-    interBold,
-    interLight,
-    interMedium,
-    interExtraBold,
-    interItalic,
-    interThin,
-    iosevka,
-  } = await fontCache;
+  const { interRegular, interBold, interLight, interMedium, interItalic, iosevka } =
+    await fontCache;
   const cssVariablesString = generateThemeCss(theme);
   const fontSizesCss = generateFontSizesCss(fontSizeMultiplier);
 
@@ -464,25 +466,13 @@ export async function exportToCustomSlidesHtml(
         font-weight: 500;
         font-style: normal;
       }
-      @font-face {
-        font-family: 'Inter';
-        src: url('data:font/ttf;base64,${interExtraBold}') format('truetype');
-        font-weight: 800;
-        font-style: normal;
-      }
-      @font-face {
+           @font-face {
         font-family: 'Inter';
         src: url('data:font/ttf;base64,${interItalic}') format('truetype');
         font-style: italic;
       }
       @font-face {
-        font-family: 'Inter';
-        src: url('data:font/ttf;base64,${interThin}') format('truetype');
-        font-weight: 100;
-        font-style: normal;
-      }
-      @font-face {
-        font-family: 'Iosevka
+        font-family: 'Iosevka';
         src: url('data:font/ttf;base64,${iosevka}') format('truetype');
         font-weight: 400;
         font-style: normal;
@@ -505,6 +495,7 @@ ${await getKatexCss()}
       const prevBtn = document.getElementById('prev-slide');
       const nextBtn = document.getElementById('next-slide');
       const endBtn = document.getElementById('end-slide');
+      const fullScreenBtn = document.getElementById('fullscreen');
       const counterElem = document.getElementById('slide-counter');
 
       function showSlideByIndex(index) {
@@ -521,6 +512,16 @@ ${await getKatexCss()}
         adjustFontSizeIfOverflow(slideElements[currentSlideIdx]);
       }
 
+function fullscreenChangeHandler() {
+  if (document.fullscreenElement) {
+fullScreenBtn.style.opacity = 1;
+document.exitFullscreen();
+  } else {
+fullScreenBtn.style.opacity = 0.6;
+document.documentElement.requestFullscreen();
+  }
+}
+
       function adjustFontSizeIfOverflow(slide) {
         const contentWrapper = slide.querySelector('.slide-content-wrapper');
         if (!contentWrapper) return;
@@ -532,7 +533,7 @@ ${await getKatexCss()}
       }
 
       function updateNavigationControls() {
-        if (!prevBtn || !nextBtn || !counterElem || !startBtn || !endBtn) return;
+        if (!prevBtn || !nextBtn || !counterElem || !startBtn || !endBtn || !fullScreenBtn) return;
         const totalSlides = slideElements.length;
         startBtn.disabled = currentSlideIdx === 0;
         prevBtn.disabled = currentSlideIdx === 0;
@@ -551,6 +552,7 @@ ${await getKatexCss()}
         prevBtn.addEventListener('click', () => showSlideByIndex(currentSlideIdx - 1));
         nextBtn.addEventListener('click', () => showSlideByIndex(currentSlideIdx + 1));
         endBtn.addEventListener('click', () => showSlideByIndex(slideElements.length - 1));
+        fullScreenBtn.addEventListener('click', () => fullscreenChangeHandler());
 
         document.addEventListener('dblclick', (e) => {
           if (!e.target.closest('.slide-navigation')) {
@@ -558,8 +560,30 @@ ${await getKatexCss()}
           }
         });
 
+
+        document.addEventListener('touchstart', (e) => {
+          if (!e.target.closest('.slide-navigation')) {
+            showSlideByIndex(currentSlideIdx + 1);
+          }
+
+  const slideNavigation = document.querySelector('.slide-navigation');
+  if (!slideNavigation) {
+    console.warn("slide-navigation element not found.");
+    return; 
+}
+
+ slideNavigation.classList.add('simulated-hover');
+  setTimeout(() => {
+    slideNavigation.classList.remove('simulated-hover');
+  }, 1000);
+        });
+
         document.addEventListener('keydown', (e) => {
           let newIdx = currentSlideIdx;
+if (e.key === 'f'){
+  e.preventDefault();
+fullscreenChangeHandler();
+}
           if (e.key === 'ArrowLeft' || e.key === 'h') {
             newIdx = currentSlideIdx - 1;
           } else if (e.key === 'ArrowRight' || e.key === 'l' || e.key === ' ') {
@@ -634,7 +658,7 @@ ${await getKatexCss()}
 <svg width="117.792" height="94.875" viewBox="0 0 235.792 189.375" xmlns="http://www.w3.org/2000/svg"><g id="svgGroup" stroke-linecap="round" fill-rule="evenodd" font-size="9pt" stroke="#00000000" stroke-width="0.25mm" fill="currentColor" style="stroke:#00000000;stroke-width:0.25mm;fill:#81a1c1"><path d="M 6.667 164.875 L 11.417 153.875 L 62.792 0 L 118.042 106.75 L 171.667 0 L 235.792 184.875 L 168.667 184.875 L 137.667 89.375 L 89.667 189.375 L 39.167 99.375 L 21.667 154 A 161.562 161.562 0 0 0 19.111 159.948 Q 18.026 162.632 17.196 165.02 A 70.807 70.807 0 0 0 15.792 169.5 Q 14.042 175.875 12.917 179.375 A 18.426 18.426 0 0 1 11.704 182.35 Q 9.382 186.78 5.342 186.78 A 7.79 7.79 0 0 1 4.667 186.75 Q 2.292 186.5 1.042 184.625 A 5.984 5.984 0 0 1 0 181.24 A 6.694 6.694 0 0 1 0.042 180.5 A 22.7 22.7 0 0 1 1.984 174.223 A 21.213 21.213 0 0 1 2.417 173.375 A 406.22 406.22 0 0 0 3.233 171.852 Q 4.37 169.719 4.979 168.5 Q 5.792 166.875 6.667 164.875 Z" vector-effect="non-scaling-stroke"/></g></svg>
 </div>
               <div>
-                 Made with <a href="https://markweavia.vercel.app">Markweavia</a>
+                 Made with <a style="text-decoration:underline;" href="https://markweavia.vercel.app">Markweavia</a>
               </div>
               <div style="font-size: 1.4dvw; color: var(--primary-color);">
                 Markdown, beautifully woven.
@@ -658,6 +682,11 @@ ${await getKatexCss()}
   </svg>
 </a>
         </div>
+<div class="slide-header-footer-item pos-bottom-right">
+<a style="opacity:0.4;" href="https://markweavia.vercel.app" style="text-decoration:none;">
+Create your own Slides
+</a>
+</div>
         </div>
 `;
   slidesHtmlContent += "</div>";
@@ -696,13 +725,18 @@ ${await getKatexCss()}
       <path d="M5.59 7.41L10.18 12l-4.59 4.59L7 18l6-6-6-6zM16 6h2v12h-2z"/>
     </svg>
   </button>
+<button id="fullscreen">
+
+<svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="currentColor"><path d="M120-120v-200h80v120h120v80H120Zm520 0v-80h120v-120h80v200H640ZM120-640v-200h200v80H200v120h-80Zm640 0v-120H640v-80h200v200h-80Z"/></svg>
+  </button>
+
 </div>    ${scripts}
 </body>
 </html>`;
 }
 
 export async function exportSingleSlideToHtmlbody(
-  slideMarkdown: string,
+  slideMarkdown: string | null,
   currentPageNo: number,
   layoutOptions?: SlideLayoutOptions,
 ): Promise<string> {
@@ -720,9 +754,10 @@ export async function exportSingleSlideToHtmlbody(
   }
   const slideIdAttribute =
     currentPageNo === 1 ? ' id="first-slide" class="slide active"' : 'class="slide active"';
-  const slideContentHtml = slideMarkdown.trim()
-    ? await marked.parse(slideMarkdown.trim())
-    : '<p style="text-align:center; font-size: var(--slide-font-size);"><em>Empty slide.</em></p>';
+  const slideContentHtml =
+    slideMarkdown && slideMarkdown.trim()
+      ? await marked.parse(slideMarkdown.trim())
+      : '<p style="text-align:center; font-size: var(--slide-font-size);"><em>Empty slide. nothing to weave.</em></p>';
   const slidesHtmlContent = `
     <div class="">
       <div data-slide-index="0" ${slideIdAttribute}>
@@ -739,7 +774,7 @@ export async function exportSingleSlideToHtml(
   theme: Theme,
   fontSizeMultiplier: number,
   fontCache: Promise<FontCache>,
-  slideMarkdown: string,
+  slideMarkdown: string | null,
   currentPageNo: number,
   layoutOptions?: SlideLayoutOptions,
 ) {
@@ -748,16 +783,8 @@ export async function exportSingleSlideToHtml(
   const prismCss = await getprsmCss();
   const prismJs = await getprismJs();
   const katexCss = await getKatexCss();
-  const {
-    interRegular,
-    interBold,
-    interLight,
-    interMedium,
-    interExtraBold,
-    interItalic,
-    interThin,
-    iosevka,
-  } = await fontCache;
+  const { interRegular, interBold, interLight, interMedium, interItalic, iosevka } =
+    await fontCache;
   const body = await exportSingleSlideToHtmlbody(slideMarkdown, currentPageNo, layoutOptions);
 
   const styles = `
@@ -786,25 +813,13 @@ export async function exportSingleSlideToHtml(
         font-weight: 500;
         font-style: normal;
       }
-      @font-face {
-        font-family: 'Inter';
-        src: url('data:font/ttf;base64,${interExtraBold}') format('truetype');
-        font-weight: 800;
-        font-style: normal;
-      }
-      @font-face {
+           @font-face {
         font-family: 'Inter';
         src: url('data:font/ttf;base64,${interItalic}') format('truetype');
         font-style: italic;
       }
       @font-face {
-        font-family: 'Inter';
-        src: url('data:font/ttf;base64,${interThin}') format('truetype');
-        font-weight: 100;
-        font-style: normal;
-      }
-      @font-face {
-        font-family: 'Iosevka
+        font-family: 'Iosevka';
         src: url('data:font/ttf;base64,${iosevka}') format('truetype');
         font-weight: 400;
         font-style: normal;

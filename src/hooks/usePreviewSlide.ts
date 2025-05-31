@@ -20,7 +20,7 @@ export function usePreviewSlide(iframeRef: React.RefObject<HTMLIFrameElement | n
   } = useSlideContext();
   const [ismarkdownEmpty, setIsMarkdownEmpty] = useState(true);
   useEffect(() => {
-    if (currentSlideText) {
+    if (currentSlideText != null) {
       setIsMarkdownEmpty(false);
     } else {
       setIsMarkdownEmpty(true);

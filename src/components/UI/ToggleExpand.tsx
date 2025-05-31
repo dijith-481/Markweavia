@@ -13,10 +13,10 @@ export default function ToggleExpand({
     setIsExpanded((prev) => !prev);
   };
   return (
-    <div className="bg-nord0 rounded-md overflow-y-auto">
+    <div className="bg-nord0 rounded-md">
       <button
         onClick={toggleExpand}
-        className=" md:hidden w-full px-4 py-2   text-nord4 text-sm   flex  items-center justify-between"
+        className=" md:hidden w-full px-4 py-2   text-nord4 text-sm    flex  items-center justify-between"
         aria-expanded={isExpanded}
         aria-controls="collapsible-slide-settings-panel"
       >

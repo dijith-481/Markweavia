@@ -20,7 +20,6 @@ export function useKeyboardDetector(enabled: boolean = true) {
       setVisualViewportHeight(vvHeight);
       setIsKeyboardVisible(vvHeight / windowHeight < KEYBOARD_THRESHOLD_PERCENTAGE);
     } else {
-      // Fallback for browsers without visualViewport
       const currentHeight = window.innerHeight;
       setVisualViewportHeight(currentHeight);
       setIsKeyboardVisible(false);

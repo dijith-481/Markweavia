@@ -1,7 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import useExportFunctions from "@/hooks/useExportFunctions";
-import { GitHubIcon, UploadIcon, DownloadIcon } from "@/components/UI/Icons";
+import { GitHubIcon, UploadIcon, DownloadIcon, DonateIcon } from "@/components/UI/Icons";
 import DropDownButton from "./UI/DropDownButton";
 
 interface AppHeaderProps {
@@ -41,8 +41,8 @@ export default function AppHeader({ fileUploadRef }: AppHeaderProps) {
           <DropDownButton
             color="text-nord9"
             options={{
-              ".md": "Markdown (.md)",
               Slides: "HTML Slides",
+              ".md": "Markdown (.md)",
             }}
             onSelect={(option) => {
               if (option === ".md") {
@@ -52,7 +52,7 @@ export default function AppHeader({ fileUploadRef }: AppHeaderProps) {
               }
             }}
           >
-            <span className="flex-shrink-0">
+            <span className="flex-shrink-0 ">
               <DownloadIcon />
             </span>
             <div className="whitespace-nowrap  opacity-0   group-hover:opacity-100 transition-opacity duration-700">
@@ -77,6 +77,19 @@ export default function AppHeader({ fileUploadRef }: AppHeaderProps) {
       </div>
 
       <div className="flex items-center justify-end space-x-2 w-full ">
+        <a
+          href="https://github.com/sponsors/dijith-481"
+          className="flex flex-row items-center group transition-all px-1 py-1 rounded-md ease-in-out duration-700 w-10 hover:w-24 overflow-hidden"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          <span className="flex-shrink-0">
+            <DonateIcon />
+          </span>
+          <span className="ml-1.5 whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity duration-700">
+            Donate
+          </span>
+        </a>
         <a
           href="https://github.com/dijith-481/markweavia"
           className="flex flex-row items-center group transition-all  px-1 py-1 rounded-md ease-in-out duration-700  w-10 hover:w-24 overflow-hidden"

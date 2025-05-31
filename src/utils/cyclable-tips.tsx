@@ -1,3 +1,4 @@
+import { HeartIcon } from "@/components/UI/Icons";
 export const cyclingTips = [
   {
     key: "focus",
@@ -79,12 +80,16 @@ export const cyclingTips = [
     content: (
       <>
         <a
-          className="  px-1 py-0.5 underline"
+          className=" gap-1  px-1 py-0.5  flex items-center justify-center italic"
           href="https://dijith.vercel.app"
           target="_blank"
           rel="noopener noreferrer"
         >
-          Made with <span style={{ color: "#bf616a" }}>❤</span> & Vim by Dijith
+          Made with{"  "}
+          <span className="text-nord11 rotate-2">
+            <HeartIcon />
+          </span>
+          {"  "}& vim by <span className="text-nord9/60 underline ">dijith</span>
         </a>
       </>
     ),

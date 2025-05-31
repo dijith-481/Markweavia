@@ -6,7 +6,7 @@ import { languages } from "@codemirror/language-data";
 import { vim } from "@replit/codemirror-vim";
 import { nord } from "@uiw/codemirror-theme-nord";
 import { markdown as markdownLang } from "@codemirror/lang-markdown";
-import { CheckboxIcon } from "./UI/Icons";
+import { VimIcon } from "./UI/Icons";
 import Button from "./UI/Button";
 
 interface EditorPanelProps {
@@ -31,7 +31,7 @@ export default function EditorPanel({ fileUploadRef, isMobile }: EditorPanelProp
     if (isMobile) {
       setIsVimMode(false);
     }
-  }, []);
+  }, [isMobile]);
 
   const extensions = useMemo(
     () => [
@@ -54,8 +54,7 @@ export default function EditorPanel({ fileUploadRef, isMobile }: EditorPanelProp
             title="toggle vim mode"
             color={`${isVimMode ? "bg-nord9 text-nord0  hover:text-nord0 " : "bg-nord1  text-nord4/80  "}    opacity-50 hover:opacity-100`}
           >
-            <CheckboxIcon checked={isVimMode} />
-            vim
+            <VimIcon />
           </Button>
         </div>
       </div>
@@ -72,7 +71,7 @@ export default function EditorPanel({ fileUploadRef, isMobile }: EditorPanelProp
           highlightActiveLineGutter: true,
         }}
         autoFocus
-        className="text-sm overflow-y-hidden w-full h-full"
+        className="text-sm overflow-y-auto w-full h-full"
         ref={codeMirrorRef}
         onCreateEditor={() => {
           setIsEditorReady(true);

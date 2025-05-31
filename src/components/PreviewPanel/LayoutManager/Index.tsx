@@ -13,13 +13,18 @@ interface LayoutManagerProps {
 }
 
 export default function LayoutManager({ isKeyboardVisible }: LayoutManagerProps) {
-  const [isMobileSettingsExpanded, setIsMobileSettingsExpanded] = useState(true);
+  const [isMobileSettingsExpanded, setIsMobileSettingsExpanded] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   useEffect(() => {
-    if (window.visualViewport) {
-      const windowWidth = window.visualViewport.width;
-      setIsMobileSettingsExpanded(windowWidth > 768);
+    function handleResize() {
+      if (window.visualViewport) {
+        const windowWidth = window.visualViewport.width;
+        if (windowWidth > 768) setIsMobileSettingsExpanded(true);
+      }
     }
+    window.addEventListener("resize", handleResize);
+    handleResize();
+    return () => window.removeEventListener("resize", handleResize);
   }, []);
 
   const { slideLayoutOptions } = useSlideContext();

@@ -254,6 +254,7 @@ Master Vim in Markweavia! Faster slide creation awaits.
 `,
 
   initialMarkdown: `# [Markweavia](https://markweavia.vercel.app/)
+      markdown beautifully woven.
      made with ❤️ by dijith
 ## Overview
 Creating slides should be a straightforward process,
@@ -350,7 +351,7 @@ And one more for good measure.
 ## Images
 
 Displaying images is also possible.
-![Alt Markweavia logo](/logo.svg)
+![Alt Markweavia logo](https://i.ibb.co/qMjBm5yx/M.png)
 Note: The image above is a placeholder  Markweavia logo.)
 >Partial support for now with links
 

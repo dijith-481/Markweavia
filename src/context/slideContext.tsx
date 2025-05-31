@@ -8,7 +8,7 @@ export interface SlideContextState {
   markdownText: string;
   activeTheme: string;
   fontSizeMultiplier: number;
-  currentSlideText: string;
+  currentSlideText: string | null;
   slideLayoutOptions: SlideLayoutOptions;
   currentSlide: number;
   totalSlidesNumber: number;
@@ -49,7 +49,7 @@ export const SlideContextProvider: React.FC<{ children: React.ReactNode }> = ({ 
     setSlideLayoutOptions,
   } = usePersistentSettings();
 
-  const [currentSlideText, setCurrentSlideText] = useState<string>("");
+  const [currentSlideText, setCurrentSlideText] = useState<string | null>(null);
   const [currentSlide, setCurrentSlide] = useState<number>(1);
   const [totalSlidesNumber, setTotalSlidesNumber] = useState<number>(1);
   const [fontCache] = useState<Promise<FontCache>>(getEncodedFonts());
