@@ -87,7 +87,7 @@ export default function AppHeader({ fileUploadRef }: AppHeaderProps) {
             <DonateIcon />
           </span>
           <span className="ml-1.5 whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity duration-700">
-            Donate
+            Sponser
           </span>
         </a>
         <a

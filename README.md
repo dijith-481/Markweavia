@@ -2,7 +2,7 @@
   <img src="https://github.com/dijith-481/Markweavia/blob/main/public/logo.svg" alt="Markweavia Logo" width="120">
   <h1>Markweavia</h1>
   <p><i>Markdown, beautifully woven.</i></p>
-  <p>Effortlessly craft minimalist, professional presentations directly from your Markdown files using familiar Vim motions.</p>
+  <p>A no-nonsense tool  for crafting minimalist, professional platform-independant presentations directly from Markdown  using familiar Vim motions.</p>
 
   <p>
     <img src="https://img.shields.io/badge/license-GPL--2.0-blue.svg?style=for-the-badge&logoColor=D8DEE9&color=5E81AC" alt="License: GPL-2.0">
@@ -18,12 +18,12 @@
 - Traditional presentation software often involves excessive mouse dragging and complex component manipulation for what should be simple text and structure.
 - Markweavia was born from the desire to simplify this
   - enabling the creation of clean, professional slides with the ease of editing a Markdown file,
-  - enhanced by the efficiency of Vim keybindings.(**It's Vim Btw**)
+  - enhanced by the efficiency of Vim keybindings.
     > Most impactful presentations rely on clear text and an uncluttered background, a philosophy Markweavia aims to embody perfectly.
 
 ## Overview
 
-Markweavia is a web-based application that transforms your Markdown text and Katex into elegant HTML slide presentations. It provides a live preview of your current slide, allowing for a seamless WYSIWYG-like experience. The editor is powered by CodeMirror with Vim keybindings, offering a familiar and powerful editing environment. Customization options include themes (with a focus on Nord aesthetics), font scaling, page numbering, and custom header/footer elements.
+Markweavia is a web-based application that transforms your Markdown text and Katex into elegant HTML slide presentations. It provides a live preview of your current slide, allowing for a seamless WYSIWYG-like experience.
 
 **Key Features:**
 
@@ -36,7 +36,7 @@ Markweavia is a web-based application that transforms your Markdown text and Kat
 - **Local Storage Persistence:** Your work is automatically saved in your browser.
 - **Export Options:**
   - Download your presentation as a self-contained HTML file.
-  - offline first approach with fonts,code syntax hightlighting and katex all included in single html file(~15Mib file size).
+  - offline first approach with fonts,code syntax hightlighting and katex all included in single html file(~2MB file size).
   - partial support for Images (online)
   - Download the source Markdown (.md) file.
 - **File Upload:** Import existing Markdown files to continue your work or convert them to slides.
@@ -45,29 +45,30 @@ Markweavia is a web-based application that transforms your Markdown text and Kat
 ## How It Works
 
 1.  **Write Markdown:** Use standard Markdown headings (`#`, `##`) to define new slides.
-2.  **Live Preview:** As you type or navigate with your cursor, the right-hand pane updates to show a preview of the slide your cursor is currently on.
+2.  **Live Preview:** As you type or navigate with your cursor, the preview pane updates to show a preview of the slide your cursor is currently on.
 3.  **Customize:** Use the controls to select themes, adjust font sizes, manage page numbers, and add custom headers or footers.
 4.  **Vim Commands:** Utilize built-in Vim commands for saving (`:w`, `:ws`) uploading (`:u`) previewing(`:p`),changing theme(`:t`), toggling page numbers(`:page`), adding headerfooters(`:h`)
 5.  **Export:** When ready, export your entire presentation as a single HTML file or save your Markdown source.
 
 ## Understanding Exported Slides
 
-When you export your presentation, Markweavia generates a single, self-contained HTML file. This file includes all necessary CSS for styling (based on your chosen theme and customizations) and JavaScript for interactivity and works offline.
+Markweavia generates a single, self-contained HTML file. This file includes all necessary CSS for styling (based on your chosen theme and customizations) and JavaScript for interactivity. It works offline.
 
 **HTML Structure & Styling:**
 
-- Each Markdown slide (typically starting with a `#` or `##` heading ) is rendered into a `<div class="slide">`.
+- Each Markdown slide (starting with a `#` title or `##` heading ) is rendered into a `<div class="slide">`.
 - The content within each slide is wrapped in a `<div class="slide-content-wrapper">`.
 - all content maintain 16:9 aspect ratio.
-- compoent sizes are based on viewport size.
-- Standard Markdown elements (headings, paragraphs, lists, code blocks, tables, etc.) are converted to their corresponding HTML tags and styled according to the active theme variables and base presentation CSS.
+- component sizes are based on viewport size.
+- Standard Markdown elements (headings, paragraphs, lists, code blocks, tables, etc.) are converted to their corresponding HTML tags with marked.js and styled according to the active theme variables and base presentation CSS.
 - Code blocks are highlighted using Prism.js with a Nord-based theme.
-- Katex is rendered using KaTeX.
+- Mathematical expressions are rendered using KaTeX.
 - Custom header/footer items and page numbers are positioned absolutely within each slide based on your settings.
 - The overall presentation uses a clean, Nord-inspired design by default, with font sizes and colors determined by the selected theme and font scaling options.
-  > massive file size is due to the fact that all the code syntax highlighting , fonts and katex are included in single html file
+  > 2Mb file size includes code syntax highlighting , fonts and katex
 
-> to improve performance in live preview fonts are loaded at startup , styles and text is injected based on change this improves performance compared to previous approach where it created a new iframe on every text change or page change delayed by 300ms  
+> to improve performance in live preview fonts are loaded at startup , styles and text is injected based on change this improves performance compared to previous approach
+>
 > with this new approach after the initial load all edits can be made in near instant, no more debounce needed.
 
 **Interactivity & Navigation:**
@@ -88,13 +89,17 @@ A set of semi-transparent navigation buttons appears on hover (typically at the 
 
 A comprehensive set of keyboard shortcuts is available for efficient navigation:
 
-- **`ArrowRight`**, **`l`** (lowercase L), **`PageDown`**, **`Spacebar`**: Next slide.
+- **`ArrowRight`**, **`l`**, **`PageDown`**, **`Spacebar`**: Next slide.
 - **`ArrowLeft`**, **`h`**, **`PageUp`**: Previous slide.
+- **`f`**: FullScreen
 - **`Home`**: Go to the first slide.
 - **`End`**: Go to the last slide.
 - **`0-9` Number Keys**: Jump to a specific slide (e.g., `1` for slide 1, `0` for slide 10 if there are 10+ slides).
 
-This design ensures that presentations are easy to navigate both with a mouse and keyboard, providing a smooth viewing experience for your audience.
+### Fonts Used
+
+- **Inter:** The primary font
+- **Iosevka:** A monospace font used in code blocks
 
 ## Tech Stack
 
@@ -120,7 +125,7 @@ This design ensures that presentations are easy to navigate both with a mouse an
 
 ## Future Plans
 
-- **Image Pasting & Handling:** Directly paste images into the Markdown editor and have them appropriately embedded in slides(concered about file size ).
+- **Image Pasting & Handling:** Directly paste images into the Markdown editor and have them appropriately embedded in slides.
   - if you want to use images in your presentation store them in a folder in same directory and serve them using relative or absolute path.
 - **More Themes:** Continuously expand the selection of built-in themes.
 - **User-Loadable Custom Themes:** Allow users to define and load their own CSS theme variables or full theme files.
@@ -137,4 +142,5 @@ See the [LICENSE](LICENSE) file for details.
   <hr style="border-top: 1px solid #4C566A; margin: 20px 0;">
   <img src="https://github.com/dijith-481/Markweavia/blob/main/public/markweavia.svg" alt="Markweavia Logo" width="300">
   <p> Markdown, beautifully woven.</p>
+  <p>made with ❤️ by <a href="https://dijith.vercel.app">dijith</a></p>
 </div>
