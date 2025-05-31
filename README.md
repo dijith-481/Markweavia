@@ -41,6 +41,13 @@ Markweavia is a web-based application that transforms your Markdown text and Kat
   - Download the source Markdown (.md) file.
 - **File Upload:** Import existing Markdown files to continue your work or convert them to slides.
 - **Predefined Templates:** Quickly start with some predefined templates.
+## Examples
+- [nord Dark template](https://markweavia.vercel.app/examples/nordDark.html)
+-  [nord Light template](https://markweavia.vercel.app/examples/nordLight.html)
+- [true White template](https://markweavia.vercel.app/examples/trueWhite.html)
+- [true Black template](https://markweavia.vercel.app/examples/trueBlack.html)
+
+
 
 <img src="https://github.com/dijith-481/Markweavia/blob/main/assets/fullWallthrough.gif" width = "48%"><img src="https://github.com/dijith-481/Markweavia/blob/main/assets/presentation.gif" width = "48%">
 <div align="center">
