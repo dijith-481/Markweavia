@@ -42,6 +42,22 @@ Markweavia is a web-based application that transforms your Markdown text and Kat
 - **File Upload:** Import existing Markdown files to continue your work or convert them to slides.
 - **Predefined Templates:** Quickly start with some predefined templates.
 
+<img src="https://github.com/dijith-481/Markweavia/blob/main/assets/fullWallthrough.gif" width = "48%"><img src="https://github.com/dijith-481/Markweavia/blob/main/assets/presentation.gif" width = "48%">
+<div align="center">
+  <img src="https://github.com/dijith-481/Markweavia/blob/main/assets/editing.gif" width="50%">
+</div>
+<table style="width:100%;">
+  <tr>
+    <td style="width:50%; text-align:center;">
+      <img src="https://github.com/user-attachments/assets/b993991c-1c25-47be-9f84-248d3bc678c4" alt="Presentation Preview" style="max-width:100%;">
+      <p style="font-size: smaller; text-align: center;">Presentation Preview</p>
+    </td>
+    <td style="width:50%; text-align:center;">
+      <img src="https://github.com/user-attachments/assets/437e63d7-9672-4cb3-b9f8-d478ddfb0119" alt="Editor View" style="max-width:100%;">
+      <p style="font-size: smaller; text-align: center;">Editor View</p>
+    </td>
+  </tr>
+</table>
 ## How It Works
 
 1.  **Write Markdown:** Use standard Markdown headings (`#`, `##`) to define new slides.
@@ -131,6 +147,22 @@ A comprehensive set of keyboard shortcuts is available for efficient navigation:
 - **User-Loadable Custom Themes:** Allow users to define and load their own CSS theme variables or full theme files.
 - **Css editing:** Allow users to edit css directly in the editor. This will allow users to customize slides in a more granular way.
 
+## Mobile view
+<table style="width:50%;">
+  <tr>
+    <td>
+      <img src="https://github.com/user-attachments/assets/15b09fd8-1fcf-453c-a97b-9d046e780b4a" alt="Image 1" style="height:400px;">
+    </td>
+    <td>
+      <img src="https://github.com/user-attachments/assets/2bc28ac3-2303-4455-9f4b-a576725a660b" alt="Image 2" style="height:400px;">
+    
+    </td>
+  </tr>
+  <tr>
+    <td>final presentation preserve(16:9) aspect</td>
+    <td>editor view</td>
+  </tr>
+</table>
 ## Contributions are welcome!
 
 ## License
