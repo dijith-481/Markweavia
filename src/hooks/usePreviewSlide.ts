@@ -10,14 +10,8 @@ import { themes } from "@/utils/themes";
 
 export function usePreviewSlide(iframeRef: React.RefObject<HTMLIFrameElement | null>) {
   const [previewHtml, setPreviewHtml] = useState<string>("");
-  const {
-    currentSlide,
-    slideLayoutOptions,
-    currentSlideText,
-    fontSizeMultiplier,
-    activeTheme,
-    fontCache,
-  } = useSlideContext();
+  const { currentSlide, slideLayoutOptions, currentSlideText, fontSizeMultiplier, activeTheme } =
+    useSlideContext();
   const [ismarkdownEmpty, setIsMarkdownEmpty] = useState(true);
   useEffect(() => {
     if (currentSlideText != null) {
@@ -33,7 +27,6 @@ export function usePreviewSlide(iframeRef: React.RefObject<HTMLIFrameElement | n
       const html = await exportSingleSlideToHtml(
         theme,
         fontSizeMultiplier,
-        fontCache,
         currentSlideText,
         currentSlide,
         slideLayoutOptions,

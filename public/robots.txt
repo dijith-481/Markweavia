@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+Sitemap: https://markweavia.vercel.app/sitemap.xml

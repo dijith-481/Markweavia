@@ -3,8 +3,7 @@ import { useSlideContext } from "@/context/slideContext";
 import { themes } from "@/utils/themes";
 
 export default function useExportFunctions() {
-  const { markdownText, slideLayoutOptions, fontSizeMultiplier, activeTheme, fontCache } =
-    useSlideContext();
+  const { markdownText, slideLayoutOptions, fontSizeMultiplier, activeTheme } = useSlideContext();
 
   async function createHtmlBlob(documentTitle: string): Promise<Blob> {
     const theme = themes[activeTheme as keyof typeof themes];
@@ -14,7 +13,6 @@ export default function useExportFunctions() {
     try {
       const htmlContent = await exportToCustomSlidesHtml(
         markdownText,
-        fontCache,
         slideLayoutOptions,
         documentTitle,
         theme,
