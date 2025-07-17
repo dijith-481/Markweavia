@@ -16,6 +16,17 @@ export default function useExportFunctions() {
     setPreviewWindow,
   } = useSlideContext();
 
+  function isPreviewing() {
+    return previewWindow !== null;
+  }
+
+  function stopPreview() {
+    if (previewWindow !== null) {
+      previewWindow.close();
+      setPreviewWindow(null);
+    }
+  }
+
   async function createHtmlBlob(documentTitle: string): Promise<Blob> {
     const theme = themes[activeTheme as keyof typeof themes];
     if (!markdownText.trim()) {
@@ -110,5 +121,7 @@ export default function useExportFunctions() {
     handlePreviewFullSlides,
     handleDownloadMd,
     getFilenameFromFirstH1,
+    stopPreview,
+    isPreviewing,
   };
 }
