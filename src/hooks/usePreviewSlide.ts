@@ -5,13 +5,22 @@ import {
   exportSingleSlideToHtml,
   generateFontSizesCss,
   generateThemeCss,
+  splitMarkdownIntoSlides,
+  createAllHtmlDiv,
 } from "@/utils/export-utils";
 import { themes } from "@/utils/themes";
 
 export function usePreviewSlide(iframeRef: React.RefObject<HTMLIFrameElement | null>) {
   const [previewHtml, setPreviewHtml] = useState<string>("");
-  const { currentSlide, slideLayoutOptions, currentSlideText, fontSizeMultiplier, activeTheme } =
-    useSlideContext();
+  const {
+    currentSlide,
+    slideLayoutOptions,
+    currentSlideText,
+    fontSizeMultiplier,
+    activeTheme,
+    previewWindow,
+    markdownText,
+  } = useSlideContext();
   const [ismarkdownEmpty, setIsMarkdownEmpty] = useState(true);
   useEffect(() => {
     if (currentSlideText != null) {
@@ -53,9 +62,20 @@ export function usePreviewSlide(iframeRef: React.RefObject<HTMLIFrameElement | n
         }
       }
     };
+    const generateFullPreview = async () => {
+      if (previewWindow !== null) {
+        const slidesArray = splitMarkdownIntoSlides(markdownText);
+        const newContent = await createAllHtmlDiv(slidesArray, slideLayoutOptions, markdownText);
+        previewWindow.postMessage(
+          { type: "slides", content: newContent, currentPageNo: currentSlide - 1 },
+          "*",
+        );
+      }
+    };
 
     generatePreview();
-  }, [currentSlideText, slideLayoutOptions]);
+    generateFullPreview();
+  }, [currentSlideText, slideLayoutOptions, currentSlide]);
 
   useEffect(() => {
     const css = generateFontSizesCss(fontSizeMultiplier);

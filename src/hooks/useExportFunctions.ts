@@ -1,9 +1,20 @@
-import { exportToCustomSlidesHtml } from "../utils/export-utils";
+import {
+  createAllHtmlDiv,
+  exportToCustomSlidesHtml,
+  splitMarkdownIntoSlides,
+} from "../utils/export-utils";
 import { useSlideContext } from "@/context/slideContext";
 import { themes } from "@/utils/themes";
 
 export default function useExportFunctions() {
-  const { markdownText, slideLayoutOptions, fontSizeMultiplier, activeTheme } = useSlideContext();
+  const {
+    markdownText,
+    slideLayoutOptions,
+    fontSizeMultiplier,
+    activeTheme,
+    previewWindow,
+    setPreviewWindow,
+  } = useSlideContext();
 
   async function createHtmlBlob(documentTitle: string): Promise<Blob> {
     const theme = themes[activeTheme as keyof typeof themes];
@@ -62,11 +73,16 @@ export default function useExportFunctions() {
   }
 
   async function handlePreviewFullSlides() {
+    if (previewWindow !== null) {
+      previewWindow.focus();
+      return;
+    }
+
     try {
       const documentTitle = getFilenameFromFirstH1("Slides Preview");
       const blob = await createHtmlBlob(documentTitle);
       const url = URL.createObjectURL(blob);
-      window.open(url, "_blank");
+      setPreviewWindow(window.open(url, "_blank"));
     } catch (error) {
       alert(error);
     }

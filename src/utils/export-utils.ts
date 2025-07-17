@@ -68,7 +68,7 @@ function hasCodeBlocks(markdown: string): boolean {
   return /```/.test(markdown);
 }
 
-function splitMarkdownIntoSlides(markdown: string): string[] {
+export function splitMarkdownIntoSlides(markdown: string): string[] {
   const lines = markdown.split("\n");
   const slides: string[] = [];
   let currentSlideLines: string[] = [];
@@ -459,7 +459,7 @@ export async function exportToCustomSlidesHtml(
     <script>
     ${hasCode ? await getprismJs() : ""}
     let currentSlideIdx = 0;
-    const slideElements = document.querySelectorAll(".slide");
+    let slideElements = document.querySelectorAll(".slide");
     const startBtn = document.getElementById("start-slide");
     const prevBtn = document.getElementById("prev-slide");
     const nextBtn = document.getElementById("next-slide");
@@ -470,24 +470,27 @@ export async function exportToCustomSlidesHtml(
     function showSlideByIndex(index) {
       if (!slideElements || slideElements.length === 0) return;
       const newIndex = Math.max(0, Math.min(index, slideElements.length - 1));
-      if (newIndex === currentSlideIdx) return;
 
-      slideElements[currentSlideIdx].classList.remove("active");
+      if (slideElements[currentSlideIdx]) {
+        slideElements[currentSlideIdx].classList.remove("active");
+      }
+      
       slideElements[newIndex].classList.add("active");
       currentSlideIdx = newIndex;
 
-      if (typeof Prism !== "undefined")
+      if (typeof Prism !== "undefined") {
         Prism.highlightAllUnder(slideElements[currentSlideIdx]);
+      }
       updateNavigationControls();
       adjustFontSizeIfOverflow(slideElements[currentSlideIdx]);
     }
 
     function fullscreenChangeHandler() {
       if (document.fullscreenElement) {
-fullScreenBtn.classList.remove("fullscreen-button");
+        fullScreenBtn.classList.remove("fullscreen-button");
         document.exitFullscreen();
       } else {
-fullScreenBtn.classList.add("fullscreen-button");
+        fullScreenBtn.classList.add("fullscreen-button");
         document.documentElement.requestFullscreen();
       }
     }
@@ -495,11 +498,15 @@ fullScreenBtn.classList.add("fullscreen-button");
     function adjustFontSizeIfOverflow(slide) {
       const contentWrapper = slide.querySelector(".slide-content-wrapper");
       if (!contentWrapper) return;
+      contentWrapper.style.fontSize = "";
       let fontSize =
         (parseFloat(getComputedStyle(contentWrapper).fontSize) /
           window.innerWidth) *
         100;
-      while (contentWrapper.scrollHeight > slide.clientHeight && fontSize > 0.5) {
+      while (
+        contentWrapper.scrollHeight > slide.clientHeight &&
+        fontSize > 0.5
+      ) {
         fontSize -= 0.1;
         contentWrapper.style.fontSize = \`\${fontSize}dvw\`;
       }
@@ -524,12 +531,20 @@ fullScreenBtn.classList.add("fullscreen-button");
         totalSlides > 0 ? \`\${currentSlideIdx + 1} / \${totalSlides}\` : "0 / 0";
     }
 
-    document.addEventListener("DOMContentLoaded", () => {
+    function reloadSlides() {
+      slideElements = document.querySelectorAll(".slide");
+      currentSlideIdx = 0;
       if (slideElements.length > 0) {
         showSlideByIndex(0);
+      } else {
+        updateNavigationControls();
       }
-      updateNavigationControls();
+      if (typeof Prism !== "undefined") {
+        Prism.highlightAll();
+      }
+    }
 
+    function initializeControls() {
       startBtn.addEventListener("click", () => showSlideByIndex(0));
       prevBtn.addEventListener("click", () =>
         showSlideByIndex(currentSlideIdx - 1),
@@ -540,7 +555,7 @@ fullScreenBtn.classList.add("fullscreen-button");
       endBtn.addEventListener("click", () =>
         showSlideByIndex(slideElements.length - 1),
       );
-      fullScreenBtn.addEventListener("click", () => fullscreenChangeHandler());
+      fullScreenBtn.addEventListener("click", fullscreenChangeHandler);
 
       document.addEventListener("dblclick", (e) => {
         if (!e.target.closest(".slide-navigation")) {
@@ -552,13 +567,10 @@ fullScreenBtn.classList.add("fullscreen-button");
         if (!e.target.closest(".slide-navigation")) {
           showSlideByIndex(currentSlideIdx + 1);
         }
-
         const slideNavigation = document.querySelector(".slide-navigation");
         if (!slideNavigation) {
-          console.warn("slide-navigation element not found.");
           return;
         }
-
         slideNavigation.classList.add("simulated-hover");
         setTimeout(() => {
           slideNavigation.classList.remove("simulated-hover");
@@ -570,8 +582,7 @@ fullScreenBtn.classList.add("fullscreen-button");
         if (e.key === "f") {
           e.preventDefault();
           fullscreenChangeHandler();
-        }
-        if (e.key === "ArrowLeft" || e.key === "h") {
+        } else if (e.key === "ArrowLeft" || e.key === "h") {
           newIdx = currentSlideIdx - 1;
         } else if (e.key === "ArrowRight" || e.key === "l" || e.key === " ") {
           newIdx = currentSlideIdx + 1;
@@ -590,53 +601,28 @@ fullScreenBtn.classList.add("fullscreen-button");
         e.preventDefault();
         showSlideByIndex(newIdx);
       });
+    }
+
+    document.addEventListener("DOMContentLoaded", () => {
+      initializeControls();
+      reloadSlides();
+    });
+
+    window.addEventListener("message", (event) => {
+      if (event.data.type === "slides") {
+        document.getElementById("slides-container").innerHTML = event.data.content;
+        reloadSlides();
+        showSlideByIndex(event.data.currentPageNo);
+      }
     });
     </script>
   `;
 
   const slideMarkdownArray = splitMarkdownIntoSlides(fullMarkdown);
-  let slidesHtmlContent = '<div class="">';
-  if (slideMarkdownArray.length > 0) {
-    for (let i = 0; i < slideMarkdownArray.length; i++) {
-      const slideMd = slideMarkdownArray[i];
-      const slideContentHtml = await marked.parse(slideMd.trim());
-      const slideIdAttribute = i === 0 ? ' id="first-slide" class="slide active"' : 'class="slide"';
-      let layoutAdditions = "";
-      if (layoutOptions) {
-        if (i > 0 || layoutOptions.layoutOnFirstPage) {
-          layoutOptions.headerFooters.forEach((item) => {
-            if (item.id === PAGE_NUMBER_SLIDE_ID) {
-              layoutAdditions += `<div class="slide-page-number pos-${item.position}">${i + 1}</div>`;
-            } else {
-              layoutAdditions += `<div class="slide-header-footer-item pos-${item.position}">${item.text}</div>`;
-            }
-          });
-        }
-      }
-      slidesHtmlContent += `
-        <div data-slide-index="${i}" ${slideIdAttribute}>
-          <div class="slide-content-wrapper">${slideContentHtml}</div>
-          ${layoutAdditions}
-        </div>
-      `;
-    }
-  } else {
-    let fallbackLayoutAdditions = "";
-    if (layoutOptions) {
-      layoutOptions.headerFooters.forEach((item) => {
-        fallbackLayoutAdditions += `<div class="slide-header-footer-item pos-${item.position}">${item.text}</div>`;
-      });
-    }
-    const fallbackHtml = fullMarkdown.trim()
-      ? await marked.parse(fullMarkdown.trim())
-      : '<p style="text-align:center; font-size: var(--slide-font-size);">Empty content.</p>';
-    slidesHtmlContent += `
-      <div class="slide active" data-slide-index="0" id="first-slide">
-        <div class="slide-content-wrapper">${fallbackHtml}</div>
-        ${fallbackLayoutAdditions}
-      </div>
-    `;
-  }
+  let slidesHtmlContent = '<div id="slides-container" class="">';
+
+  slidesHtmlContent += await createAllHtmlDiv(slideMarkdownArray, layoutOptions, fullMarkdown);
+
   slidesHtmlContent += `
     <div data-slide-index="${slideMarkdownArray.length}" class="slide">
       <div class="slide-content-wrapper" style="height: 100%; width: 100%">
@@ -927,4 +913,54 @@ ${body}
 </body>
 </html>
   `;
+}
+
+export async function createAllHtmlDiv(
+  slideMarkdownArray: string[],
+  layoutOptions: SlideLayoutOptions | undefined,
+  fullMarkdown: string,
+): Promise<string> {
+  let slidesHtmlContent = "";
+  if (slideMarkdownArray.length > 0) {
+    for (let i = 0; i < slideMarkdownArray.length; i++) {
+      const slideMd = slideMarkdownArray[i];
+      const slideContentHtml = await marked.parse(slideMd.trim());
+      const slideIdAttribute = i === 0 ? ' id="first-slide" class="slide active"' : 'class="slide"';
+      let layoutAdditions = "";
+      if (layoutOptions) {
+        if (i > 0 || layoutOptions.layoutOnFirstPage) {
+          layoutOptions.headerFooters.forEach((item) => {
+            if (item.id === PAGE_NUMBER_SLIDE_ID) {
+              layoutAdditions += `<div class="slide-page-number pos-${item.position}">${i + 1}</div>`;
+            } else {
+              layoutAdditions += `<div class="slide-header-footer-item pos-${item.position}">${item.text}</div>`;
+            }
+          });
+        }
+      }
+      slidesHtmlContent += `
+        <div data-slide-index="${i}" ${slideIdAttribute}>
+          <div class="slide-content-wrapper">${slideContentHtml}</div>
+          ${layoutAdditions}
+        </div>
+      `;
+    }
+  } else {
+    let fallbackLayoutAdditions = "";
+    if (layoutOptions) {
+      layoutOptions.headerFooters.forEach((item) => {
+        fallbackLayoutAdditions += `<div class="slide-header-footer-item pos-${item.position}">${item.text}</div>`;
+      });
+    }
+    const fallbackHtml = fullMarkdown.trim()
+      ? await marked.parse(fullMarkdown.trim())
+      : '<p style="text-align:center; font-size: var(--slide-font-size);">Empty content.</p>';
+    slidesHtmlContent += `
+      <div class="slide active" data-slide-index="0" id="first-slide">
+        <div class="slide-content-wrapper">${fallbackHtml}</div>
+        ${fallbackLayoutAdditions}
+      </div>
+    `;
+  }
+  return slidesHtmlContent;
 }

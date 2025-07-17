@@ -13,6 +13,8 @@ export interface SlideContextState {
   totalSlidesNumber: number;
   words: number;
   letters: number;
+  previewWindow: Window | null;
+  setPreviewWindow: React.Dispatch<React.SetStateAction<Window | null>>;
 }
 
 interface SlideContextType extends SlideContextState {
@@ -50,6 +52,7 @@ export const SlideContextProvider: React.FC<{ children: React.ReactNode }> = ({ 
   const [currentSlideText, setCurrentSlideText] = useState<string | null>(null);
   const [currentSlide, setCurrentSlide] = useState<number>(1);
   const [totalSlidesNumber, setTotalSlidesNumber] = useState<number>(1);
+  const [previewWindow, setPreviewWindow] = useState<Window | null>(null);
 
   const words = useMemo(() => countWords(markdownText), [markdownText]);
   const letters = useMemo(() => countLetters(markdownText), [markdownText]);
@@ -71,6 +74,8 @@ export const SlideContextProvider: React.FC<{ children: React.ReactNode }> = ({ 
     setSlideLayoutOptions,
     words,
     letters,
+    previewWindow,
+    setPreviewWindow,
   };
   return <SlideContext.Provider value={contextValue}>{children}</SlideContext.Provider>;
 };
