@@ -485,6 +485,13 @@ export async function exportToCustomSlidesHtml(
       adjustFontSizeIfOverflow(slideElements[currentSlideIdx]);
     }
 
+    function sendMessageToParentWindow(message) {
+      const parentWindow = window.opener || window.parent;
+      if (parentWindow) {
+        parentWindow.postMessage(message, "*");
+      }
+    }
+
     function fullscreenChangeHandler() {
       if (document.fullscreenElement) {
         fullScreenBtn.classList.remove("fullscreen-button");
@@ -614,6 +621,9 @@ export async function exportToCustomSlidesHtml(
         reloadSlides();
         showSlideByIndex(event.data.currentPageNo);
       }
+    });
+    window.addEventListener("beforeunload", () => {
+        sendMessageToParentWindow({ type: "preview_closed" });
     });
     </script>
   `;

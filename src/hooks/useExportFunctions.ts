@@ -123,5 +123,6 @@ export default function useExportFunctions() {
     getFilenameFromFirstH1,
     stopPreview,
     isPreviewing,
+    previewWindow,
   };
 }

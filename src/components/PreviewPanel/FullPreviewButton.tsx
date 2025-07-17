@@ -1,10 +1,25 @@
-import React from "react";
+import React, { useEffect } from "react";
 import useExportFunctions from "@/hooks/useExportFunctions";
 import { DownloadIcon, SlideShowIcon, StopCircleIcon } from "../UI/Icons";
 
 export default function FullPreviewButton() {
-  const { handlePreviewFullSlides, handleSaveAsSlides, isPreviewing, stopPreview } =
+  const { handlePreviewFullSlides, handleSaveAsSlides, isPreviewing, stopPreview, previewWindow } =
     useExportFunctions();
+  useEffect(() => {
+    const handleMessage = (event: MessageEvent) => {
+      if (event.source !== previewWindow) return;
+      if (event.data.type === "preview_closed") {
+        stopPreview();
+      }
+    };
+
+    window.addEventListener("message", handleMessage);
+
+    return () => {
+      window.removeEventListener("message", handleMessage);
+    };
+  }, [previewWindow]);
+
   return (
     <div className="w-full  flex items-center  gap-0.5">
       <button
