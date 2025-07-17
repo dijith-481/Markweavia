@@ -14,6 +14,7 @@ export default function useExportFunctions() {
     activeTheme,
     previewWindow,
     setPreviewWindow,
+    currentSlide,
   } = useSlideContext();
 
   function isPreviewing() {
@@ -35,6 +36,7 @@ export default function useExportFunctions() {
     try {
       const htmlContent = await exportToCustomSlidesHtml(
         markdownText,
+        currentSlide - 1,
         slideLayoutOptions,
         documentTitle,
         theme,

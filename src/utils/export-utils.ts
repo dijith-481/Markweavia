@@ -142,7 +142,6 @@ display: flex;
 flex-direction: column;
 justify-content: flex-start;
 align-items: flex-start;
-gap:5%;
 }
 #first-slide .slide-content-wrapper {
 justify-content: center;
@@ -176,6 +175,7 @@ font-weight:500;
   font-size: var(--slide-h3-size);
 }
 .slide p {
+padding-top: 0.5em;
 padding-left: 5%;
   margin:  0;
 font-weight:400;
@@ -260,6 +260,7 @@ font-size: calc(var(--slide-font-size) * 0.9 );
 font-weight:300;
 }
 .slide table {
+  margin-top: 0.5em;
   width: 100%;
 border-radius: 1vw;
 overflow: hidden;
@@ -291,11 +292,10 @@ padding:0 0 0 0;
   border-left: none;
 }
 .slide img {
-  max-width: 70dvw;
-  max-height: 30dvh;
-  height: auto;
+  align-self: center;
+  max-height:100%;
+  max-width:100%;
   border-radius: 4px;
-  margin: 1em auto;
   display: block;
 }
 .slide input{
@@ -416,6 +416,7 @@ background-color: var(--secondary-color) !important;
 
 export async function exportToCustomSlidesHtml(
   fullMarkdown: string,
+  currentSlide: number,
   layoutOptions?: SlideLayoutOptions,
   documentTitle?: string,
   theme?: Theme,
@@ -484,6 +485,9 @@ export async function exportToCustomSlidesHtml(
       updateNavigationControls();
       adjustFontSizeIfOverflow(slideElements[currentSlideIdx]);
     }
+
+
+
 
     function sendMessageToParentWindow(message) {
       const parentWindow = window.opener || window.parent;
@@ -613,6 +617,7 @@ export async function exportToCustomSlidesHtml(
     document.addEventListener("DOMContentLoaded", () => {
       initializeControls();
       reloadSlides();
+      showSlideByIndex(${currentSlide});
     });
 
     window.addEventListener("message", (event) => {
@@ -625,6 +630,7 @@ export async function exportToCustomSlidesHtml(
     window.addEventListener("beforeunload", () => {
         sendMessageToParentWindow({ type: "preview_closed" });
     });
+
     </script>
   `;
 
