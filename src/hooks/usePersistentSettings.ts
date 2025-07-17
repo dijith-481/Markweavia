@@ -9,7 +9,7 @@ import {
 } from "../utils/local-storage";
 
 export function usePersistentSettings() {
-  const [markdownText, setMarkdownText] = useState<string>("");
+  const [editorText, setEditorText] = useState<string>("");
   const [activeTheme, setActiveTheme] = useState<string>("nordDark");
   const [fontSizeMultiplier, setFontSizeMultiplier] = useState<number>(1);
   const [slideLayoutOptions, setSlideLayoutOptions] = useState<SlideLayoutOptions>({
@@ -19,7 +19,7 @@ export function usePersistentSettings() {
 
   useEffect(() => {
     const savedMarkdown = localStorage.getItem(LOCAL_STORAGE_MARKDOWN_TEXT_KEY);
-    setMarkdownText(savedMarkdown || slideTemplates.initialMarkdown);
+    setEditorText(savedMarkdown || slideTemplates.initialMarkdown);
     setActiveTheme(localStorage.getItem(LOCAL_STORAGE_THEME_KEY) || "nordDark");
     const storedMultiplier = localStorage.getItem(LOCAL_STORAGE_FONT_MULTIPLIER_KEY);
     setFontSizeMultiplier(storedMultiplier ? parseFloat(storedMultiplier) : 1);
@@ -36,10 +36,10 @@ export function usePersistentSettings() {
 
   useEffect(() => {
     const handler = setTimeout(() => {
-      localStorage.setItem(LOCAL_STORAGE_MARKDOWN_TEXT_KEY, markdownText);
+      localStorage.setItem(LOCAL_STORAGE_MARKDOWN_TEXT_KEY, editorText);
     }, 500);
     return () => clearTimeout(handler);
-  }, [markdownText]);
+  }, [editorText]);
 
   useEffect(() => {
     localStorage.setItem(LOCAL_STORAGE_FONT_MULTIPLIER_KEY, fontSizeMultiplier.toString());
@@ -54,8 +54,8 @@ export function usePersistentSettings() {
   }, [activeTheme]);
 
   return {
-    markdownText,
-    setMarkdownText,
+    editorText,
+    setEditorText,
     activeTheme,
     setActiveTheme,
     fontSizeMultiplier,

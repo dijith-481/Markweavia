@@ -19,7 +19,7 @@ export function usePreviewSlide(iframeRef: React.RefObject<HTMLIFrameElement | n
     fontSizeMultiplier,
     activeTheme,
     previewWindow,
-    markdownText,
+    editorText: markdownText,
   } = useSlideContext();
   const [ismarkdownEmpty, setIsMarkdownEmpty] = useState(true);
   useEffect(() => {

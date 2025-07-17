@@ -7,7 +7,7 @@ export default function TemplateSelector() {
   Object.keys(slideTemplates).forEach((key) => {
     slideOptions[key] = key;
   });
-  const { markdownText, setMarkdownText } = useSlideContext();
+  const { editorText: markdownText, setEditorText: setMarkdownText } = useSlideContext();
 
   const loadTemplate = (templateKey: string) => {
     if (markdownText.trim() && !confirm("Your edits will be lost. Continue?")) {

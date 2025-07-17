@@ -26,7 +26,7 @@ const handleFileUpload = (
 
 const FileUpload = forwardRef((_props, ref: ForwardedRef<FileUploadHandle>) => {
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const { setMarkdownText, markdownText } = useSlideContext();
+  const { setEditorText: setMarkdownText, editorText: markdownText } = useSlideContext();
 
   const triggerFileUpload = useCallback(() => {
     if (fileInputRef.current) {

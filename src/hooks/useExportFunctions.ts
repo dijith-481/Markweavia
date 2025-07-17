@@ -8,7 +8,7 @@ import { themes } from "@/utils/themes";
 
 export default function useExportFunctions() {
   const {
-    markdownText,
+    editorText: markdownText,
     slideLayoutOptions,
     fontSizeMultiplier,
     activeTheme,

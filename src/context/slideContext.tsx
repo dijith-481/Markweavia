@@ -4,7 +4,7 @@ import { usePersistentSettings } from "../hooks/usePersistentSettings";
 import { countWords, countLetters } from "../utils/common";
 
 export interface SlideContextState {
-  markdownText: string;
+  editorText: string;
   activeTheme: string;
   fontSizeMultiplier: number;
   currentSlideText: string | null;
@@ -15,10 +15,12 @@ export interface SlideContextState {
   letters: number;
   previewWindow: Window | null;
   setPreviewWindow: React.Dispatch<React.SetStateAction<Window | null>>;
+  markdownText: string;
 }
 
 interface SlideContextType extends SlideContextState {
   setMarkdownText: (markdownText: string) => void;
+  setEditorText: (markdownText: string) => void;
   setActiveTheme: (activeTheme: string) => void;
   setFontSizeMultiplier: React.Dispatch<React.SetStateAction<number>>;
   setCurrentSlideText: (currentSlideText: string) => void;
@@ -39,8 +41,8 @@ export const useSlideContext = (): SlideContextType => {
 
 export const SlideContextProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const {
-    markdownText,
-    setMarkdownText,
+    editorText,
+    setEditorText,
     activeTheme,
     setActiveTheme,
     fontSizeMultiplier,
@@ -49,17 +51,20 @@ export const SlideContextProvider: React.FC<{ children: React.ReactNode }> = ({ 
     setSlideLayoutOptions,
   } = usePersistentSettings();
 
+  const [markdownText, setMarkdownText] = useState<string>("");
   const [currentSlideText, setCurrentSlideText] = useState<string | null>(null);
   const [currentSlide, setCurrentSlide] = useState<number>(1);
   const [totalSlidesNumber, setTotalSlidesNumber] = useState<number>(1);
   const [previewWindow, setPreviewWindow] = useState<Window | null>(null);
 
-  const words = useMemo(() => countWords(markdownText), [markdownText]);
-  const letters = useMemo(() => countLetters(markdownText), [markdownText]);
+  const words = useMemo(() => countWords(editorText), [editorText]);
+  const letters = useMemo(() => countLetters(editorText), [editorText]);
 
   const contextValue = {
     markdownText,
     setMarkdownText,
+    editorText,
+    setEditorText,
     activeTheme,
     setActiveTheme,
     fontSizeMultiplier,
