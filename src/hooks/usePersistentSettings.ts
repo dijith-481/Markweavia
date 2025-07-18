@@ -47,7 +47,7 @@ export function usePersistentSettings() {
 
   useEffect(() => {
     localStorage.setItem(LOCAL_STORAGE_LAYOUT_OPTIONS_KEY, JSON.stringify(slideLayoutOptions));
-  }, [slideLayoutOptions.headerFooters]);
+  }, [slideLayoutOptions.headerFooters, slideLayoutOptions]);
 
   useEffect(() => {
     localStorage.setItem(LOCAL_STORAGE_THEME_KEY, activeTheme);

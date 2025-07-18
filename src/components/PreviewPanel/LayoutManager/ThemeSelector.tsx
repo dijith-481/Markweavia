@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useCallback, useEffect } from "react";
 import { themes } from "@/utils/themes";
 import DropDownButton from "../../UI/DropDownButton";
 import { useSlideContext } from "@/context/slideContext";
@@ -23,14 +23,17 @@ Object.keys(themes).forEach((themeKey) => {
 
 export default function ThemeSelector() {
   const { activeTheme, setActiveTheme } = useSlideContext();
-  const changeTheme = (themeName: keyof typeof themeOptions) => {
-    setActiveTheme(themeName);
-  };
-  const nextTheme = () => {
+  const changeTheme = useCallback(
+    (themeName: keyof typeof themeOptions) => {
+      setActiveTheme(themeName);
+    },
+    [setActiveTheme],
+  );
+  const nextTheme = useCallback(() => {
     const currentIndex = Object.keys(themeOptions).indexOf(activeTheme);
     const nextIndex = (currentIndex + 1) % Object.keys(themeOptions).length;
     changeTheme(Object.keys(themeOptions)[nextIndex]);
-  };
+  }, [activeTheme, changeTheme]);
 
   useEffect(() => {
     Vim.defineEx("theme", "t", nextTheme);

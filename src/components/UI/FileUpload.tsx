@@ -1,5 +1,4 @@
-// FileUpload.tsx
-import React, { useRef, useCallback, forwardRef, ForwardedRef } from "react";
+import React, { useRef, useCallback, forwardRef } from "react";
 import { useSlideContext } from "@/context/slideContext";
 
 export type FileUploadHandle = { triggerFileUpload: () => void };
@@ -24,7 +23,7 @@ const handleFileUpload = (
   }
 };
 
-const FileUpload = forwardRef((_props, ref: ForwardedRef<FileUploadHandle>) => {
+const FileUpload = forwardRef<FileUploadHandle>((_props, ref) => {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { setEditorText: setMarkdownText, editorText: markdownText } = useSlideContext();
 
@@ -67,5 +66,7 @@ const FileUpload = forwardRef((_props, ref: ForwardedRef<FileUploadHandle>) => {
     />
   );
 });
+
+FileUpload.displayName = "FileUpload";
 
 export default FileUpload;

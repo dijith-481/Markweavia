@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState, useLayoutEffect } from "react";
 import { createPortal } from "react-dom";
 
 interface DropDownProps {
-  options: Record<any, string>;
+  options: Record<string, string>;
   selectedOption?: string;
   onSelect: (option: string) => void;
   triggerRef: React.RefObject<HTMLElement | null>;

@@ -1,7 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import useExportFunctions from "@/hooks/useExportFunctions";
-import { GitHubIcon, UploadIcon, DownloadIcon, DonateIcon, StarIcon } from "@/components/UI/Icons";
+import { GitHubIcon, UploadIcon, DownloadIcon, DonateIcon } from "@/components/UI/Icons";
 import DropDownButton from "./UI/DropDownButton";
 import { useEffect, useState } from "react";
 

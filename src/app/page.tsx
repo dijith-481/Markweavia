@@ -8,5 +8,4 @@ export default function Page() {
       <HomePageClient />
     </SlideContextProvider>
   );
-
 }

@@ -1,8 +1,4 @@
-import {
-  createAllHtmlDiv,
-  exportToCustomSlidesHtml,
-  splitMarkdownIntoSlides,
-} from "../utils/export-utils";
+import { exportToCustomSlidesHtml } from "../utils/export-utils";
 import { useSlideContext } from "@/context/slideContext";
 import { themes } from "@/utils/themes";
 

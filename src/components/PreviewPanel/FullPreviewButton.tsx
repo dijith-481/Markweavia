@@ -18,7 +18,7 @@ export default function FullPreviewButton() {
     return () => {
       window.removeEventListener("message", handleMessage);
     };
-  }, [previewWindow]);
+  }, [previewWindow, stopPreview]);
 
   return (
     <div className="w-full  flex items-center  gap-0.5">

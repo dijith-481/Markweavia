@@ -31,7 +31,7 @@ export const metadata: Metadata = {
     siteName: "Markweavia",
     images: [
       {
-        url: "https://markweavia.vercel.app/image.png",
+        url: "https://markweavia.vercel.app/editor.png",
         width: 1200,
         height: 630,
         alt: "Markweavia - Markdown Presentation Tool",

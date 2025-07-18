@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import Button from "../../UI/Button";
 import { CheckboxIcon } from "../../UI/Icons";
 import { useSlideContext } from "@/context/slideContext";
@@ -22,7 +22,7 @@ export default function LayoutSettings({ availableHeaderFooterPositions }: Layou
     );
   }, [slideLayoutOptions]);
 
-  const onToggleShowPageNumbers = () => {
+  const onToggleShowPageNumbers = useCallback(() => {
     if (availableHeaderFooterPositions.length === 0 && !showPageNumbers) {
       alert("No header/footer positions available.Try deleting some");
       return;
@@ -47,7 +47,7 @@ export default function LayoutSettings({ availableHeaderFooterPositions }: Layou
     }
 
     setShowPageNumbers((prev) => !prev);
-  };
+  }, [availableHeaderFooterPositions, showPageNumbers, setSlideLayoutOptions]);
 
   useEffect(() => {
     Vim.defineEx("pageno", "page", onToggleShowPageNumbers);

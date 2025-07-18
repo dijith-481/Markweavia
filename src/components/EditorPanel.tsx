@@ -1,6 +1,6 @@
 import React, { useRef, useEffect, useMemo, useState } from "react";
 import { EditorView } from "@codemirror/view";
-import CodeMirror from "@uiw/react-codemirror";
+import CodeMirror, { ReactCodeMirrorRef } from "@uiw/react-codemirror";
 import { useEditor } from "@/hooks/useEditor";
 import { languages } from "@codemirror/language-data";
 import { vim } from "@replit/codemirror-vim";
@@ -15,7 +15,7 @@ interface EditorPanelProps {
 }
 
 export default function EditorPanel({ fileUploadRef, isMobile }: EditorPanelProps) {
-  const codeMirrorRef = useRef<any>(null);
+  const codeMirrorRef = useRef<ReactCodeMirrorRef>(null);
   const [isVimMode, setIsVimMode] = useState(true);
   const { markdownText, handleMarkdownChange, setIsEditorReady, editorUpdateListener } = useEditor(
     codeMirrorRef,
@@ -25,7 +25,7 @@ export default function EditorPanel({ fileUploadRef, isMobile }: EditorPanelProp
     if (codeMirrorRef.current && codeMirrorRef.current.view) {
       setIsEditorReady(true);
     }
-  }, [codeMirrorRef.current, setIsEditorReady]);
+  }, [setIsEditorReady]);
 
   useEffect(() => {
     if (isMobile) {
@@ -44,7 +44,7 @@ export default function EditorPanel({ fileUploadRef, isMobile }: EditorPanelProp
   );
 
   return (
-    <div className="order-2 relative md:w-1/2 w-full rounded-md md:order-1 bg-nord9/30 h-full min-h-48   overscroll-contain overflow-x-hidden">
+    <div className="order-2 relative md:w-1/2 w-full rounded-md md:order-1 bg-nord0 h-full min-h-48   overscroll-contain overflow-x-hidden">
       <div className="sticky top-2 right-2 z-10 w-full   pointer-events-none flex items-end justify-end  ">
         <div className="w-10 mr-2">
           <Button

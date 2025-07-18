@@ -3,11 +3,11 @@ import { Vim } from "@replit/codemirror-vim";
 import { EditorView } from "@codemirror/view";
 import { useSlideContext } from "../context/slideContext";
 import useExportFunctions from "@/hooks/useExportFunctions";
+import { ReactCodeMirrorRef } from "@uiw/react-codemirror";
 import yaml from "js-yaml";
 
 export function useEditor(
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  codeMirrorRef: React.RefObject<any>,
+  codeMirrorRef: React.RefObject<ReactCodeMirrorRef | null>,
   fileUploadRef: React.RefObject<{ triggerFileUpload: () => void } | null>,
 ) {
   const {
@@ -16,7 +16,6 @@ export function useEditor(
     setCurrentSlide,
     setTotalSlidesNumber,
     setCurrentSlideText,
-    markdownText,
     setMarkdownText,
   } = useSlideContext();
   const { handleSaveAsSlides, handleDownloadMd, handlePreviewFullSlides } = useExportFunctions();
@@ -104,7 +103,7 @@ export function useEditor(
 
     const currentSlideText = doc.sliceString(slideStartPos, slideEndPos).trim();
     setCurrentSlideText(currentSlideText);
-  }, [codeMirrorRef]);
+  }, [codeMirrorRef, setCurrentSlideText, setCurrentSlide, setTotalSlidesNumber]);
 
   const editorUpdateListener = useMemo(
     () =>
@@ -160,14 +159,14 @@ export function useEditor(
     return () => {
       window.removeEventListener("keydown", handleKeyDown);
     };
-  }, [focusCodeMirror, codeMirrorRef]);
+  }, [focusCodeMirror, codeMirrorRef, handleDownloadMd, handleSaveAsSlides, triggerFileUpload]);
 
   useEffect(() => {
     Vim.defineEx("write", "w", handleDownloadMd);
     Vim.defineEx("wslide", "ws", handleSaveAsSlides);
     Vim.defineEx("upload", "u", triggerFileUpload);
     Vim.defineEx("preview", "p", handlePreviewFullSlides);
-  }, [handleDownloadMd, handleSaveAsSlides]);
+  }, [handleDownloadMd, handleSaveAsSlides, triggerFileUpload, handlePreviewFullSlides]);
 
   return {
     markdownText: editorText,

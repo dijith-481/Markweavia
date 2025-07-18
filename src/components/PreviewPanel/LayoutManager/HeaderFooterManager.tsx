@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { PAGE_NUMBER_SLIDE_ID } from "@/utils/local-storage";
 import { useSlideContext } from "@/context/slideContext";
 import {
@@ -67,14 +67,14 @@ export default function HeaderFooterManager({
       : "bottom-center",
   );
 
-  const onToggleAddForm = () => {
+  const onToggleAddForm = useCallback(() => {
     if (availableHeaderFooterPositions.length === 0) {
       alert("No header/footer positions available.Try deleting some");
     } else {
       setIsEditing((prev) => !prev);
       setFormOpen((prev) => !prev);
     }
-  };
+  }, [availableHeaderFooterPositions, setIsEditing]);
 
   useEffect(() => {
     if (
@@ -116,7 +116,7 @@ export default function HeaderFooterManager({
     return () => {
       window.removeEventListener("keydown", handleKeyDown);
     };
-  }, [formOpen]);
+  }, [formOpen, onToggleAddForm]);
 
   const layoutItemMap: Record<layoutItemPosition, layoutItemLabel> =
     availableHeaderFooterPositions.reduce(
@@ -131,13 +131,16 @@ export default function HeaderFooterManager({
     setNewItemPosition(position as layoutItemPosition);
   };
 
-  const handleClickOutside = (event: MouseEvent) => {
-    if (newItemTextRef.current && !newItemTextRef.current.contains(event.target as Node)) {
-      setIsEditing(false);
-      setIsEditingText("");
-      setNewItemText("");
-    }
-  };
+  const handleClickOutside = useCallback(
+    (event: MouseEvent) => {
+      if (newItemTextRef.current && !newItemTextRef.current.contains(event.target as Node)) {
+        setIsEditing(false);
+        setIsEditingText("");
+        setNewItemText("");
+      }
+    },
+    [setIsEditing, setIsEditingText, setNewItemText],
+  );
 
   useEffect(() => {
     document.addEventListener("mousedown", handleClickOutside);

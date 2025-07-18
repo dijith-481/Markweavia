@@ -46,7 +46,14 @@ export function usePreviewSlide(iframeRef: React.RefObject<HTMLIFrameElement | n
     if (!ismarkdownEmpty) {
       generatePreview();
     }
-  }, [ismarkdownEmpty]);
+  }, [
+    ismarkdownEmpty,
+    activeTheme,
+    currentSlideText,
+    currentSlide,
+    slideLayoutOptions,
+    fontSizeMultiplier,
+  ]);
 
   useEffect(() => {
     const generatePreview = async () => {
@@ -75,7 +82,7 @@ export function usePreviewSlide(iframeRef: React.RefObject<HTMLIFrameElement | n
 
     generatePreview();
     generateFullPreview();
-  }, [currentSlideText, slideLayoutOptions, currentSlide]);
+  }, [currentSlideText, slideLayoutOptions, currentSlide, iframeRef, previewWindow, markdownText]);
 
   useEffect(() => {
     const css = generateFontSizesCss(fontSizeMultiplier);
@@ -90,7 +97,7 @@ export function usePreviewSlide(iframeRef: React.RefObject<HTMLIFrameElement | n
         );
       }
     }
-  }, [fontSizeMultiplier]);
+  }, [fontSizeMultiplier, iframeRef]);
 
   useEffect(() => {
     const theme = themes[activeTheme as keyof typeof themes];
@@ -106,7 +113,7 @@ export function usePreviewSlide(iframeRef: React.RefObject<HTMLIFrameElement | n
         );
       }
     }
-  }, [activeTheme]);
+  }, [activeTheme, iframeRef]);
 
   return {
     previewHtml,
