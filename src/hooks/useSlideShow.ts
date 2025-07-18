@@ -6,12 +6,10 @@ import { createHtmlBlob } from "@/utils/file-functions";
 export default function useSlideShow() {
   const {
     markdownText,
-    slideLayoutOptions,
-    fontSizeMultiplier,
-    activeTheme,
     previewWindow: slideShowBrowserTab,
     setPreviewWindow: setSlideShowBrowserTab,
     currentSlide,
+    config,
   } = useSlideContext();
 
   function isSlideShowRunning() {
@@ -30,17 +28,12 @@ export default function useSlideShow() {
       slideShowBrowserTab!.focus();
       return;
     }
-    const theme = themes[activeTheme as keyof typeof themes];
+    const themeString = config.theme;
+    const theme = themes[themeString as keyof typeof themes];
+    console.log(theme);
     const documentTitle = getFilenameFromFirstH1(markdownText, "Slide Show");
-    const htmlBlob = await createHtmlBlob(
-      markdownText,
-      currentSlide - 1,
-      slideLayoutOptions,
-      documentTitle,
-      theme,
-      fontSizeMultiplier,
-    );
-    createAndOpenBrowserTab(htmlBlob);
+    const htmlBlob = await createHtmlBlob(markdownText, currentSlide - 1, documentTitle, config);
+    setSlideShowBrowserTab(createAndOpenBrowserTab(htmlBlob));
   }
 
   function createAndOpenBrowserTab(htmlBlob: Blob): Window | null {

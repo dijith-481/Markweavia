@@ -1,5 +1,5 @@
 import { marked } from "marked";
-import { SlideLayoutOptions } from "./layoutOptions";
+import { headerFooterPosition, SlideConfig, SlideLayoutOptions } from "./layoutOptions";
 import { PAGE_NUMBER_SLIDE_ID } from "@/utils/local-storage";
 import { themes } from "./themes";
 import { Theme } from "./themes";
@@ -48,7 +48,7 @@ export function generateThemeCss(theme?: Theme): string {
   return css;
 }
 
-export function generateFontSizesCss(fontSizeMultiplier: number | undefined): string {
+export function generateFontSizesCss(fontSizeMultiplier = 1): string {
   const fontSizes = {
     "--slide-font-size": `calc(2.4dvw * ${fontSizeMultiplier})`,
     "--slide-h1-size": `calc(7dvw * ${fontSizeMultiplier})`,
@@ -417,15 +417,14 @@ background-color: var(--secondary-color) !important;
 export async function exportToCustomSlidesHtml(
   fullMarkdown: string,
   currentSlide: number,
-  layoutOptions: SlideLayoutOptions,
   documentTitle: string,
-  theme: Theme,
-  fontSizeMultiplier: number,
+  config: SlideConfig,
 ): Promise<string> {
   const hasCode = hasCodeBlocks(fullMarkdown);
   const { inter, iosevka } = await getEncodedFonts();
+  const theme = themes[config.theme as keyof typeof themes];
   const themeCss = generateThemeCss(theme);
-  const fontSizesCss = generateFontSizesCss(fontSizeMultiplier);
+  const fontSizesCss = generateFontSizesCss(config.fontSize);
 
   const styles = `
     <style>
@@ -637,7 +636,12 @@ export async function exportToCustomSlidesHtml(
   const slideMarkdownArray = splitMarkdownIntoSlides(fullMarkdown);
   let slidesHtmlContent = '<div id="slides-container" class="">';
 
-  slidesHtmlContent += await createAllHtmlDiv(slideMarkdownArray, layoutOptions, fullMarkdown);
+  slidesHtmlContent += await createAllHtmlDiv(
+    slideMarkdownArray,
+    config.headerFooters,
+    config.layoutOnFirstPage,
+    fullMarkdown,
+  );
 
   slidesHtmlContent += `
     <div data-slide-index="${slideMarkdownArray.length}" class="slide">
@@ -931,9 +935,24 @@ ${body}
   `;
 }
 
+function generateLayoutAdditions(headerFooters: headerFooterPosition, pageNo: number): string {
+  let layoutAdditions = "";
+  Object.entries(headerFooters).forEach((verticalPosition) => {
+    Object.entries(verticalPosition[1]).forEach((horizontalPosition) => {
+      let headerFooter = horizontalPosition[1];
+      if (headerFooter) {
+        if (headerFooter === "{pg}") headerFooter = pageNo;
+        layoutAdditions += `<div class="slide-header-footer-item pos-${verticalPosition[0]}-${horizontalPosition[0]}">${headerFooter}</div>`;
+      }
+    });
+  });
+  return layoutAdditions;
+}
+
 export async function createAllHtmlDiv(
   slideMarkdownArray: string[],
-  layoutOptions: SlideLayoutOptions | undefined,
+  headerFooters: headerFooterPosition | undefined,
+  headerFooterOnFirstPage: boolean | undefined,
   fullMarkdown: string,
 ): Promise<string> {
   let slidesHtmlContent = "";
@@ -943,17 +962,11 @@ export async function createAllHtmlDiv(
       const slideContentHtml = await marked.parse(slideMd.trim());
       const slideIdAttribute = i === 0 ? ' id="first-slide" class="slide active"' : 'class="slide"';
       let layoutAdditions = "";
-      if (layoutOptions) {
-        if (i > 0 || layoutOptions.layoutOnFirstPage) {
-          layoutOptions.headerFooters.forEach((item) => {
-            if (item.id === PAGE_NUMBER_SLIDE_ID) {
-              layoutAdditions += `<div class="slide-page-number pos-${item.position}">${i + 1}</div>`;
-            } else {
-              layoutAdditions += `<div class="slide-header-footer-item pos-${item.position}">${item.text}</div>`;
-            }
-          });
-        }
+      console.log(headerFooterOnFirstPage);
+      if (headerFooters && (i > 0 || headerFooterOnFirstPage)) {
+        layoutAdditions = generateLayoutAdditions(headerFooters, i + 1);
       }
+
       slidesHtmlContent += `
         <div data-slide-index="${i}" ${slideIdAttribute}>
           <div class="slide-content-wrapper">${slideContentHtml}</div>
@@ -963,10 +976,8 @@ export async function createAllHtmlDiv(
     }
   } else {
     let fallbackLayoutAdditions = "";
-    if (layoutOptions) {
-      layoutOptions.headerFooters.forEach((item) => {
-        fallbackLayoutAdditions += `<div class="slide-header-footer-item pos-${item.position}">${item.text}</div>`;
-      });
+    if (headerFooters) {
+      fallbackLayoutAdditions = generateLayoutAdditions(headerFooters, 0);
     }
     const fallbackHtml = fullMarkdown.trim()
       ? await marked.parse(fullMarkdown.trim())

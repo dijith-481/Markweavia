@@ -1,10 +1,13 @@
-import { useMemo, useState, useCallback, useEffect, useRef } from "react";
+import { useMemo, useState, useCallback, useRef, useEffect } from "react";
 import { Vim } from "@replit/codemirror-vim";
 import { EditorView } from "@codemirror/view";
 import { useSlideContext } from "../context/slideContext";
-import useExportFunctions from "@/hooks/useExportFunctions";
 import { ReactCodeMirrorRef } from "@uiw/react-codemirror";
 import yaml from "js-yaml";
+import { downloadSlides, downloadMd } from "@/utils/download";
+import { themes } from "@/utils/themes";
+import useSlideShow from "./useSlideShow";
+import { SlideConfig } from "@/utils/layoutOptions";
 
 export function useEditor(
   codeMirrorRef: React.RefObject<ReactCodeMirrorRef | null>,
@@ -12,13 +15,20 @@ export function useEditor(
 ) {
   const {
     editorText,
+    markdownText,
+    activeTheme,
+    fontSizeMultiplier,
+    slideLayoutOptions,
+    currentSlide,
     setEditorText,
     setCurrentSlide,
     setTotalSlidesNumber,
     setCurrentSlideText,
     setMarkdownText,
+    setConfig,
   } = useSlideContext();
-  const { handleSaveAsSlides, handleDownloadMd, handlePreviewFullSlides } = useExportFunctions();
+  const { startSlideShow } = useSlideShow();
+
   const lastconfig = useRef("");
 
   const [isEditorReady, setIsEditorReady] = useState(false);
@@ -31,17 +41,21 @@ export function useEditor(
     }
     return [match[1], editorText.replace(frontMatterRegex, "")];
   };
-  const handleConfigChange = (config: string) => {
-    if (config !== lastconfig.current) {
-      lastconfig.current = config;
-      try {
-        const data = yaml.load(config);
-        console.log(data);
-      } catch (error) {
-        console.log("Failed to parse front matter:", error);
+
+  const handleConfigChange = useCallback(
+    (config: string) => {
+      if (config !== lastconfig.current) {
+        lastconfig.current = config;
+        try {
+          const data = yaml.load(config) as SlideConfig;
+          setConfig(data);
+        } catch (error) {
+          console.log("Failed to parse front matter:", error);
+        }
       }
-    }
-  };
+    },
+    [setConfig],
+  );
 
   const handleMarkdownChange = useCallback(
     (value: string) => {
@@ -50,7 +64,7 @@ export function useEditor(
       setMarkdownText(content);
       handleConfigChange(config);
     },
-    [setEditorText, setMarkdownText],
+    [setEditorText, setMarkdownText, handleConfigChange],
   );
 
   const triggerFileUpload = useCallback(() => {
@@ -118,6 +132,27 @@ export function useEditor(
     [processEditorState, isEditorReady],
   );
 
+  const download = useCallback(
+    (option: string) => {
+      const theme = themes[activeTheme as keyof typeof themes];
+      switch (option) {
+        case "Slides":
+          downloadSlides(
+            markdownText,
+            currentSlide - 1,
+            slideLayoutOptions,
+            theme,
+            fontSizeMultiplier,
+          );
+          break;
+        case ".md":
+          downloadMd(markdownText);
+          break;
+      }
+    },
+    [markdownText, currentSlide, slideLayoutOptions, activeTheme, fontSizeMultiplier],
+  );
+
   const focusCodeMirror = useCallback(() => {
     if (codeMirrorRef.current && codeMirrorRef.current.view) {
       codeMirrorRef.current.view.focus();
@@ -144,7 +179,7 @@ export function useEditor(
         }
       } else if ((event.ctrlKey || event.metaKey) && event.key === "s" && !event.shiftKey) {
         event.preventDefault();
-        handleDownloadMd();
+        download(".md");
       }
       if ((event.ctrlKey || event.metaKey) && event.key === "o") {
         event.preventDefault();
@@ -152,24 +187,25 @@ export function useEditor(
       }
       if ((event.ctrlKey || event.metaKey) && event.shiftKey && event.key.toLowerCase() === "s") {
         event.preventDefault();
-        handleSaveAsSlides();
+        download("Slides");
       }
     };
     window.addEventListener("keydown", handleKeyDown);
     return () => {
       window.removeEventListener("keydown", handleKeyDown);
     };
-  }, [focusCodeMirror, codeMirrorRef, handleDownloadMd, handleSaveAsSlides, triggerFileUpload]);
+  }, [focusCodeMirror, codeMirrorRef, triggerFileUpload, download]);
 
   useEffect(() => {
-    Vim.defineEx("write", "w", handleDownloadMd);
-    Vim.defineEx("wslide", "ws", handleSaveAsSlides);
+    Vim.defineEx("write", "w", download.bind(null, ".md"));
+    Vim.defineEx("wslide", "ws", download.bind(null, "Slides"));
     Vim.defineEx("upload", "u", triggerFileUpload);
-    Vim.defineEx("preview", "p", handlePreviewFullSlides);
-  }, [handleDownloadMd, handleSaveAsSlides, triggerFileUpload, handlePreviewFullSlides]);
+    Vim.defineEx("preview", "p", startSlideShow);
+  }, [triggerFileUpload, download, startSlideShow]);
 
   return {
-    markdownText: editorText,
+    editorText,
+    markdownText,
     handleMarkdownChange,
     setIsEditorReady,
     editorUpdateListener,

@@ -1,6 +1,5 @@
 import { exportToCustomSlidesHtml } from "./export-utils";
-import { SlideLayoutOptions } from "./layoutOptions";
-import { Theme } from "@/utils/themes";
+import { SlideConfig } from "./layoutOptions";
 
 export function getFilenameFromFirstH1(content: string | null, defaultName = "document"): string {
   if (!content || typeof content !== "string") {
@@ -24,10 +23,8 @@ export function getFilenameFromFirstH1(content: string | null, defaultName = "do
 export async function createHtmlBlob(
   markdownText: string,
   currentSlide: number,
-  slideLayoutOptions: SlideLayoutOptions,
   documentTitle: string,
-  theme: Theme,
-  fontSizeMultiplier: number,
+  config: SlideConfig,
 ): Promise<Blob> {
   if (!markdownText.trim()) {
     throw new Error("Nothing to process! Write some Markdown first.");
@@ -36,10 +33,8 @@ export async function createHtmlBlob(
     const htmlContent = await exportToCustomSlidesHtml(
       markdownText,
       currentSlide - 1,
-      slideLayoutOptions,
       documentTitle,
-      theme,
-      fontSizeMultiplier,
+      config,
     );
     return new Blob([htmlContent], { type: "text/html;charset=utf-8;" });
   } catch (error) {
