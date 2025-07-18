@@ -1,19 +1,27 @@
 import React, { useEffect } from "react";
-import useExportFunctions from "@/hooks/useExportFunctions";
 import { DownloadIcon, SlideShowIcon, StopCircleIcon } from "../UI/Icons";
 import useSlideShow from "@/hooks/useSlideShow";
+import { downloadSlides } from "@/utils/download";
+import { useSlideContext } from "@/context/slideContext";
+import { themes } from "@/utils/themes";
 
 export default function FullPreviewButton() {
-  const { handleSaveAsSlides } = useExportFunctions();
   const { startSlideShow, stopSlideShow, isSlideShowRunning, handleMessageFromSlideShow } =
     useSlideShow();
+  const { markdownText, currentSlide, slideLayoutOptions, fontSizeMultiplier, activeTheme } =
+    useSlideContext();
+  const download = () => {
+    const theme = themes[activeTheme as keyof typeof themes];
+    downloadSlides(markdownText, currentSlide - 1, slideLayoutOptions, theme, fontSizeMultiplier);
+  };
+
   useEffect(() => {
     window.addEventListener("message", handleMessageFromSlideShow);
 
     return () => {
       window.removeEventListener("message", handleMessageFromSlideShow);
     };
-  }, [startSlideShow, stopSlideShow, handleMessageFromSlideShow]);
+  }, [handleMessageFromSlideShow]);
 
   return (
     <div className="w-full  flex items-center  gap-0.5">
@@ -43,7 +51,7 @@ export default function FullPreviewButton() {
         </button>
       ) : (
         <button
-          onClick={handleSaveAsSlides}
+          onClick={download}
           className="flex  flex-row items-center bg-nord7/80 hover:bg-nord7 group transition-all  px-2 delay-100 py-1 rounded-r-xl hover:rounded-r-md ease-in-out duration-700  w-10 hover:w-36 overflow-hidden"
           title="Download slides"
         >

@@ -417,10 +417,10 @@ background-color: var(--secondary-color) !important;
 export async function exportToCustomSlidesHtml(
   fullMarkdown: string,
   currentSlide: number,
-  layoutOptions?: SlideLayoutOptions,
-  documentTitle?: string,
-  theme?: Theme,
-  fontSizeMultiplier?: number,
+  layoutOptions: SlideLayoutOptions,
+  documentTitle: string,
+  theme: Theme,
+  fontSizeMultiplier: number,
 ): Promise<string> {
   const hasCode = hasCodeBlocks(fullMarkdown);
   const { inter, iosevka } = await getEncodedFonts();

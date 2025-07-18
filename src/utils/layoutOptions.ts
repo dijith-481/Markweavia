@@ -17,6 +17,25 @@ export interface SlideLayoutOptions {
   headerFooters: layoutItem[];
 }
 
+type ThemeString = "nordDark" | "nordLight" | "proWhiteMonochrome" | "proBlackMonochrome";
+
+export interface headerFooterHorizontalPosition {
+  left?: layoutItem;
+  center?: layoutItem;
+  right?: layoutItem;
+}
+export interface headerFooterPosition {
+  top?: headerFooterHorizontalPosition;
+  bottom?: headerFooterHorizontalPosition;
+}
+
+export interface SlideConfig {
+  theme?: ThemeString;
+  fontSize?: number;
+  headerFooters?: headerFooterPosition;
+  layoutOnFirstPage?: boolean;
+}
+
 export const headerFooterPositions = [
   { value: "top-left", label: "Top Left" },
   { value: "top-center", label: "Top Center" },

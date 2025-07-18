@@ -1,4 +1,4 @@
-export const themes = {
+export const themes: Record<string, Theme> = {
   nordDark: {
     "--background-color": "#2e3440",
     "--background-color-secondary": "#3b4252",

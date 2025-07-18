@@ -1,6 +1,6 @@
 import { exportToCustomSlidesHtml } from "./export-utils";
 import { SlideLayoutOptions } from "./layoutOptions";
-import { Theme, themes } from "@/utils/themes";
+import { Theme } from "@/utils/themes";
 
 export function getFilenameFromFirstH1(content: string | null, defaultName = "document"): string {
   if (!content || typeof content !== "string") {

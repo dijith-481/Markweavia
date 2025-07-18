@@ -17,7 +17,7 @@ interface EditorPanelProps {
 export default function EditorPanel({ fileUploadRef, isMobile }: EditorPanelProps) {
   const codeMirrorRef = useRef<ReactCodeMirrorRef>(null);
   const [isVimMode, setIsVimMode] = useState(true);
-  const { markdownText, handleMarkdownChange, setIsEditorReady, editorUpdateListener } = useEditor(
+  const { handleMarkdownChange, setIsEditorReady, editorUpdateListener, editorText } = useEditor(
     codeMirrorRef,
     fileUploadRef,
   );
@@ -59,7 +59,7 @@ export default function EditorPanel({ fileUploadRef, isMobile }: EditorPanelProp
         </div>
       </div>
       <CodeMirror
-        value={markdownText}
+        value={editorText}
         extensions={extensions}
         onChange={handleMarkdownChange}
         theme={nord}

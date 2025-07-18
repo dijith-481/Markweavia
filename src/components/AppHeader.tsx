@@ -4,6 +4,9 @@ import useExportFunctions from "@/hooks/useExportFunctions";
 import { GitHubIcon, UploadIcon, DownloadIcon, DonateIcon } from "@/components/UI/Icons";
 import DropDownButton from "./UI/DropDownButton";
 import { useEffect, useState } from "react";
+import { downloadMd, downloadSlides } from "@/utils/download";
+import { useSlideContext } from "@/context/slideContext";
+import { themes } from "@/utils/themes";
 
 interface AppHeaderProps {
   fileUploadRef: React.RefObject<{ triggerFileUpload: () => void } | null>;
@@ -11,9 +14,28 @@ interface AppHeaderProps {
 
 export default function AppHeader({ fileUploadRef }: AppHeaderProps) {
   const triggerFileUpload = () => fileUploadRef.current?.triggerFileUpload();
+  const { markdownText, currentSlide, slideLayoutOptions, fontSizeMultiplier, activeTheme } =
+    useSlideContext();
 
-  const { handleDownloadMd, handleSaveAsSlides } = useExportFunctions();
   const [starCount, setStarCount] = useState(0);
+
+  const download = (option: string) => {
+    const theme = themes[activeTheme as keyof typeof themes];
+    switch (option) {
+      case "Slides":
+        downloadSlides(
+          markdownText,
+          currentSlide - 1,
+          slideLayoutOptions,
+          theme,
+          fontSizeMultiplier,
+        );
+        break;
+      case ".md":
+        downloadMd(markdownText);
+        break;
+    }
+  };
 
   useEffect(() => {
     fetch("https://api.github.com/repos/dijith-481/markweavia")
@@ -52,13 +74,7 @@ export default function AppHeader({ fileUploadRef }: AppHeaderProps) {
               Slides: "HTML Slides",
               ".md": "Markdown (.md)",
             }}
-            onSelect={(option) => {
-              if (option === ".md") {
-                handleDownloadMd();
-              } else {
-                handleSaveAsSlides();
-              }
-            }}
+            onSelect={download}
           >
             <span className="flex-shrink-0 ">
               <DownloadIcon />
