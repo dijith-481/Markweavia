@@ -794,19 +794,11 @@ export async function exportToCustomSlidesHtml(
 export async function exportSingleSlideToHtmlbody(
   slideMarkdown: string | null,
   currentPageNo: number,
-  layoutOptions?: SlideLayoutOptions,
+  config: SlideConfig,
 ): Promise<string> {
   let layoutAdditions = "";
-  if (layoutOptions) {
-    if (currentPageNo > 1 || layoutOptions.layoutOnFirstPage) {
-      layoutOptions.headerFooters.forEach((item) => {
-        if (item.id === PAGE_NUMBER_SLIDE_ID) {
-          layoutAdditions += `<div class="slide-page-number pos-${item.position}">${currentPageNo}</div>`;
-        } else {
-          layoutAdditions += `<div class="slide-header-footer-item pos-${item.position}">${item.text}</div>`;
-        }
-      });
-    }
+  if (config.headerFooters && (currentPageNo > 1 || config.layoutOnFirstPage)) {
+    layoutAdditions = generateLayoutAdditions(config.headerFooters, currentPageNo);
   }
   const slideIdAttribute =
     currentPageNo === 1 ? ' id="first-slide" class="slide active"' : 'class="slide active"';
@@ -827,19 +819,18 @@ export async function exportSingleSlideToHtmlbody(
 `;
 }
 export async function exportSingleSlideToHtml(
-  theme: Theme,
-  fontSizeMultiplier: number,
   slideMarkdown: string | null,
   currentPageNo: number,
-  layoutOptions?: SlideLayoutOptions,
+  config: SlideConfig,
 ) {
+  const theme = themes[config.theme as keyof typeof themes];
   const themeCss = generateThemeCss(theme);
-  const fontSizesCss = generateFontSizesCss(fontSizeMultiplier);
+  const fontSizesCss = generateFontSizesCss(config.fontSize);
   const prismCss = await getprsmCss();
   const prismJs = await getprismJs();
   const katexCss = await getKatexCss();
   const { inter, iosevka } = await getEncodedFonts();
-  const body = await exportSingleSlideToHtmlbody(slideMarkdown, currentPageNo, layoutOptions);
+  const body = await exportSingleSlideToHtmlbody(slideMarkdown, currentPageNo, config);
 
   const styles = `
     <style>
