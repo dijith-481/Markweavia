@@ -1,15 +1,13 @@
-import { createContext, useMemo, useState, useContext } from "react";
-import { SlideConfig, SlideLayoutOptions } from "../utils/layoutOptions";
+import { createContext, useMemo, useState, useContext, useRef, RefObject } from "react";
+import { SlideConfig } from "../utils/layoutOptions";
 import { usePersistentSettings } from "../hooks/usePersistentSettings";
 import { countWords, countLetters } from "../utils/common";
+import { EditorView } from "@codemirror/view";
 
 export interface SlideContextState {
   editorText: string;
   config: SlideConfig;
-  activeTheme: string;
-  fontSizeMultiplier: number;
   currentSlideText: string | null;
-  slideLayoutOptions: SlideLayoutOptions;
   currentSlide: number;
   totalSlidesNumber: number;
   words: number;
@@ -23,12 +21,10 @@ interface SlideContextType extends SlideContextState {
   setConfig: (config: SlideConfig) => void;
   setMarkdownText: (markdownText: string) => void;
   setEditorText: (markdownText: string) => void;
-  setActiveTheme: (activeTheme: string) => void;
-  setFontSizeMultiplier: React.Dispatch<React.SetStateAction<number>>;
   setCurrentSlideText: (currentSlideText: string) => void;
-  setSlideLayoutOptions: React.Dispatch<React.SetStateAction<SlideLayoutOptions>>;
   setTotalSlidesNumber: (totalSlidesNumber: number) => void;
   setCurrentSlide: (currentSlide: number) => void;
+  editorViewRef: RefObject<EditorView | null>;
 }
 
 const SlideContext = createContext<SlideContextType | null>(null);
@@ -42,23 +38,15 @@ export const useSlideContext = (): SlideContextType => {
 };
 
 export const SlideContextProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const {
-    editorText,
-    setEditorText,
-    activeTheme,
-    setActiveTheme,
-    fontSizeMultiplier,
-    setFontSizeMultiplier,
-    slideLayoutOptions,
-    setSlideLayoutOptions,
-  } = usePersistentSettings();
-
   const [markdownText, setMarkdownText] = useState<string>("");
   const [currentSlideText, setCurrentSlideText] = useState<string | null>(null);
   const [currentSlide, setCurrentSlide] = useState<number>(1);
   const [totalSlidesNumber, setTotalSlidesNumber] = useState<number>(1);
   const [previewWindow, setPreviewWindow] = useState<Window | null>(null);
   const [config, setConfig] = useState<SlideConfig>({});
+  const editorViewRef = useRef<EditorView | null>(null);
+
+  const { editorText, setEditorText } = usePersistentSettings();
 
   const words = useMemo(() => countWords(editorText), [editorText]);
   const letters = useMemo(() => countLetters(editorText), [editorText]);
@@ -70,22 +58,17 @@ export const SlideContextProvider: React.FC<{ children: React.ReactNode }> = ({ 
     setMarkdownText,
     editorText,
     setEditorText,
-    activeTheme,
-    setActiveTheme,
-    fontSizeMultiplier,
-    setFontSizeMultiplier,
     currentSlideText,
     setCurrentSlideText,
     currentSlide,
     setCurrentSlide,
     totalSlidesNumber,
     setTotalSlidesNumber,
-    slideLayoutOptions,
-    setSlideLayoutOptions,
     words,
     letters,
     previewWindow,
     setPreviewWindow,
+    editorViewRef,
   };
   return <SlideContext.Provider value={contextValue}>{children}</SlideContext.Provider>;
 };
