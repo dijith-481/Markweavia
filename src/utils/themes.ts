@@ -13,14 +13,14 @@ export const themes: Record<string, Theme> = {
     "--primary-color": "#5E81AC",
     "--secondary-color": "#81a1c1",
   },
-  proWhiteMonochrome: {
+  trueWhite: {
     "--background-color": "#FFFFFF",
     "--background-color-secondary": "#cccccc",
     "--text-color": "#212121",
     "--primary-color": "#121212",
     "--secondary-color": "#121212",
   },
-  proBlackMonochrome: {
+  trueBlack: {
     "--background-color": "#121212",
     "--background-color-secondary": "#2c2c2c",
     "--text-color": "#E0E0E0",
