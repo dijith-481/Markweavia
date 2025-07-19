@@ -8,6 +8,7 @@ import { downloadSlides, downloadMd } from "@/utils/download";
 import { themes } from "@/utils/themes";
 import useSlideShow from "./useSlideShow";
 import { SlideConfig } from "@/utils/layoutOptions";
+import { frontMatterRegex } from "@/constants";
 
 export function useEditor(
   codeMirrorRef: React.RefObject<ReactCodeMirrorRef | null>,
@@ -16,9 +17,7 @@ export function useEditor(
   const {
     editorText,
     markdownText,
-    activeTheme,
-    fontSizeMultiplier,
-    slideLayoutOptions,
+    config,
     currentSlide,
     setEditorText,
     setCurrentSlide,
@@ -26,15 +25,16 @@ export function useEditor(
     setCurrentSlideText,
     setMarkdownText,
     setConfig,
+    editorViewRef,
   } = useSlideContext();
   const { startSlideShow } = useSlideShow();
+  const [isYamlError, setIsYamlError] = useState(false);
 
   const lastconfig = useRef("");
 
   const [isEditorReady, setIsEditorReady] = useState(false);
 
   const extractParts = (editorText: string) => {
-    const frontMatterRegex = /^---\r?\n([\s\S]+?)\r?\n---/;
     const match = editorText.match(frontMatterRegex);
     if (!match) {
       return ["", editorText];
@@ -49,22 +49,27 @@ export function useEditor(
         try {
           const data = yaml.load(config) as SlideConfig;
           setConfig(data);
+          setIsYamlError(false);
         } catch (error) {
           console.log("Failed to parse front matter:", error);
+          setCurrentSlideText(error.reason);
+          setIsYamlError(true);
+          setCurrentSlide(0);
         }
       }
     },
-    [setConfig],
+    [setConfig, setCurrentSlideText, setCurrentSlide, setIsYamlError],
   );
 
-  const handleMarkdownChange = useCallback(
+  const handleEditorChange = useCallback(
     (value: string) => {
       setEditorText(value);
+
       const [config, content] = extractParts(value);
       setMarkdownText(content);
       handleConfigChange(config);
     },
-    [setEditorText, setMarkdownText, handleConfigChange],
+    [setEditorText, handleConfigChange, setMarkdownText],
   );
 
   const triggerFileUpload = useCallback(() => {
@@ -89,9 +94,18 @@ export function useEditor(
     let slideStartIndex = -1;
     let slideEndIndex = -1;
     let headingsAboveCursor = 0;
+    let configStartIndex = -1;
+    let configEndIndex = -1;
 
     for (let i = 1; i <= doc.lines; i++) {
       const lineText = doc.line(i).text.trimStart();
+      if (lineText.startsWith("---")) {
+        if (configStartIndex !== -1 && configEndIndex === -1) {
+          configEndIndex = i;
+        } else if (configStartIndex === -1) {
+          configStartIndex = i;
+        }
+      }
       if (lineText.startsWith("# ") || lineText.startsWith("## ")) {
         MainHeadings.push(i);
         if (cursorLineNumber >= i) {
@@ -102,13 +116,19 @@ export function useEditor(
         }
       }
     }
+    const isConfiguring =
+      configStartIndex !== -1 && configEndIndex !== -1 && configEndIndex >= cursorLineNumber;
 
     setTotalSlidesNumber(Math.max(MainHeadings.length, 1));
     setCurrentSlide(Math.max(headingsAboveCursor, 1));
 
     if (slideStartIndex === -1) {
-      // setCurrentSlideText(doc.toString());
       setCurrentSlideText("");
+      if (isConfiguring) {
+        setCurrentSlide(-2);
+        return;
+      }
+      setCurrentSlide(-1);
       return;
     }
 
@@ -117,7 +137,7 @@ export function useEditor(
 
     const currentSlideText = doc.sliceString(slideStartPos, slideEndPos).trim();
     setCurrentSlideText(currentSlideText);
-  }, [codeMirrorRef, setCurrentSlideText, setCurrentSlide, setTotalSlidesNumber]);
+  }, [codeMirrorRef, setCurrentSlideText, setCurrentSlide, setTotalSlidesNumber, isYamlError]);
 
   const editorUpdateListener = useMemo(
     () =>
@@ -134,23 +154,16 @@ export function useEditor(
 
   const download = useCallback(
     (option: string) => {
-      const theme = themes[activeTheme as keyof typeof themes];
       switch (option) {
         case "Slides":
-          downloadSlides(
-            markdownText,
-            currentSlide - 1,
-            slideLayoutOptions,
-            theme,
-            fontSizeMultiplier,
-          );
+          downloadSlides(markdownText, config);
           break;
         case ".md":
           downloadMd(markdownText);
           break;
       }
     },
-    [markdownText, currentSlide, slideLayoutOptions, activeTheme, fontSizeMultiplier],
+    [markdownText, config],
   );
 
   const focusCodeMirror = useCallback(() => {
@@ -206,9 +219,10 @@ export function useEditor(
   return {
     editorText,
     markdownText,
-    handleMarkdownChange,
+    handleEditorChange,
     setIsEditorReady,
     editorUpdateListener,
     isEditorReady,
+    editorViewRef,
   };
 }

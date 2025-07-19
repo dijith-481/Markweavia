@@ -1,7 +1,5 @@
 import { useSlideContext } from "@/context/slideContext";
-import { themes } from "@/utils/themes";
-import { getFilenameFromFirstH1 } from "@/utils/file-functions";
-import { createHtmlBlob } from "@/utils/file-functions";
+import { generateSlides } from "@/utils/slides";
 
 export default function useSlideShow() {
   const {
@@ -28,11 +26,12 @@ export default function useSlideShow() {
       slideShowBrowserTab!.focus();
       return;
     }
-    const themeString = config.theme;
-    const theme = themes[themeString as keyof typeof themes];
-    console.log(theme);
-    const documentTitle = getFilenameFromFirstH1(markdownText, "Slide Show");
-    const htmlBlob = await createHtmlBlob(markdownText, currentSlide - 1, documentTitle, config);
+    if (!markdownText.trim()) {
+      alert("Nothing to show!");
+      return;
+    }
+    const { html } = await generateSlides(markdownText, config, currentSlide - 1);
+    const htmlBlob = new Blob([html], { type: "text/html;charset=utf-8;" });
     setSlideShowBrowserTab(createAndOpenBrowserTab(htmlBlob));
   }
 
@@ -44,7 +43,7 @@ export default function useSlideShow() {
 
   function handleMessageFromSlideShow(event: MessageEvent) {
     if (event.source !== slideShowBrowserTab) return;
-    if (event.data.type === "preview_closed") {
+    if (event.data.type === "tab_closed") {
       stopSlideShow();
     }
   }
