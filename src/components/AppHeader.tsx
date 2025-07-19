@@ -1,12 +1,10 @@
 import Image from "next/image";
 import Link from "next/link";
-import useExportFunctions from "@/hooks/useExportFunctions";
 import { GitHubIcon, UploadIcon, DownloadIcon, DonateIcon } from "@/components/UI/Icons";
 import DropDownButton from "./UI/DropDownButton";
 import { useEffect, useState } from "react";
 import { downloadMd, downloadSlides } from "@/utils/download";
 import { useSlideContext } from "@/context/slideContext";
-import { themes } from "@/utils/themes";
 
 interface AppHeaderProps {
   fileUploadRef: React.RefObject<{ triggerFileUpload: () => void } | null>;
@@ -14,22 +12,14 @@ interface AppHeaderProps {
 
 export default function AppHeader({ fileUploadRef }: AppHeaderProps) {
   const triggerFileUpload = () => fileUploadRef.current?.triggerFileUpload();
-  const { markdownText, currentSlide, slideLayoutOptions, fontSizeMultiplier, activeTheme } =
-    useSlideContext();
+  const { markdownText, config } = useSlideContext();
 
   const [starCount, setStarCount] = useState(0);
 
   const download = (option: string) => {
-    const theme = themes[activeTheme as keyof typeof themes];
     switch (option) {
       case "Slides":
-        downloadSlides(
-          markdownText,
-          currentSlide - 1,
-          slideLayoutOptions,
-          theme,
-          fontSizeMultiplier,
-        );
+        downloadSlides(markdownText, config);
         break;
       case ".md":
         downloadMd(markdownText);

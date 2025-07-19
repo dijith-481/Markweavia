@@ -17,10 +17,16 @@ interface EditorPanelProps {
 export default function EditorPanel({ fileUploadRef, isMobile }: EditorPanelProps) {
   const codeMirrorRef = useRef<ReactCodeMirrorRef>(null);
   const [isVimMode, setIsVimMode] = useState(true);
-  const { handleMarkdownChange, setIsEditorReady, editorUpdateListener, editorText } = useEditor(
-    codeMirrorRef,
-    fileUploadRef,
-  );
+  const { handleEditorChange, setIsEditorReady, editorUpdateListener, editorText, editorViewRef } =
+    useEditor(codeMirrorRef, fileUploadRef);
+
+  const onCreateEditor = (view: EditorView) => {
+    setIsEditorReady(true);
+    if (editorViewRef) {
+      (editorViewRef as React.RefObject<EditorView | null>).current = view;
+    }
+  };
+
   useEffect(() => {
     if (codeMirrorRef.current && codeMirrorRef.current.view) {
       setIsEditorReady(true);
@@ -61,7 +67,7 @@ export default function EditorPanel({ fileUploadRef, isMobile }: EditorPanelProp
       <CodeMirror
         value={editorText}
         extensions={extensions}
-        onChange={handleMarkdownChange}
+        onChange={handleEditorChange}
         theme={nord}
         basicSetup={{
           lineNumbers: true,
@@ -73,9 +79,7 @@ export default function EditorPanel({ fileUploadRef, isMobile }: EditorPanelProp
         autoFocus
         className="text-sm overflow-y-auto w-full h-full absolute top-0 left-0"
         ref={codeMirrorRef}
-        onCreateEditor={() => {
-          setIsEditorReady(true);
-        }}
+        onCreateEditor={onCreateEditor}
       />
     </div>
   );
