@@ -1,68 +1,45 @@
 import { useCallback, useEffect, useState } from "react";
 import Button from "../../UI/Button";
 import { CheckboxIcon } from "../../UI/Icons";
-import { useSlideContext } from "@/context/slideContext";
 import { Vim } from "@replit/codemirror-vim";
-import { HeaderFooterPosition } from "@/utils/layoutOptions";
-import { PAGE_NUMBER_SLIDE_ID } from "@/utils/local-storage";
+import useConfig from "@/hooks/useConfig";
+import { headerFooterPositions } from "@/utils/layoutOptions";
 
-interface LayoutSettingsProps {
-  availableHeaderFooterPositions: HeaderFooterPosition[];
-}
-
-export default function LayoutSettings({ availableHeaderFooterPositions }: LayoutSettingsProps) {
-  const { slideLayoutOptions, setSlideLayoutOptions } = useSlideContext();
-  const canToggleFirstPageLayout = slideLayoutOptions.headerFooters.length > 0;
-
+export default function LayoutSettings() {
+  const config = useConfig();
   const [showPageNumbers, setShowPageNumbers] = useState(false);
+  const [headerFootersLength, setHeaderFooterLength] = useState(0);
 
   useEffect(() => {
-    setShowPageNumbers(
-      slideLayoutOptions.headerFooters.some((hf) => hf.id === PAGE_NUMBER_SLIDE_ID),
-    );
-  }, [slideLayoutOptions]);
+    setShowPageNumbers(config.pageNumbers().pageNo);
+    setHeaderFooterLength(config.headerFooters().length);
+  }, [config]);
 
   const onToggleShowPageNumbers = useCallback(() => {
-    if (availableHeaderFooterPositions.length === 0 && !showPageNumbers) {
+    const pageNumbers = config.pageNumbers();
+    if (!pageNumbers.pageNo && pageNumbers.position === null) {
       alert("No header/footer positions available.Try deleting some");
       return;
     }
-    if (showPageNumbers) {
-      setSlideLayoutOptions((prev) => ({
-        ...prev,
-        headerFooters: prev.headerFooters.filter((item) => item.id !== PAGE_NUMBER_SLIDE_ID),
-      }));
+    if (pageNumbers.pageNo) {
+      config.removePageNumbers();
     } else {
-      setSlideLayoutOptions((prev) => ({
-        ...prev,
-        headerFooters: [
-          ...prev.headerFooters,
-          {
-            id: PAGE_NUMBER_SLIDE_ID,
-            text: "PageNo",
-            position: availableHeaderFooterPositions[0].value,
-          },
-        ],
-      }));
+      config.setPageNumbers(pageNumbers.position!);
     }
+  }, [config]);
 
-    setShowPageNumbers((prev) => !prev);
-  }, [availableHeaderFooterPositions, showPageNumbers, setSlideLayoutOptions]);
+  const handleToggleLayoutOnFirstPage = useCallback(() => {
+    config.setLayoutOnFirstPage((prev) => !prev);
+  }, [config]);
 
   useEffect(() => {
     Vim.defineEx("pageno", "page", onToggleShowPageNumbers);
-  }, [onToggleShowPageNumbers]);
-
-  const handleToggleLayoutOnFirstPage = () => {
-    setSlideLayoutOptions((prev) => ({
-      ...prev,
-      layoutOnFirstPage: !prev.layoutOnFirstPage,
-    }));
-  };
+    Vim.defineEx("first", "first", handleToggleLayoutOnFirstPage);
+  }, [onToggleShowPageNumbers, handleToggleLayoutOnFirstPage]);
 
   return (
     <div className="flex flex-col gap-2 w-full md:w-auto justify-center">
-      {(availableHeaderFooterPositions.length > 0 || showPageNumbers) && (
+      {(headerFootersLength < headerFooterPositions.length || showPageNumbers) && (
         <Button
           onClick={onToggleShowPageNumbers}
           color={`${showPageNumbers ? "bg-nord8 text-nord0 " : "bg-nord1 text-nord4/80 hover:bg-nord8/70 "}    hover:text-nord0`}
@@ -71,13 +48,13 @@ export default function LayoutSettings({ availableHeaderFooterPositions }: Layou
           Page Nunber
         </Button>
       )}
-      {canToggleFirstPageLayout && (
+      {headerFootersLength > 0 && (
         <Button
           onClick={handleToggleLayoutOnFirstPage}
           title="show header/footer on first page"
-          color={`${slideLayoutOptions.layoutOnFirstPage ? "bg-nord7 text-nord0 " : "bg-nord1 text-nord4/80 hover:bg-nord7/70 "}    hover:text-nord0`}
+          color={`${config.layoutOnFirstPage() ? "bg-nord7 text-nord0 " : "bg-nord1 text-nord4/80 hover:bg-nord7/70 "}    hover:text-nord0`}
         >
-          <CheckboxIcon checked={slideLayoutOptions.layoutOnFirstPage} />
+          <CheckboxIcon checked={config.layoutOnFirstPage()} />
           Layout (Page 1)
         </Button>
       )}

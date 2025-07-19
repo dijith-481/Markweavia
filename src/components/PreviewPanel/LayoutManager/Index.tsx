@@ -1,12 +1,10 @@
-import { useState, useMemo, useEffect } from "react";
+import { useState, useEffect } from "react";
 import ThemeSelector from "@/components/PreviewPanel/LayoutManager/ThemeSelector";
 import TemplateSelector from "@/components/PreviewPanel/LayoutManager/TemplateSelector";
 import FontScaler from "@/components/PreviewPanel/LayoutManager/FontScaler";
 import LayoutSettings from "@/components/PreviewPanel/LayoutManager/LayoutSettings";
 import HeaderFooterManager from "@/components/PreviewPanel/LayoutManager/HeaderFooterManager";
 import ToggleExpand from "@/components/UI/ToggleExpand";
-import { useSlideContext } from "@/context/slideContext";
-import { headerFooterPositions } from "@/utils/layoutOptions";
 
 interface LayoutManagerProps {
   isKeyboardVisible: boolean;
@@ -27,12 +25,6 @@ export default function LayoutManager({ isKeyboardVisible }: LayoutManagerProps)
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
-  const { slideLayoutOptions } = useSlideContext();
-  const availableHeaderFooterPositions = useMemo(() => {
-    const usedPositions = new Set(slideLayoutOptions.headerFooters.map((item) => item.position));
-    return headerFooterPositions.filter((pos) => !usedPositions.has(pos.value));
-  }, [slideLayoutOptions]);
-
   return (
     (!isKeyboardVisible || isEditing) && (
       <ToggleExpand
@@ -45,12 +37,9 @@ export default function LayoutManager({ isKeyboardVisible }: LayoutManagerProps)
             <TemplateSelector />
           </div>
           <FontScaler />
-          <LayoutSettings availableHeaderFooterPositions={availableHeaderFooterPositions} />
+          <LayoutSettings />
         </div>
-        <HeaderFooterManager
-          availableHeaderFooterPositions={availableHeaderFooterPositions}
-          setIsEditing={setIsEditing}
-        />
+        <HeaderFooterManager setIsEditing={setIsEditing} />
       </ToggleExpand>
     )
   );

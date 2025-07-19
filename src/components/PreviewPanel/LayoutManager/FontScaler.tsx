@@ -1,9 +1,9 @@
 import React from "react";
-import { useSlideContext } from "@/context/slideContext";
 import { addIcon, substractIcon } from "../../UI/Icons";
+import useConfig from "@/hooks/useConfig";
 
 export default function FontScaler() {
-  const { setFontSizeMultiplier: setFontSize, fontSizeMultiplier: fontSize } = useSlideContext();
+  const { fontSize, setFontSize } = useConfig();
   const onIncrease = () => {
     setFontSize((prev) => Math.min(2.5, prev + 0.1));
   };
@@ -23,7 +23,7 @@ export default function FontScaler() {
           {substractIcon}
         </button>
         <span className="text-sm text-nord5 min-w-max max-w-full  text-center font-mono">
-          {Math.round(fontSize * 100)}%
+          {Math.round(fontSize() * 100)}%
         </span>
         <button
           onClick={onIncrease}
