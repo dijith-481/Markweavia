@@ -208,6 +208,10 @@ export function useEditor(
     const [config, content] = extractParts(editorText);
     setMarkdownText(content);
     handleConfigChange(config);
+    const hashIndex = editorText.indexOf("# ");
+    editorViewRef.current?.dispatch({
+      selection: { anchor: hashIndex },
+    });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isEditorReady]);
 

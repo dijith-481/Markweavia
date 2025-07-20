@@ -12,7 +12,7 @@ export default function InfoPopup({ show, onClose, popupRef }: InfoPopupProps) {
   return (
     <div
       ref={popupRef}
-      className="absolute bottom-full right-0 mb-2 w-72 md:w-96 max-h-96 overflow-y-auto flex items-end flex-col  p-4 bg-nord9/20 backdrop-blur-lg rounded-md shadow-xl z-50 text-nord5 text-xs leading-relaxed"
+      className="absolute bottom-full right-0 mb-2 w-72 md:w-96 max-h-96 overflow-y-auto flex items-end flex-col  p-4 bg-nord0/50 backdrop-blur-lg rounded-md shadow-xl z-50 text-nord5 text-xs leading-relaxed"
     >
       <button
         onClick={onClose}

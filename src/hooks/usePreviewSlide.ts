@@ -61,7 +61,7 @@ export function usePreviewSlide(iframeRef: React.RefObject<HTMLIFrameElement | n
     generatePreview();
     generateFullPreview();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [currentSlideText, currentSlide]);
+  }, [currentSlideText, currentSlide, config.headerFooters(), config.theme()]);
 
   useEffect(() => {
     const css = getFontSizeCss(config.fontSize());
