@@ -1,5 +1,16 @@
 export const slideTemplates = {
-  basic: `# Presentation Template
+  basic: `---
+theme: "nordDark"
+fontSize: 1.05
+layoutOnFirstPage: true
+headerFooters:
+  top:
+    left: "Slide Template"
+    center: "Slide Template"
+  bottom:
+    right: "{pg}"
+---
+# Presentation Template
     this is a presentation template
 
 ## Introduction
@@ -52,7 +63,17 @@ print(example_function(5))
 | Item 4   | Item 5   | Item 6   |
 ## Thank you for your attention!
 `,
-  professional: `# Professional Presentation Template
+  professional: `---
+theme: "trueWhite"
+layoutOnFirstPage: false
+headerFooters:
+  top:
+    left: "Professional Template"
+  bottom:
+    right: "{pg}"
+---
+
+# Professional Presentation Template
 
 ## Introduction
 
@@ -202,7 +223,11 @@ A brief outline of your research, its goals, and your key findings.
 Remember to cite all sources used in your presentation!
 # Thank you slide if you like `,
 
-  vim: `# Vim Motions in Markweavia
+  vim: `---
+theme: "nordLight"
+layoutOnFirstPage: true
+---
+# Vim Motions in Markweavia
 
 ## Navigating & Editing
 
@@ -253,7 +278,18 @@ Here are some delete commands to improve editing
 Master Vim in Markweavia! Faster slide creation awaits.
 `,
 
-  initialMarkdown: `# [Markweavia](https://markweavia.vercel.app/)
+  initialMarkdown: `---
+theme: "nordDark"
+fontSize: 1
+layoutOnFirstPage: true
+headerFooters:
+  top:
+    left: "Markweavia"
+    center: "weaiving your slides"
+  bottom:
+    right: "{pg}"
+---
+# [Markweavia](https://markweavia.vercel.app/)
       markdown beautifully woven.
      made with ❤️ by dijith
 ## Overview

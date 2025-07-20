@@ -1,26 +1,23 @@
 import { createContext, useMemo, useState, useContext, useRef, RefObject } from "react";
 import { SlideConfig } from "../utils/layoutOptions";
-import { usePersistentSettings } from "../hooks/usePersistentSettings";
 import { countWords, countLetters } from "../utils/common";
 import { EditorView } from "@codemirror/view";
 
 export interface SlideContextState {
-  editorText: string;
   config: SlideConfig;
   currentSlideText: string | null;
   currentSlide: number;
   totalSlidesNumber: number;
   words: number;
   letters: number;
-  previewWindow: Window | null;
-  setPreviewWindow: React.Dispatch<React.SetStateAction<Window | null>>;
+  slideShowBrowserTab: Window | null;
+  setSlideShowBrowserTab: React.Dispatch<React.SetStateAction<Window | null>>;
   markdownText: string;
 }
 
 interface SlideContextType extends SlideContextState {
   setConfig: (config: SlideConfig) => void;
   setMarkdownText: (markdownText: string) => void;
-  setEditorText: (markdownText: string) => void;
   setCurrentSlideText: (currentSlideText: string) => void;
   setTotalSlidesNumber: (totalSlidesNumber: number) => void;
   setCurrentSlide: (currentSlide: number) => void;
@@ -42,22 +39,18 @@ export const SlideContextProvider: React.FC<{ children: React.ReactNode }> = ({ 
   const [currentSlideText, setCurrentSlideText] = useState<string | null>(null);
   const [currentSlide, setCurrentSlide] = useState<number>(1);
   const [totalSlidesNumber, setTotalSlidesNumber] = useState<number>(1);
-  const [previewWindow, setPreviewWindow] = useState<Window | null>(null);
+  const [slideShowBrowserTab, setSlideShowBrowserTab] = useState<Window | null>(null);
   const [config, setConfig] = useState<SlideConfig>({});
   const editorViewRef = useRef<EditorView | null>(null);
 
-  const { editorText, setEditorText } = usePersistentSettings();
-
-  const words = useMemo(() => countWords(editorText), [editorText]);
-  const letters = useMemo(() => countLetters(editorText), [editorText]);
+  const words = useMemo(() => countWords(markdownText), [markdownText]);
+  const letters = useMemo(() => countLetters(markdownText), [markdownText]);
 
   const contextValue = {
     config,
     setConfig,
     markdownText,
     setMarkdownText,
-    editorText,
-    setEditorText,
     currentSlideText,
     setCurrentSlideText,
     currentSlide,
@@ -66,8 +59,8 @@ export const SlideContextProvider: React.FC<{ children: React.ReactNode }> = ({ 
     setTotalSlidesNumber,
     words,
     letters,
-    previewWindow,
-    setPreviewWindow,
+    slideShowBrowserTab,
+    setSlideShowBrowserTab,
     editorViewRef,
   };
   return <SlideContext.Provider value={contextValue}>{children}</SlideContext.Provider>;

@@ -1,6 +1,7 @@
 import { frontMatterRegex } from "@/constants";
 import { useSlideContext } from "@/context/slideContext";
 import { FONT_SIZE, THEME } from "@/utils/config/default";
+import { sanitizeConfig } from "@/utils/config/sanitize";
 import {
   HeaderFooterHorizontal,
   HeaderFooterPosition,
@@ -32,7 +33,8 @@ export default function useConfig(): ConfigState {
   const { config, editorViewRef } = useSlideContext();
 
   function updateConfigString(newConfig: SlideConfig) {
-    const yamlString = yaml.dump(newConfig);
+    const sanitized = sanitizeConfig(newConfig);
+    const yamlString = yaml.dump(sanitized);
     const newText = `---\n${yamlString}---`;
     const view = editorViewRef.current;
     if (!view) {
@@ -41,6 +43,7 @@ export default function useConfig(): ConfigState {
     }
     const currentDoc = view.state.doc.toString();
     const match = currentDoc.match(frontMatterRegex);
+    console.log(match);
     const from = 0;
     const to = match ? match[0].length : 0;
     const insert = match ? newText : `${newText}\n`;
@@ -52,11 +55,13 @@ export default function useConfig(): ConfigState {
 
   function setTheme(themeName: ThemeString) {
     const view = editorViewRef.current;
+    let cfg = config;
+    if (!cfg) cfg = {};
     if (!view) {
       console.error("Editor view is not available yet.");
       return;
     }
-    const newConfig = { ...config, theme: themeName };
+    const newConfig = { ...cfg, theme: themeName };
 
     updateConfigString(newConfig);
   }
@@ -68,13 +73,15 @@ export default function useConfig(): ConfigState {
   }
 
   function setFontSize(fontSizeOrUpdater: number | ((prevFontSize: number) => number)) {
+    let cfg = config;
+    if (!cfg) cfg = {};
     const currentFontSize = fontSize();
     const newFontSize =
       typeof fontSizeOrUpdater === "function"
         ? fontSizeOrUpdater(currentFontSize)
         : fontSizeOrUpdater;
 
-    const newConfig = { ...config, fontSize: parseFloat(newFontSize.toFixed(2)) };
+    const newConfig = { ...cfg, fontSize: parseFloat(newFontSize.toFixed(2)) };
     updateConfigString(newConfig);
   }
   function fontSize() {
@@ -85,9 +92,12 @@ export default function useConfig(): ConfigState {
   }
 
   function setLayoutOnFirstPage(fn: boolean | ((prev: boolean) => boolean)) {
+    let cfg = config;
+    if (!cfg) cfg = {};
+
     const currentLayoutOnFirstPage = layoutOnFirstPage();
     const newLayoutOnFirstPage = typeof fn === "function" ? fn(currentLayoutOnFirstPage) : fn;
-    const newConfig = { ...config, layoutOnFirstPage: newLayoutOnFirstPage };
+    const newConfig = { ...cfg, layoutOnFirstPage: newLayoutOnFirstPage };
     updateConfigString(newConfig);
   }
   function layoutOnFirstPage() {
@@ -111,8 +121,8 @@ export default function useConfig(): ConfigState {
 
       for (const align of alignments) {
         const value = section[align];
-        if (value !== undefined && value !== "") {
-          result.push([`${pos}-${align}`, value]);
+        if (typeof value === "string" || typeof value === "number") {
+          result.push([`${pos}-${align}`, value.toString()]);
         }
       }
     }
@@ -121,8 +131,10 @@ export default function useConfig(): ConfigState {
   }
 
   function modifyHeaderFooters(pos: HeaderFooterPosition, val: string) {
-    if (!config.headerFooters) config.headerFooters = {};
-    const hf = config.headerFooters;
+    let cfg = config;
+    if (!config) cfg = {};
+    if (!cfg.headerFooters) cfg.headerFooters = {};
+    const hf = cfg.headerFooters;
 
     const [sectionKey, alignKey] = pos.split("-");
 
@@ -132,11 +144,12 @@ export default function useConfig(): ConfigState {
     const section = hf[sectionKey as keyof HeaderFooters]!;
 
     (section as HeaderFooterHorizontal)[alignKey as keyof HeaderFooterHorizontal] = val;
-    const newConfig = { ...config, headerFooters: hf };
+    const newConfig = { ...cfg, headerFooters: hf };
     updateConfigString(newConfig);
   }
 
   function removeHeaderFooter(pos: HeaderFooterPosition) {
+    if (!config) return;
     if (!config.headerFooters) return;
     const hf = config.headerFooters;
     const [sectionKey, alignKey] = pos.split("-");

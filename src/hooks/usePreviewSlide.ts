@@ -8,7 +8,7 @@ import useConfig from "./useConfig";
 export function usePreviewSlide(iframeRef: React.RefObject<HTMLIFrameElement | null>) {
   const [previewHtml, setPreviewHtml] = useState<string>("");
   const config = useConfig();
-  const { currentSlide, currentSlideText, previewWindow, markdownText } = useSlideContext();
+  const { currentSlide, currentSlideText, slideShowBrowserTab, markdownText } = useSlideContext();
   const [ismarkdownEmpty, setIsMarkdownEmpty] = useState(true);
   useEffect(() => {
     if (currentSlideText != null) {
@@ -45,13 +45,13 @@ export function usePreviewSlide(iframeRef: React.RefObject<HTMLIFrameElement | n
       }
     };
     const generateFullPreview = async () => {
-      if (previewWindow !== null) {
+      if (slideShowBrowserTab !== null) {
         const newContent = await getAllSlideDivs(
           markdownText,
           config.headerFooters(),
           config.layoutOnFirstPage(),
         );
-        previewWindow.postMessage(
+        slideShowBrowserTab.postMessage(
           { type: "slides", content: newContent, currentPageNo: currentSlide - 1 },
           "*",
         );
@@ -60,7 +60,8 @@ export function usePreviewSlide(iframeRef: React.RefObject<HTMLIFrameElement | n
 
     generatePreview();
     generateFullPreview();
-  }, [currentSlideText, currentSlide, iframeRef, previewWindow, markdownText, config]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [currentSlideText, currentSlide]);
 
   useEffect(() => {
     const css = getFontSizeCss(config.fontSize());

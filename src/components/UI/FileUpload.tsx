@@ -25,7 +25,7 @@ const handleFileUpload = (
 
 const FileUpload = forwardRef<FileUploadHandle>((_props, ref) => {
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const { setEditorText: setMarkdownText, editorText: markdownText } = useSlideContext();
+  const { editorViewRef, markdownText } = useSlideContext();
 
   const triggerFileUpload = useCallback(() => {
     if (fileInputRef.current) {
@@ -44,11 +44,15 @@ const FileUpload = forwardRef<FileUploadHandle>((_props, ref) => {
             if (fileInputRef.current) fileInputRef.current.value = "";
             return;
           }
-          setMarkdownText(content);
+          const hashIndex = content.indexOf("# ");
+          editorViewRef.current?.dispatch({
+            changes: { from: 0, to: editorViewRef.current?.state.doc.length, insert: content },
+            selection: { anchor: hashIndex },
+          });
         }
       });
     },
-    [markdownText, setMarkdownText],
+    [markdownText, editorViewRef],
   );
 
   React.useImperativeHandle(ref, () => ({

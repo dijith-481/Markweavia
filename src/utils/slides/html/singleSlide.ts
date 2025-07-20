@@ -1,16 +1,6 @@
-import { HeaderFooters, HeaderFootersArray } from "@/utils/layoutOptions";
+import { HeaderFootersArray } from "@/utils/layoutOptions";
 import { getSlideDiv } from "./shared";
-import { configIntro } from "./configSlide";
-
-function emptySlide(): string {
-  return `
-<div  class="slide" id="slide-empty">
-          <div class="slide-content-wrapper">
-<p style="text-align:center; font-size: var(--slide-font-size);"><em>Empty slide. nothing to weave.</em></p>
-</div>
-        </div>
-`;
-}
+import { configIntro, firstMarkdown } from "./configSlide";
 
 export async function getSingleSlideDiv(
   markdown: string | null,
@@ -20,9 +10,10 @@ export async function getSingleSlideDiv(
 ) {
   if (!markdown || !markdown.trim()) {
     if (pageNo !== -2) {
-      return emptySlide();
+      markdown = firstMarkdown;
+    } else {
+      markdown = configIntro;
     }
-    markdown = configIntro;
   }
   const slide = await getSlideDiv(
     pageNo,

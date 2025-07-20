@@ -1,14 +1,11 @@
 import { useSlideContext } from "@/context/slideContext";
 import { generateSlides } from "@/utils/slides";
+import useConfig from "./useConfig";
 
 export default function useSlideShow() {
-  const {
-    markdownText,
-    previewWindow: slideShowBrowserTab,
-    setPreviewWindow: setSlideShowBrowserTab,
-    currentSlide,
-    config,
-  } = useSlideContext();
+  const { markdownText, slideShowBrowserTab, setSlideShowBrowserTab, currentSlide } =
+    useSlideContext();
+  const config = useConfig();
 
   function isSlideShowRunning() {
     return slideShowBrowserTab !== null;
@@ -21,7 +18,8 @@ export default function useSlideShow() {
     }
   }
 
-  async function startSlideShow() {
+  async function startSlideShow(pageNo?: number) {
+    if (pageNo === undefined) pageNo = currentSlide - 1;
     if (isSlideShowRunning()) {
       slideShowBrowserTab!.focus();
       return;
@@ -30,7 +28,7 @@ export default function useSlideShow() {
       alert("Nothing to show!");
       return;
     }
-    const { html } = await generateSlides(markdownText, config, currentSlide - 1);
+    const { html } = await generateSlides(markdownText, config, pageNo);
     const htmlBlob = new Blob([html], { type: "text/html;charset=utf-8;" });
     setSlideShowBrowserTab(createAndOpenBrowserTab(htmlBlob));
   }

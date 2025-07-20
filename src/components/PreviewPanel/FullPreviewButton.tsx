@@ -1,19 +1,14 @@
 import React, { useEffect } from "react";
-import { DownloadIcon, SlideShowIcon, StopCircleIcon } from "../UI/Icons";
+import { SlideShow1Icon, SlideShowIcon, StopCircleIcon } from "../UI/Icons";
 import useSlideShow from "@/hooks/useSlideShow";
-import { downloadSlides } from "@/utils/download";
-import { useSlideContext } from "@/context/slideContext";
-import { themes } from "@/utils/themes";
 
 export default function FullPreviewButton() {
-  const { startSlideShow, stopSlideShow, isSlideShowRunning, handleMessageFromSlideShow } =
-    useSlideShow();
-  const { markdownText, currentSlide, slideLayoutOptions, fontSizeMultiplier, activeTheme } =
-    useSlideContext();
-  const download = () => {
-    const theme = themes[activeTheme as keyof typeof themes];
-    downloadSlides(markdownText, currentSlide - 1, slideLayoutOptions, theme, fontSizeMultiplier);
-  };
+  const {
+    startSlideShow: _startSlideShow,
+    stopSlideShow,
+    isSlideShowRunning,
+    handleMessageFromSlideShow,
+  } = useSlideShow();
 
   useEffect(() => {
     window.addEventListener("message", handleMessageFromSlideShow);
@@ -23,10 +18,18 @@ export default function FullPreviewButton() {
     };
   }, [handleMessageFromSlideShow]);
 
+  const startSlideShow = (firstPage = false) => {
+    if (firstPage) {
+      _startSlideShow(0);
+      return;
+    }
+    _startSlideShow();
+  };
+
   return (
     <div className="w-full  flex items-center  gap-0.5">
       <button
-        onClick={startSlideShow}
+        onClick={startSlideShow.bind(null, false)}
         className={`${isSlideShowRunning() ? "bg-nord14/80 hover:bg-nord14 italic" : "bg-nord9/80 hover:bg-nord9"} flex items-center gap-2 justify-center py-2 w-full hover:mx-1 rounded-l-xl h-8 transition-all duration-300 ease-in-out hover:rounded-md  text-nord0`}
         title="Preview all slides in a new tab"
       >
@@ -46,20 +49,20 @@ export default function FullPreviewButton() {
             <StopCircleIcon />
           </span>
           <span className="mx-1.5 whitespace-nowrap  opacity-50  delay-100  group-hover:opacity-100 transition-opacity duration-700">
-            Stop Preview
+            Stop Slide Show
           </span>
         </button>
       ) : (
         <button
-          onClick={download}
-          className="flex  flex-row items-center bg-nord7/80 hover:bg-nord7 group transition-all  px-2 delay-100 py-1 rounded-r-xl hover:rounded-r-md ease-in-out duration-700  w-10 hover:w-36 overflow-hidden"
+          onClick={startSlideShow.bind(null, true)}
+          className="flex  flex-row items-center bg-nord7/80 hover:bg-nord7 group transition-all  px-2 delay-100 py-1 rounded-r-xl hover:rounded-r-md ease-in-out duration-700  w-10 hover:w-46 overflow-hidden"
           title="Download slides"
         >
           <span className="flex-shrink-0">
-            <DownloadIcon />
+            <SlideShow1Icon />
           </span>
           <span className="mx-1.5 whitespace-nowrap  opacity-0  delay-100  group-hover:opacity-100 transition-opacity duration-700">
-            Download
+            from 1st page
           </span>
         </button>
       )}

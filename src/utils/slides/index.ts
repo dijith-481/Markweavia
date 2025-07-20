@@ -1,6 +1,5 @@
-import useConfig, { ConfigState } from "@/hooks/useConfig";
+import { ConfigState } from "@/hooks/useConfig";
 import { CODE_BLOCK_FONT, FONT } from "../config/default";
-import { SlideConfig } from "../layoutOptions";
 import { hasCodeBlocks } from "../markdown";
 import { getTitleFromMarkdown } from "../markdown/file-functions";
 import { getSingleSlideCss, getSlidesCss } from "./css";
@@ -54,16 +53,16 @@ ${scripts}
   };
 }
 
-export async function generateSlides(markdown: string, config: SlideConfig, pageNo = 0) {
+export async function generateSlides(markdown: string, config: ConfigState, pageNo = 0) {
   const title = getTitleFromMarkdown(markdown, "slides_presentation");
   const hasCode = hasCodeBlocks(markdown);
   const requiredFonts: FontName[] = [FONT];
   if (hasCode) requiredFonts.push(CODE_BLOCK_FONT);
-  const styles = await getSlidesCss(requiredFonts, config.fontSize, config.theme, hasCode);
+  const styles = await getSlidesCss(requiredFonts, config.fontSize(), config.theme(), hasCode);
   const content = await getSlidesContainer(
     markdown,
-    config.headerFooters,
-    config.layoutOnFirstPage,
+    config.headerFooters(),
+    config.layoutOnFirstPage(),
   );
   const scripts = await getSlidesJs(pageNo, hasCode);
   const navigationHtml = getNavigationHtml();

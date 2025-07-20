@@ -5,6 +5,7 @@ import DropDownButton from "./UI/DropDownButton";
 import { useEffect, useState } from "react";
 import { downloadMd, downloadSlides } from "@/utils/download";
 import { useSlideContext } from "@/context/slideContext";
+import useConfig from "@/hooks/useConfig";
 
 interface AppHeaderProps {
   fileUploadRef: React.RefObject<{ triggerFileUpload: () => void } | null>;
@@ -12,7 +13,8 @@ interface AppHeaderProps {
 
 export default function AppHeader({ fileUploadRef }: AppHeaderProps) {
   const triggerFileUpload = () => fileUploadRef.current?.triggerFileUpload();
-  const { markdownText, config } = useSlideContext();
+  const { editorViewRef, markdownText } = useSlideContext();
+  const config = useConfig();
 
   const [starCount, setStarCount] = useState(0);
 
@@ -22,7 +24,7 @@ export default function AppHeader({ fileUploadRef }: AppHeaderProps) {
         downloadSlides(markdownText, config);
         break;
       case ".md":
-        downloadMd(markdownText);
+        downloadMd(editorViewRef.current?.state.doc.toString() || markdownText);
         break;
     }
   };

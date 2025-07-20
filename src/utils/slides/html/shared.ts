@@ -1,10 +1,10 @@
-import { HeaderFooters, HeaderFootersArray } from "@/utils/layoutOptions";
+import { HeaderFootersArray } from "@/utils/layoutOptions";
 import { marked } from "marked";
 
 export async function getSlideDiv(
   pageNo: number,
   markdown: string,
-  headerFooters: HeaderFootersArray,
+  headerFooters?: HeaderFootersArray,
 ) {
   const content = await marked.parse(markdown.trim());
   const layoutAdditions = headerFooters ? getLayoutAdditions(headerFooters, pageNo) : "";

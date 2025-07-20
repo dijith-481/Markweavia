@@ -5,21 +5,18 @@ import { useSlideContext } from "../context/slideContext";
 import { ReactCodeMirrorRef } from "@uiw/react-codemirror";
 import yaml from "js-yaml";
 import { downloadSlides, downloadMd } from "@/utils/download";
-import { themes } from "@/utils/themes";
 import useSlideShow from "./useSlideShow";
 import { SlideConfig } from "@/utils/layoutOptions";
 import { frontMatterRegex } from "@/constants";
+import { usePersistentSettings } from "./usePersistentSettings";
+import useConfig from "./useConfig";
 
 export function useEditor(
   codeMirrorRef: React.RefObject<ReactCodeMirrorRef | null>,
   fileUploadRef: React.RefObject<{ triggerFileUpload: () => void } | null>,
 ) {
   const {
-    editorText,
     markdownText,
-    config,
-    currentSlide,
-    setEditorText,
     setCurrentSlide,
     setTotalSlidesNumber,
     setCurrentSlideText,
@@ -27,8 +24,10 @@ export function useEditor(
     setConfig,
     editorViewRef,
   } = useSlideContext();
+
+  const config = useConfig();
   const { startSlideShow } = useSlideShow();
-  const [isYamlError, setIsYamlError] = useState(false);
+  const { editorText, setEditorText } = usePersistentSettings();
 
   const lastconfig = useRef("");
 
@@ -49,27 +48,23 @@ export function useEditor(
         try {
           const data = yaml.load(config) as SlideConfig;
           setConfig(data);
-          setIsYamlError(false);
         } catch (error) {
           console.log("Failed to parse front matter:", error);
-          setCurrentSlideText(error.reason);
-          setIsYamlError(true);
           setCurrentSlide(0);
         }
       }
     },
-    [setConfig, setCurrentSlideText, setCurrentSlide, setIsYamlError],
+    [setConfig, setCurrentSlide],
   );
 
   const handleEditorChange = useCallback(
     (value: string) => {
-      setEditorText(value);
-
+      setEditorText(value.trim());
       const [config, content] = extractParts(value);
       setMarkdownText(content);
       handleConfigChange(config);
     },
-    [setEditorText, handleConfigChange, setMarkdownText],
+    [handleConfigChange, setMarkdownText, setEditorText],
   );
 
   const triggerFileUpload = useCallback(() => {
@@ -137,7 +132,7 @@ export function useEditor(
 
     const currentSlideText = doc.sliceString(slideStartPos, slideEndPos).trim();
     setCurrentSlideText(currentSlideText);
-  }, [codeMirrorRef, setCurrentSlideText, setCurrentSlide, setTotalSlidesNumber, isYamlError]);
+  }, [codeMirrorRef, setCurrentSlideText, setCurrentSlide, setTotalSlidesNumber]);
 
   const editorUpdateListener = useMemo(
     () =>
@@ -159,11 +154,11 @@ export function useEditor(
           downloadSlides(markdownText, config);
           break;
         case ".md":
-          downloadMd(markdownText);
+          downloadMd(editorViewRef.current?.state.doc.toString() || markdownText);
           break;
       }
     },
-    [markdownText, config],
+    [markdownText, config, editorViewRef],
   );
 
   const focusCodeMirror = useCallback(() => {
@@ -210,10 +205,18 @@ export function useEditor(
   }, [focusCodeMirror, codeMirrorRef, triggerFileUpload, download]);
 
   useEffect(() => {
+    const [config, content] = extractParts(editorText);
+    setMarkdownText(content);
+    handleConfigChange(config);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isEditorReady]);
+
+  useEffect(() => {
     Vim.defineEx("write", "w", download.bind(null, ".md"));
     Vim.defineEx("wslide", "ws", download.bind(null, "Slides"));
     Vim.defineEx("upload", "u", triggerFileUpload);
-    Vim.defineEx("preview", "p", startSlideShow);
+    Vim.defineEx("preview", "p", startSlideShow.bind(null, undefined));
+    Vim.defineEx("pf", "pf", startSlideShow.bind(null, 0));
   }, [triggerFileUpload, download, startSlideShow]);
 
   return {

@@ -184,13 +184,13 @@ export default function HeaderFooterManager({
                   <span
                     className={`truncate w-fit   underline text-nord4/80  text-sm  hover:text-nord4/50`}
                     onClick={() => {
-                      setNewItemText(item[1]);
+                      setNewItemText(item[1].toString());
                       setIsEditing(true);
                       setIsEditingText(item[0]);
                     }}
-                    title={item[1]}
+                    title={item[1].toString()}
                   >
-                    {item[1]}
+                    {item[1].toString()}
                   </span>
                 </div>
               )}

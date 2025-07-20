@@ -7,13 +7,24 @@ export default function TemplateSelector() {
   Object.keys(slideTemplates).forEach((key) => {
     slideOptions[key] = key;
   });
-  const { editorText: markdownText, setEditorText: setMarkdownText } = useSlideContext();
+  const { markdownText, editorViewRef } = useSlideContext();
 
   const loadTemplate = (templateKey: string) => {
     if (markdownText.trim() && !confirm("Your edits will be lost. Continue?")) {
       return;
     }
-    setMarkdownText(slideTemplates[templateKey as keyof typeof slideTemplates]);
+    const content = slideTemplates[templateKey as keyof typeof slideTemplates].trim();
+    const hashIndex = content.indexOf("# ");
+
+    editorViewRef.current?.dispatch({
+      changes: {
+        from: 0,
+        to: editorViewRef.current?.state.doc.length,
+        insert: content,
+      },
+
+      selection: { anchor: hashIndex },
+    });
   };
 
   return (

@@ -1,6 +1,6 @@
 import { getTitleFromMarkdown } from "./markdown/file-functions";
-import { SlideConfig } from "./layoutOptions";
 import { generateSlides } from "./slides";
+import { ConfigState } from "@/hooks/useConfig";
 
 function downloadBlob(blob: Blob, filename: string) {
   const url = URL.createObjectURL(blob);
@@ -13,7 +13,7 @@ function downloadBlob(blob: Blob, filename: string) {
   URL.revokeObjectURL(url);
 }
 
-export async function downloadSlides(markdownText: string, config: SlideConfig) {
+export async function downloadSlides(markdownText: string, config: ConfigState) {
   if (!markdownText.trim()) {
     alert("Nothing to download!");
     return;
@@ -28,7 +28,7 @@ export async function downloadMd(markdownText: string) {
     alert("Nothing to download!");
     return;
   }
-  const filenameBase = getTitleFromMarkdown("markdown_document");
+  const filenameBase = getTitleFromMarkdown(markdownText);
   const blob = new Blob([markdownText], { type: "text/markdown;charset=utf-8;" });
-  downloadBlob(blob, `${filenameBase}.md`);
+  downloadBlob(blob, `${filenameBase}.mv.md`);
 }

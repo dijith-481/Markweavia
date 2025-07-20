@@ -1,11 +1,11 @@
-import { HeaderFooters } from "@/utils/layoutOptions";
+import { HeaderFootersArray } from "@/utils/layoutOptions";
 import { splitMarkdownIntoSlides } from "@/utils/markdown";
 import { getWaterMarkSlide } from "./waterMarkPage";
 import { getSlideDiv } from "./shared";
 
 export async function getAllSlideDivs(
   markdown: string,
-  headerFooters: HeaderFooters | undefined,
+  headerFooters: HeaderFootersArray,
   layoutOnFirstPage: boolean | undefined,
 ): Promise<string> {
   const markdownArray = splitMarkdownIntoSlides(markdown);
@@ -26,7 +26,7 @@ export async function getAllSlideDivs(
 
 export async function getSlidesContainer(
   markdown: string,
-  layoutConfig: HeaderFooters | undefined,
+  layoutConfig: HeaderFootersArray,
   layoutOnFirstPage: boolean | undefined,
 ) {
   const htmlArray = await getAllSlideDivs(markdown, layoutConfig, layoutOnFirstPage);
