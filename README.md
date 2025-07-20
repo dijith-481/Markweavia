@@ -41,15 +41,10 @@ Markweavia is a web-based application that transforms your Markdown text and Kat
   - Download the source Markdown (.md) file.
 - **File Upload:** Import existing Markdown files to continue your work or convert them to slides.
 - **Predefined Templates:** Quickly start with some predefined templates.
-## Examples
-- [nord Dark template](https://markweavia.vercel.app/examples/nordDark.html)
--  [nord Light template](https://markweavia.vercel.app/examples/nordLight.html)
-- [true White template](https://markweavia.vercel.app/examples/trueWhite.html)
-- [true Black template](https://markweavia.vercel.app/examples/trueBlack.html)
-
-
+- `yaml` based infile configuration
 
 <img src="https://github.com/dijith-481/Markweavia/blob/main/assets/fullWallthrough.gif" width = "48%"><img src="https://github.com/dijith-481/Markweavia/blob/main/assets/presentation.gif" width = "48%">
+
 <div align="center">
   <img src="https://github.com/dijith-481/Markweavia/blob/main/assets/editing.gif" width="50%">
 </div>
@@ -68,10 +63,10 @@ Markweavia is a web-based application that transforms your Markdown text and Kat
 ## How It Works
 
 1.  **Write Markdown:** Use standard Markdown headings (`#`, `##`) to define new slides.
-2.  **Live Preview:** As you type or navigate with your cursor, the preview pane updates to show a preview of the slide your cursor is currently on.
-3.  **Customize:** Use the controls to select themes, adjust font sizes, manage page numbers, and add custom headers or footers.
-4.  **Vim Commands:** Utilize built-in Vim commands for saving (`:w`, `:ws`) uploading (`:u`) previewing(`:p`),changing theme(`:t`), toggling page numbers(`:page`), adding headerfooters(`:h`)
-5.  **Export:** When ready, export your entire presentation as a single HTML file or save your Markdown source.
+1.  **Live Preview:** As you type or navigate with your cursor, the preview pane updates to show a preview of the slide your cursor is currently on.
+1.  **Customize:** Use the controls or yaml config to select themes, adjust font sizes, manage page numbers, and add custom headers or footers.
+1.  **Vim Commands:** Utilize built-in Vim commands for saving (`:w`, `:ws`) uploading (`:u`) previewing(`:p`),changing theme(`:t`), toggling page numbers(`:page`), adding headerfooters(`:h`)
+1.  **Export:** When ready, export your entire presentation as a single HTML file or save your Markdown source.
 
 ## Understanding Exported Slides
 
@@ -88,7 +83,7 @@ Markweavia generates a single, self-contained HTML file. This file includes all 
 - Mathematical expressions are rendered using KaTeX.
 - Custom header/footer items and page numbers are positioned absolutely within each slide based on your settings.
 - The overall presentation uses a clean, Nord-inspired design by default, with font sizes and colors determined by the selected theme and font scaling options.
-  > 2Mb file size includes code syntax highlighting , fonts and katex
+  > ~1Mb file size includes code syntax highlighting , fonts and katex
 
 > to improve performance in live preview fonts are loaded at startup , styles and text is injected based on change this improves performance compared to previous approach
 >
@@ -135,6 +130,7 @@ A comprehensive set of keyboard shortcuts is available for efficient navigation:
   <img src="https://img.shields.io/badge/VIM-019733?style=for-the-badge&logo=vim&logoColor=D8DEE9&labelColor=2E3440" alt="Vim (bindings)">
   <img src="https://img.shields.io/badge/Marked.js-333333?style=for-the-badge&logo=markdown&logoColor=D8DEE9&labelColor=2E3440" alt="Marked.js">
   <img src="https://img.shields.io/badge/Nord_Theme-88C0D0?style=for-the-badge&logoColor=2E3440&labelColor=2E3440" alt="Nord Theme">
+  <img src="https://img.shields.io/badge/js-yaml-88C0D0?style=for-the-badge&logoColor=2E3440&labelColor=2E3440" alt="Nord Theme">
 </div>
 
 - **Framework:** Next.js (with React)
@@ -153,8 +149,11 @@ A comprehensive set of keyboard shortcuts is available for efficient navigation:
 - **More Themes:** Continuously expand the selection of built-in themes.
 - **User-Loadable Custom Themes:** Allow users to define and load their own CSS theme variables or full theme files.
 - **Css editing:** Allow users to edit css directly in the editor. This will allow users to customize slides in a more granular way.
+- **yaml based config:** Allow users to define their own yaml config file and load it in the editor.
+- **library** convert codebase to library
 
 ## Mobile view
+
 <table style="width:50%;">
   <tr>
     <td>

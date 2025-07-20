@@ -20,7 +20,7 @@ export async function downloadSlides(markdownText: string, config: ConfigState) 
   }
   const { html, title } = await generateSlides(markdownText, config);
   const blob = new Blob([html], { type: "text/html;charset=utf-8;" });
-  downloadBlob(blob, `${title}.html`);
+  downloadBlob(blob, `${title.toLocaleLowerCase()}.mv.html`);
 }
 
 export async function downloadMd(markdownText: string) {

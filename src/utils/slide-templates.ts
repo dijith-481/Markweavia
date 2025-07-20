@@ -285,7 +285,7 @@ layoutOnFirstPage: true
 headerFooters:
   top:
     left: "Markweavia"
-    center: "weaiving your slides"
+    center: "weaving your slides"
   bottom:
     right: "{pg}"
 ---
