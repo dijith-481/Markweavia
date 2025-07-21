@@ -4,7 +4,7 @@ import DropDown from "./DropDown";
 
 interface DropDownButtonProps {
   color?: string;
-  options: Record<any, string>;
+  options: Record<string, string>;
   onSelect: (option: string) => void;
   selectedOption?: string;
   children: React.ReactNode;

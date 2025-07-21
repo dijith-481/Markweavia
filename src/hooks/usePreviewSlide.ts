@@ -1,17 +1,14 @@
 import { useState, useEffect } from "react";
 import { useSlideContext } from "@/context/slideContext";
-import {
-  exportSingleSlideToHtmlbody,
-  exportSingleSlideToHtml,
-  generateFontSizesCss,
-  generateThemeCss,
-} from "@/utils/export-utils";
-import { themes } from "@/utils/themes";
+import { getAllSlideDivs } from "@/utils/slides/html/slides";
+import { getFontSizeCss, getThemeCss } from "@/utils/slides/css/configurable";
+import { generateSingleSlide, getSingleSlideDiv } from "@/utils/slides";
+import useConfig from "./useConfig";
 
 export function usePreviewSlide(iframeRef: React.RefObject<HTMLIFrameElement | null>) {
   const [previewHtml, setPreviewHtml] = useState<string>("");
-  const { currentSlide, slideLayoutOptions, currentSlideText, fontSizeMultiplier, activeTheme } =
-    useSlideContext();
+  const config = useConfig();
+  const { currentSlide, currentSlideText, slideShowBrowserTab, markdownText } = useSlideContext();
   const [ismarkdownEmpty, setIsMarkdownEmpty] = useState(true);
   useEffect(() => {
     if (currentSlideText != null) {
@@ -23,28 +20,22 @@ export function usePreviewSlide(iframeRef: React.RefObject<HTMLIFrameElement | n
 
   useEffect(() => {
     const generatePreview = async () => {
-      const theme = themes[activeTheme as keyof typeof themes];
-      const html = await exportSingleSlideToHtml(
-        theme,
-        fontSizeMultiplier,
-        currentSlideText,
-        currentSlide,
-        slideLayoutOptions,
-      );
-
+      const { html } = await generateSingleSlide(currentSlideText, config, currentSlide);
       setPreviewHtml(html);
     };
     if (!ismarkdownEmpty) {
       generatePreview();
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [ismarkdownEmpty]);
 
   useEffect(() => {
     const generatePreview = async () => {
-      const html = await exportSingleSlideToHtmlbody(
+      const html = await getSingleSlideDiv(
         currentSlideText,
         currentSlide,
-        slideLayoutOptions,
+        config.headerFooters(),
+        config.layoutOnFirstPage(),
       );
 
       if (iframeRef.current) {
@@ -53,12 +44,27 @@ export function usePreviewSlide(iframeRef: React.RefObject<HTMLIFrameElement | n
         }
       }
     };
+    const generateFullPreview = async () => {
+      if (slideShowBrowserTab !== null) {
+        const newContent = await getAllSlideDivs(
+          markdownText,
+          config.headerFooters(),
+          config.layoutOnFirstPage(),
+        );
+        slideShowBrowserTab.postMessage(
+          { type: "slides", content: newContent, currentPageNo: currentSlide - 1 },
+          "*",
+        );
+      }
+    };
 
     generatePreview();
-  }, [currentSlideText, slideLayoutOptions]);
+    generateFullPreview();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [currentSlideText, currentSlide, config.headerFooters(), config.theme()]);
 
   useEffect(() => {
-    const css = generateFontSizesCss(fontSizeMultiplier);
+    const css = getFontSizeCss(config.fontSize());
     if (iframeRef.current) {
       if (iframeRef.current.contentWindow) {
         iframeRef.current.contentWindow.postMessage(
@@ -70,11 +76,10 @@ export function usePreviewSlide(iframeRef: React.RefObject<HTMLIFrameElement | n
         );
       }
     }
-  }, [fontSizeMultiplier]);
+  }, [iframeRef, config]);
 
   useEffect(() => {
-    const theme = themes[activeTheme as keyof typeof themes];
-    const css = generateThemeCss(theme);
+    const css = getThemeCss(config.theme());
     if (iframeRef.current) {
       if (iframeRef.current.contentWindow) {
         iframeRef.current.contentWindow.postMessage(
@@ -86,7 +91,7 @@ export function usePreviewSlide(iframeRef: React.RefObject<HTMLIFrameElement | n
         );
       }
     }
-  }, [activeTheme]);
+  }, [iframeRef, config]);
 
   return {
     previewHtml,

@@ -1,15 +1,11 @@
-import React, { useEffect } from "react";
+import React, { useCallback, useEffect } from "react";
 import { themes } from "@/utils/themes";
 import DropDownButton from "../../UI/DropDownButton";
-import { useSlideContext } from "@/context/slideContext";
 import { Vim } from "@replit/codemirror-vim";
+import useConfig from "@/hooks/useConfig";
+import { ThemeString } from "@/utils/layoutOptions";
 
 const formatThemeNameForDisplay = (themeKey: string): string => {
-  if (themeKey === "nordDark") return "Nord Dark (Default)";
-  if (themeKey === "nordLight") return "Nord Light";
-  if (themeKey === "proWhiteMonochrome") return "True White";
-  if (themeKey === "proBlackMonochrome") return "True Black";
-
   return themeKey
     .replace(/([A-Z])/g, " $1")
     .replace(/^./, (str) => str.toUpperCase())
@@ -22,24 +18,30 @@ Object.keys(themes).forEach((themeKey) => {
 });
 
 export default function ThemeSelector() {
-  const { activeTheme, setActiveTheme } = useSlideContext();
-  const changeTheme = (themeName: keyof typeof themeOptions) => {
-    setActiveTheme(themeName);
-  };
-  const nextTheme = () => {
-    const currentIndex = Object.keys(themeOptions).indexOf(activeTheme);
-    const nextIndex = (currentIndex + 1) % Object.keys(themeOptions).length;
-    changeTheme(Object.keys(themeOptions)[nextIndex]);
-  };
+  const config = useConfig();
+
+  function changeTheme(theme?: string) {
+    if (!theme) {
+      return getNextTheme();
+    }
+    config.setTheme(theme as ThemeString);
+  }
+  const getNextTheme = useCallback(() => {
+    const currentTheme = config.theme();
+    const themeNames = Object.keys(themes);
+    const currentIndex = themeNames.indexOf(currentTheme);
+    const nextIndex = (currentIndex + 1) % themeNames.length;
+    config.setTheme(themeNames[nextIndex]);
+  }, [config]);
 
   useEffect(() => {
-    Vim.defineEx("theme", "t", nextTheme);
-  }, [nextTheme]);
+    Vim.defineEx("theme", "t", getNextTheme);
+  }, [getNextTheme]);
 
   return (
     <DropDownButton
       color="bg-nord7/80 hover:bg-nord7"
-      selectedOption={activeTheme}
+      selectedOption={config.theme()}
       options={themeOptions}
       onSelect={changeTheme}
     >

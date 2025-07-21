@@ -1,5 +1,4 @@
-// FileUpload.tsx
-import React, { useRef, useCallback, forwardRef, ForwardedRef } from "react";
+import React, { useRef, useCallback, forwardRef } from "react";
 import { useSlideContext } from "@/context/slideContext";
 
 export type FileUploadHandle = { triggerFileUpload: () => void };
@@ -24,9 +23,9 @@ const handleFileUpload = (
   }
 };
 
-const FileUpload = forwardRef((_props, ref: ForwardedRef<FileUploadHandle>) => {
+const FileUpload = forwardRef<FileUploadHandle>((_props, ref) => {
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const { setMarkdownText, markdownText } = useSlideContext();
+  const { editorViewRef, markdownText } = useSlideContext();
 
   const triggerFileUpload = useCallback(() => {
     if (fileInputRef.current) {
@@ -45,11 +44,15 @@ const FileUpload = forwardRef((_props, ref: ForwardedRef<FileUploadHandle>) => {
             if (fileInputRef.current) fileInputRef.current.value = "";
             return;
           }
-          setMarkdownText(content);
+          const hashIndex = content.indexOf("# ");
+          editorViewRef.current?.dispatch({
+            changes: { from: 0, to: editorViewRef.current?.state.doc.length, insert: content },
+            selection: { anchor: hashIndex },
+          });
         }
       });
     },
-    [markdownText, setMarkdownText],
+    [markdownText, editorViewRef],
   );
 
   React.useImperativeHandle(ref, () => ({
@@ -67,5 +70,7 @@ const FileUpload = forwardRef((_props, ref: ForwardedRef<FileUploadHandle>) => {
     />
   );
 });
+
+FileUpload.displayName = "FileUpload";
 
 export default FileUpload;

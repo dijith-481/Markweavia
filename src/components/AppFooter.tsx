@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useCallback } from "react";
 import InfoPopup from "./UI/InfoPopup";
 import { useSlideContext } from "@/context/slideContext";
 import { cyclingTips } from "@/utils/cyclable-tips";
@@ -43,18 +43,21 @@ export default function AppFooter() {
     setShowWordCount((prev) => !prev);
   };
 
-  const handleClickOutside = (event: MouseEvent) => {
-    if (
-      infoPopupRef.current &&
-      infoButtonRef.current &&
-      !(
-        infoPopupRef.current.contains(event.target as Node) ||
-        infoButtonRef.current.contains(event.target as Node)
-      )
-    ) {
-      toggleInfoPopup();
-    }
-  };
+  const handleClickOutside = useCallback(
+    (event: MouseEvent) => {
+      if (
+        infoPopupRef.current &&
+        infoButtonRef.current &&
+        !(
+          infoPopupRef.current.contains(event.target as Node) ||
+          infoButtonRef.current.contains(event.target as Node)
+        )
+      ) {
+        toggleInfoPopup();
+      }
+    },
+    [infoPopupRef, infoButtonRef],
+  );
 
   useEffect(() => {
     document.addEventListener("mousedown", handleClickOutside);

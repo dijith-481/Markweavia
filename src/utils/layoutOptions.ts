@@ -1,27 +1,32 @@
-export type layoutItemPosition = (typeof headerFooterPositions)[number]["value"];
-export type layoutItemLabel = (typeof headerFooterPositions)[number]["label"];
+import { themes } from "./themes";
 
-export type HeaderFooterPosition = {
-  value: layoutItemPosition;
-  label: layoutItemLabel;
-};
+export type ThemeString = keyof typeof themes;
 
-export interface layoutItem {
-  id: string;
-  text: string;
-  position: layoutItemPosition;
+export interface HeaderFooterHorizontal {
+  left?: string;
+  center?: string;
+  right?: string;
+}
+export interface HeaderFooters {
+  top?: HeaderFooterHorizontal;
+  bottom?: HeaderFooterHorizontal;
 }
 
-export interface SlideLayoutOptions {
-  layoutOnFirstPage: boolean;
-  headerFooters: layoutItem[];
+export interface SlideConfig {
+  theme?: ThemeString;
+  fontSize?: number;
+  headerFooters?: HeaderFooters;
+  layoutOnFirstPage?: boolean;
 }
 
 export const headerFooterPositions = [
-  { value: "top-left", label: "Top Left" },
-  { value: "top-center", label: "Top Center" },
-  { value: "top-right", label: "Top Right" },
-  { value: "bottom-left", label: "Bottom Left" },
-  { value: "bottom-center", label: "Bottom Center" },
-  { value: "bottom-right", label: "Bottom Right" },
-] as const;
+  "top-left",
+  "top-center",
+  "top-right",
+  "bottom-left",
+  "bottom-center",
+  "bottom-right",
+];
+
+export type HeaderFooterPosition = (typeof headerFooterPositions)[number];
+export type HeaderFootersArray = Array<[HeaderFooterPosition, string]>;

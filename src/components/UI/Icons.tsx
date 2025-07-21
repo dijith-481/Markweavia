@@ -105,6 +105,18 @@ export const DownloadIcon = () => (
     />
   </svg>
 );
+export const SlideShow1Icon = () => (
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    height="24px"
+    viewBox="0 -960 960 960"
+    width="24px"
+    className="h-5 w-5"
+    fill="currentColor"
+  >
+    <path d="M560-360h80v-400H480v80h80v320ZM320-240q-33 0-56.5-23.5T240-320v-480q0-33 23.5-56.5T320-880h480q33 0 56.5 23.5T880-800v480q0 33-23.5 56.5T800-240H320Zm0-80h480v-480H320v480ZM160-80q-33 0-56.5-23.5T80-160v-560h80v560h560v80H160Zm160-720v480-480Z" />
+  </svg>
+);
 
 export const MarkdownIcon = () => (
   <svg
@@ -204,6 +216,17 @@ export const SlideShowIcon = () => (
   </svg>
 );
 
+export const StopCircleIcon = () => (
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    height="24px"
+    viewBox="0 -960 960 960"
+    className="h-5 w-5"
+    fill="currentColor"
+  >
+    <path d="M320-320h320v-320H320v320ZM480-80q-83 0-156-31.5T197-197q-54-54-85.5-127T80-480q0-83 31.5-156T197-763q54-54 127-85.5T480-880q83 0 156 31.5T763-763q54 54 85.5 127T880-480q0 83-31.5 156T763-197q-54 54-127 85.5T480-80Zm0-80q134 0 227-93t93-227q0-134-93-227t-227-93q-134 0-227 93t-93 227q0 134 93 227t227 93Zm0-320Z" />
+  </svg>
+);
 export const VimIcon = () => (
   <svg
     height="32"
