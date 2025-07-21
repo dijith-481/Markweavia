@@ -1,2 +1,5 @@
-export { getSlidesCss } from "./slides";
-export { getSingleSlideCss } from "./singleSlide";
+export async function createStyleTags(cssContent: Record<string, string>) {
+  return Object.entries(cssContent)
+    .map(([key, value]) => `<style class="css-${key}">${value}</style>`)
+    .join("");
+}

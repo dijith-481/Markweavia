@@ -1,27 +1,25 @@
 import { HeaderFootersArray } from "../../types";
 import { marked } from "marked";
 
-export async function getSlideDiv(
-  pageNo: number,
-  markdown: string,
-  headerFooters?: HeaderFootersArray,
-) {
-  const content = await marked.parse(markdown);
-  const layoutAdditions = headerFooters ? getLayoutAdditions(headerFooters, pageNo) : "";
-  return `
-<div  class="slide" id="slide-${pageNo}">
-          <div class="slide-content-wrapper">${content}</div>
-          ${layoutAdditions}
-        </div>
-`;
+export function createSlide(content: Promise<string>, headerFooters: string, pageNo: number) {
+  return `<div class="slide" id="slide-${pageNo}">${content}${headerFooters}</div>`;
 }
 
-function getLayoutAdditions(headerFooters: HeaderFootersArray, pageNo: number): string {
-  let layoutAdditions = "";
-  headerFooters.forEach(([pos, val]) => {
-    if (val === "{pg}") val = pageNo.toString();
-    layoutAdditions += `<div class="slide-header-footer-item pos-${pos}">${val}</div>`;
-  });
+export function createHeaderFooters(pageNo: number, headerFooters?: HeaderFootersArray): string {
+  if (!headerFooters) return "";
+  return headerFooters
+    .map(
+      ([pos, val]) =>
+        `<div class="slide-header-footer-item pos-${pos}">${val === "{pg}" ? pageNo : val}</div>`,
+    )
+    .join("");
+}
 
-  return layoutAdditions;
+export async function createSlideContentWrapper(content: Promise<string>) {
+  return `<div class="slide-content-wrapper">${content}</div>`;
+}
+
+export async function createSlideContentWrapperInnerHtml(markdown: string) {
+  const content = await marked.parse(markdown);
+  return content;
 }

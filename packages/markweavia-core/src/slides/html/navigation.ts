@@ -1,4 +1,4 @@
-export const getNavigationHtml = () => `<div class="slide-navigation">
+export const createNavigationHtml = () => `<div class="slide-navigation">
           <button id="start-slide">
             <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
               <path

@@ -26,7 +26,7 @@ export async function getSingleSlideDiv(
     }
     markdown = configIntro;
   }
-  const slideDiv = await getSlideDiv(
+  const slideDiv = await createSlideInnerHtml(
     pageNo,
     markdown,
     pageNo > 1 || layoutOnFirstPage ? headerFooters : [],
