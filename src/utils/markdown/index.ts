@@ -6,7 +6,7 @@ export function splitMarkdownIntoSlides(markdown: string): string[] {
 
   for (const line of lines) {
     const trimmedLine = line.trim();
-    const isHeading = trimmedLine.startsWith("#");
+    const isHeading = trimmedLine.startsWith("# ") || trimmedLine.startsWith("## ");
     if (isHeading) {
       if (currentSlideLines.length > 0 && hasHeadingInCurrentSlide) {
         slides.push(currentSlideLines.join("\n"));
