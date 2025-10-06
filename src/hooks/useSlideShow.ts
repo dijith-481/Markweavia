@@ -3,8 +3,13 @@ import { generateSlides } from "@/utils/slides";
 import useConfig from "./useConfig";
 
 export default function useSlideShow() {
-  const { markdownText, slideShowBrowserTab, setSlideShowBrowserTab, currentSlide } =
-    useSlideContext();
+  const {
+    markdownText,
+    slideShowBrowserTab,
+    setSlideShowBrowserTab,
+    currentSlide,
+    uploadedImages,
+  } = useSlideContext();
   const config = useConfig();
 
   function isSlideShowRunning() {
@@ -28,7 +33,7 @@ export default function useSlideShow() {
       alert("Nothing to show!");
       return;
     }
-    const { html } = await generateSlides(markdownText, config, pageNo);
+    const { html } = await generateSlides(markdownText, config, uploadedImages, pageNo);
     const htmlBlob = new Blob([html], { type: "text/html;charset=utf-8;" });
     setSlideShowBrowserTab(createAndOpenBrowserTab(htmlBlob));
   }

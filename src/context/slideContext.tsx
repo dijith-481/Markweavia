@@ -3,6 +3,11 @@ import { SlideConfig } from "../utils/layoutOptions";
 import { countWords, countLetters } from "../utils/common";
 import { EditorView } from "@codemirror/view";
 
+export interface UploadedImage {
+  name: string;
+  data: string; // Base64 data URL
+}
+
 export interface SlideContextState {
   config: SlideConfig;
   currentSlideText: string | null;
@@ -13,6 +18,7 @@ export interface SlideContextState {
   slideShowBrowserTab: Window | null;
   setSlideShowBrowserTab: React.Dispatch<React.SetStateAction<Window | null>>;
   markdownText: string;
+  uploadedImages: UploadedImage[];
 }
 
 interface SlideContextType extends SlideContextState {
@@ -21,6 +27,7 @@ interface SlideContextType extends SlideContextState {
   setCurrentSlideText: (currentSlideText: string) => void;
   setTotalSlidesNumber: (totalSlidesNumber: number) => void;
   setCurrentSlide: (currentSlide: number) => void;
+  setUploadedImages: React.Dispatch<React.SetStateAction<UploadedImage[]>>;
   editorViewRef: RefObject<EditorView | null>;
 }
 
@@ -41,6 +48,7 @@ export const SlideContextProvider: React.FC<{ children: React.ReactNode }> = ({ 
   const [totalSlidesNumber, setTotalSlidesNumber] = useState<number>(1);
   const [slideShowBrowserTab, setSlideShowBrowserTab] = useState<Window | null>(null);
   const [config, setConfig] = useState<SlideConfig>({});
+  const [uploadedImages, setUploadedImages] = useState<UploadedImage[]>([]);
   const editorViewRef = useRef<EditorView | null>(null);
 
   const words = useMemo(() => countWords(markdownText), [markdownText]);
@@ -61,6 +69,8 @@ export const SlideContextProvider: React.FC<{ children: React.ReactNode }> = ({ 
     letters,
     slideShowBrowserTab,
     setSlideShowBrowserTab,
+    uploadedImages,
+    setUploadedImages,
     editorViewRef,
   };
   return <SlideContext.Provider value={contextValue}>{children}</SlideContext.Provider>;

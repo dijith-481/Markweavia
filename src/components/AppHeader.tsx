@@ -13,7 +13,7 @@ interface AppHeaderProps {
 
 export default function AppHeader({ fileUploadRef }: AppHeaderProps) {
   const triggerFileUpload = () => fileUploadRef.current?.triggerFileUpload();
-  const { editorViewRef, markdownText } = useSlideContext();
+  const { editorViewRef, markdownText, uploadedImages } = useSlideContext();
   const config = useConfig();
 
   const [starCount, setStarCount] = useState(0);
@@ -21,7 +21,7 @@ export default function AppHeader({ fileUploadRef }: AppHeaderProps) {
   const download = (option: string) => {
     switch (option) {
       case "Slides":
-        downloadSlides(markdownText, config);
+        downloadSlides(markdownText, config, uploadedImages);
         break;
       case ".md":
         downloadMd(editorViewRef.current?.state.doc.toString() || markdownText);

@@ -2,13 +2,14 @@ import { useState, useEffect } from "react";
 import { useSlideContext } from "@/context/slideContext";
 import { getAllSlideDivs } from "@/utils/slides/html/slides";
 import { getFontSizeCss, getThemeCss } from "@/utils/slides/css/configurable";
-import { generateSingleSlide, getSingleSlideDiv } from "@/utils/slides";
+import { embedImages, generateSingleSlide, getSingleSlideDiv } from "@/utils/slides";
 import useConfig from "./useConfig";
 
 export function usePreviewSlide(iframeRef: React.RefObject<HTMLIFrameElement | null>) {
   const [previewHtml, setPreviewHtml] = useState<string>("");
   const config = useConfig();
-  const { currentSlide, currentSlideText, slideShowBrowserTab, markdownText } = useSlideContext();
+  const { currentSlide, currentSlideText, slideShowBrowserTab, markdownText, uploadedImages } =
+    useSlideContext();
   const [ismarkdownEmpty, setIsMarkdownEmpty] = useState(true);
   useEffect(() => {
     if (currentSlideText != null) {
@@ -37,10 +38,11 @@ export function usePreviewSlide(iframeRef: React.RefObject<HTMLIFrameElement | n
         config.headerFooters(),
         config.layoutOnFirstPage(),
       );
+      const finalHtml = embedImages(html, uploadedImages);
 
       if (iframeRef.current) {
         if (iframeRef.current.contentWindow) {
-          iframeRef.current.contentWindow.postMessage({ type: "body", data: html }, "*");
+          iframeRef.current.contentWindow.postMessage({ type: "body", data: finalHtml }, "*");
         }
       }
     };
@@ -51,8 +53,9 @@ export function usePreviewSlide(iframeRef: React.RefObject<HTMLIFrameElement | n
           config.headerFooters(),
           config.layoutOnFirstPage(),
         );
+        const finalHtml = embedImages(newContent, uploadedImages);
         slideShowBrowserTab.postMessage(
-          { type: "slides", content: newContent, currentPageNo: currentSlide - 1 },
+          { type: "slides", content: finalHtml, currentPageNo: currentSlide - 1 },
           "*",
         );
       }
