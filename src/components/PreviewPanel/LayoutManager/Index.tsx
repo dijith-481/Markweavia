@@ -4,6 +4,7 @@ import TemplateSelector from "@/components/PreviewPanel/LayoutManager/TemplateSe
 import FontScaler from "@/components/PreviewPanel/LayoutManager/FontScaler";
 import LayoutSettings from "@/components/PreviewPanel/LayoutManager/LayoutSettings";
 import HeaderFooterManager from "@/components/PreviewPanel/LayoutManager/HeaderFooterManager";
+import ImageManager from "@/components/PreviewPanel/LayoutManager/ImageManager";
 import ToggleExpand from "@/components/UI/ToggleExpand";
 
 interface LayoutManagerProps {
@@ -40,6 +41,7 @@ export default function LayoutManager({ isKeyboardVisible }: LayoutManagerProps)
           <LayoutSettings />
         </div>
         <HeaderFooterManager setIsEditing={setIsEditing} />
+        <ImageManager />
       </ToggleExpand>
     )
   );

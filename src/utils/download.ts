@@ -1,6 +1,7 @@
 import { getTitleFromMarkdown } from "./markdown/file-functions";
 import { generateSlides } from "./slides";
 import { ConfigState } from "@/hooks/useConfig";
+import { UploadedImage } from "@/context/slideContext";
 
 function downloadBlob(blob: Blob, filename: string) {
   const url = URL.createObjectURL(blob);
@@ -13,12 +14,16 @@ function downloadBlob(blob: Blob, filename: string) {
   URL.revokeObjectURL(url);
 }
 
-export async function downloadSlides(markdownText: string, config: ConfigState) {
+export async function downloadSlides(
+  markdownText: string,
+  config: ConfigState,
+  uploadedImages: UploadedImage[],
+) {
   if (!markdownText.trim()) {
     alert("Nothing to download!");
     return;
   }
-  const { html, title } = await generateSlides(markdownText, config);
+  const { html, title } = await generateSlides(markdownText, config, uploadedImages);
   const blob = new Blob([html], { type: "text/html;charset=utf-8;" });
   downloadBlob(blob, `${title.toLocaleLowerCase()}.mv.html`);
 }
