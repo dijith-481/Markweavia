@@ -23,6 +23,7 @@ export function useEditor(
     setMarkdownText,
     setConfig,
     editorViewRef,
+    uploadedImages,
   } = useSlideContext();
 
   const config = useConfig();
@@ -151,14 +152,14 @@ export function useEditor(
     (option: string) => {
       switch (option) {
         case "Slides":
-          downloadSlides(markdownText, config);
+          downloadSlides(markdownText, config, uploadedImages);
           break;
         case ".md":
           downloadMd(editorViewRef.current?.state.doc.toString() || markdownText);
           break;
       }
     },
-    [markdownText, config, editorViewRef],
+    [markdownText, config, editorViewRef, uploadedImages],
   );
 
   const focusCodeMirror = useCallback(() => {

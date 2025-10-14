@@ -10,6 +10,7 @@ import { getSingleSlideJs } from "./scripts";
 import { getSlidesJs } from "./scripts/slides";
 import { marked } from "marked";
 import markedKatex from "marked-katex-extension";
+import { UploadedImage } from "@/context/slideContext";
 
 export { getSingleSlideDiv } from "./html/singleSlide";
 export { getAllSlideDivs } from "./html/slides";
@@ -19,6 +20,27 @@ const options = {
 };
 
 marked.use(markedKatex(options));
+
+export function embedImages(html: string, images: UploadedImage[]): string {
+  if (!images || images.length === 0) {
+    return html;
+  }
+
+  let processedHtml = html;
+  const imageMap = new Map(images.map((i) => [i.name, i.data]));
+  const imgTagRegex = /<img[^>]+src="([^"]+)"[^>]*>/g;
+
+  processedHtml = processedHtml.replace(imgTagRegex, (match, src) => {
+    const imageName = src.split("/").pop();
+    if (imageName && imageMap.has(imageName)) {
+      const dataUrl = imageMap.get(imageName)!;
+      return match.replace(src, dataUrl);
+    }
+    return match;
+  });
+
+  return processedHtml;
+}
 
 export async function generateSingleSlide(
   markdown: string | null,
@@ -53,7 +75,12 @@ ${scripts}
   };
 }
 
-export async function generateSlides(markdown: string, config: ConfigState, pageNo = 0) {
+export async function generateSlides(
+  markdown: string,
+  config: ConfigState,
+  uploadedImages: UploadedImage[],
+  pageNo = 0,
+) {
   const title = getTitleFromMarkdown(markdown, "slides_presentation");
   const hasCode = hasCodeBlocks(markdown);
   const requiredFonts: FontName[] = [FONT];
@@ -67,8 +94,7 @@ export async function generateSlides(markdown: string, config: ConfigState, page
   const scripts = await getSlidesJs(pageNo, hasCode);
   const navigationHtml = getNavigationHtml();
 
-  return {
-    html: `
+  const finalHtml = `
   <!doctype html>
 <html lang="en">
 <head>
@@ -83,8 +109,10 @@ ${navigationHtml}
 ${scripts}
 </body>
 </html> 
+`;
 
-`,
+  return {
+    html: embedImages(finalHtml, uploadedImages),
     title,
   };
 }
